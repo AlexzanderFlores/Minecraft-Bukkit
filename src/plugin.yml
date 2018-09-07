@@ -1,0 +1,325 @@
+name: Core
+main: network.Network
+version: 1.0
+softdepend: [NPC, Votifier, EffectLib, Citizens]
+authors: [AlexzanderFlores]
+commands:
+# Global Commands
+  twitter:
+    usage: /twitter
+
+  discord:
+    usage: /discord
+
+  linkTwitter:
+    usage: /linkTwitter
+
+  tweetRank:
+    usage: /tweetRank
+
+  killAura:
+    usage: /killaura <name> [tp]
+
+  autoJoin:
+    usage: /autoJoin
+
+  defaultChatColor:
+    usage: /defaultChatColor
+
+  booster:
+    usage: /booster
+
+  colorCodes:
+    usage: /colorCodes
+
+  buy:
+    usage: /buy
+
+  coins:
+    usage: /coins [name]
+
+  elo:
+    usage: /elo [name]
+
+  getLoc:
+    usage: /getLoc
+
+  hub:
+    usage: /hub
+
+  ignore:
+    usage: /ignore <name>
+
+  join:
+    usage: /join <server name>
+
+  lag:
+    usage: /lag
+
+  lang:
+    usage: /lang
+
+  list:
+    usage: /list
+
+  msg:
+    usage: /msg <name> <message>
+    aliases: [m]
+
+  noRank:
+    usage: /noRank
+
+  ping:
+    usage: /ping [name]
+
+  r:
+    usage: /r <message>
+
+  shop:
+    usage: /shop
+
+  seen:
+    usage: /seen <name>
+
+  shout:
+    usage: /shout <message>
+
+  spawn:
+    usage: /spawn
+
+  staff:
+    usage: staff
+
+  stats:
+    usage: /stats [name]
+
+  sysTime:
+    usage: /sysTime
+
+  team:
+    usage: /team
+
+  rescatter:
+    uasge: /rescatter
+
+  report:
+    usage: /report <name> <reason>
+
+  reports:
+    usage: /reports
+
+  closeReport:
+    usage: /closeReport <id>
+
+  vote:
+    usage: /vote
+
+  versions:
+    usage: /versions
+
+# Hub Commands
+  giveKey:
+    usage: /giveKey <name> <amount> <type>
+
+# Op Only Global Commands
+  addRankedMatches:
+    usage: /addRankedMatches <name> <amount>
+
+  hubCommand:
+    usage: /hubCommand <command>
+
+  updateSupporters:
+    usage: /updateSupporters
+
+  sudo:
+    usage: /sudo <name> <command...>
+
+  repeatCommand:
+    usage: /repeatCommand <ticks> <command...>
+
+  shadowMute:
+    usage: /shadowMute <name>
+
+  addCoins:
+    usage: /addCoins <name> <game> <amount>
+
+  antiCheat:
+    usage: /antiCheat <additional arguments>
+
+  toggleSpectator:
+    usage: /toggleSpectator
+
+  sendCommand:
+    usage: /sendCommand <server> <command>
+
+  alert:
+    usage: /alert <text>
+
+  globalAlert:
+    usage: /globalAlert <text>
+
+  aa:
+    usage: /aa help
+
+  globalHubUpdate:
+    usage: /globalHubUpdate [stop]
+
+  hubAlert:
+    usage: /hubAlert <alert>
+
+  gmc:
+    usage: /gmc
+
+  gms:
+    usage: /gms
+
+  reloadImageMaps:
+    usage: /reloadImageMaps
+
+  restartServer:
+    usage: /restartServer <minutes>
+
+  restartIfEmpty:
+    usage: /restartIfEmpty [dispatch]
+
+  say:
+    usage: /say <message>
+
+  setRank:
+    usage: /setRank <name> <rank>
+
+  test:
+    usage: /test
+
+  tpPos:
+    usage: /tpPos <x> <y> <z>
+
+  win:
+   usage: /win
+
+  viewArmorStands:
+    usage: /viewArmorStands <radius>
+
+# Staff Commands
+  ban:
+    usage: /ban <name> <reason> <proof>
+
+  banData:
+    usage: /banData <name>
+
+  mute:
+    usage: /mute <name> <reason> <proof>
+
+  serverMute:
+    usage: /serverMute
+
+  badName:
+    usage: /badName <name>
+
+  s:
+    usage: /s <message>
+
+  staffHere:
+    usage: /staffHere
+
+  sm:
+    usage: /sm [tp] [name]
+
+  unban:
+    usage: /unban <name>
+
+  unMute:
+    usage: /unMute <name> <reason>
+
+# Hub Commands
+  rankTransfer:
+    usage: /rankTransfer <target>
+
+  statReset:
+    usage: /statReset
+
+  endlessParkourRespawn:
+    usage: /endlessParkourRespawn
+# Mini-Game Commands
+  grace:
+    usage: /grace <seconds>
+
+  startGame:
+    usage: /startGame
+
+  setTimer:
+    usage: /setTimer <seconds>
+
+  spec:
+    usage: /spec <name>
+
+# Building Commands
+  world:
+    usage: /world <list | import | tp | setSpawn | create | delete>
+
+  setsgspawn:
+    usage: /setsgspawn
+
+  setGameSpawn:
+    usage: /setGameSpawn [number]
+
+  copyArmorStands:
+    usage: /copyArmorStands [copy <radius>] [paste]
+
+  dom:
+    usage: /dom <addional arguments>
+
+  kitpvp:
+    usage: /kitpvp <additional arguments>
+
+  editSkyWarsMap:
+    usage: /editSkyWarsMap <Y> <N> <S> <E> <W> <Start Radius>
+
+# Worker commands
+  purchase:
+    usage: /purchase <name> <package name>
+
+# UHC commands
+  health:
+    usage: /health [name]
+    aliases: [h]
+    
+  toggleEvent:
+    usage: /toggleEvent
+    
+  info:
+    usage: /info
+    
+  sinfo:
+    usage: /sinfo
+        
+  wl:
+    usage: /wl
+        
+  bestPVE:
+    usage: /bestPVE
+        
+  scenarios:
+    usage: /scenarios
+        
+  sc:
+    usage: /sc
+        
+  teamChat:
+    usage: /teamChat
+    aliases: [tc]
+
+  addUHCGame:
+    usage: /addUHCGame <day> <hour> <started> <options> <scenarios>
+
+  uhc:
+    usage: /uhc
+
+# 1v1 Commands
+
+  battle:
+    usage: /battle <name of opponent>
+    aliases: [duel]
+
+  quit:
+    usage: /quit
