@@ -59,8 +59,8 @@ public class MapProvider implements Listener {
         spawnDistances.put(new Location(world, 700, 0, -30), new Vector(30, 0, 0));
         spawnDistances.put(new Location(world, 800, 0, -30), new Vector(0, 0, -15));
         spawnDistances.put(new Location(world, 900, 0, -30), new Vector(0, 0, -25));
-        spawnDistances.put(new Location(world, 1000, 0, -30), new Vector(20, 0, 0));
-        spawnDistances.put(new Location(world, 1100, 0, -30), new Vector(20, 0, -17));
+        spawnDistances.put(new Location(world, 1000, 0, -30), new Vector(15, 0, 0)); // Library
+        spawnDistances.put(new Location(world, 1100, 0, -30), new Vector(0, 0, -17));
 
         for(Location location : spawnDistances.keySet()) {
             Bukkit.getLogger().info(location.toString() + " - " + spawnDistances.get(location).toString());

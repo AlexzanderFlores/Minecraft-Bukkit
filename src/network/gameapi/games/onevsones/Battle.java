@@ -86,7 +86,7 @@ public class Battle implements Listener {
         if(!HotbarEditor.load(playerOne, kit)) {
         	kit.give(playerOne);
         }
-        Location locationTwo = targetLocation.clone().add(distance.getX() * -1, 7, distance.getZ() * -1);
+        Location locationTwo = targetLocation.clone().add(distance.getX() * -1, 0, distance.getZ() * -1);
         MessageHandler.sendMessage(playerOne, "To quit this battle do &e/quit");
         if(playerTwo == null) {
 //            MessageHandler.sendMessage(playerOne, "There was an odd number of players, you must wait for a match to be available");

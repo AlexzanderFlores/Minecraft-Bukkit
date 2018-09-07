@@ -37,7 +37,7 @@ public class TeamMatchHandler implements Listener {
 
     @EventHandler
     public void onInventoryItemClick(InventoryItemClickEvent event) {
-        if(event.getItemTitle().equals(name)) {
+        if(event.getInventory().getTitle().equals(name)) {
             event.setCancelled(true);
         }
     }

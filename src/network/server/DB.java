@@ -156,19 +156,17 @@ public enum DB {
 	STAFF_REPORTS_CLOSED("id INT NOT NULL AUTO_INCREMENT, uuid VARCHAR(40), date_closed VARCHAR(10), amount INT, PRIMARY KEY(id)"),
 	STAFF_COMMANDS("id INT NOT NULL AUTO_INCREMENT, uuid VARCHAR(40), time VARCHAR(25), command VARCHAR(250), PRIMARY KEY(id)");
 
-	// TODO: Move this to a config
-	public static final boolean ENABLED = false;
 	private String table = null;
 	private String keys = "";
 	private Databases database = null;
 	private static boolean displayErrors = true;
 	
 	private DB(String query) {
-		if(!ENABLED) {
-			return;
-		}
 		String databaseName = toString().split("_")[0];
 		database = Databases.valueOf(databaseName);
+		if(!database.isEnabled()) {
+			return;
+		}
 		table = toString().replace(databaseName, "");
 		table = table.substring(1, table.length()).toLowerCase();
 		String [] declarations = query.split(", ");
@@ -194,11 +192,11 @@ public enum DB {
 	}
 	
 	public Connection getConnection() {
-		return ENABLED ? this.database.getConnection() : null;
+		return database.isEnabled() ? this.database.getConnection() : null;
 	}
 	
 	public boolean isKeySet(String key, String value) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return false;
 		}
 		PreparedStatement statement = null;
@@ -220,7 +218,7 @@ public enum DB {
 	}
 	
 	public boolean isKeySet(String [] keys, String [] values) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return false;
 		}
 		PreparedStatement statement = null;
@@ -254,7 +252,7 @@ public enum DB {
 	}
 	
 	public int getInt(String key, String value, String requested) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return 0;
 		}
 		PreparedStatement statement = null;
@@ -278,7 +276,7 @@ public enum DB {
 	}
 	
 	public int getInt(String [] keys, String [] values, String requested) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return 0;
 		}
 		PreparedStatement statement = null;
@@ -306,7 +304,7 @@ public enum DB {
 	}
 	
 	public void updateInt(String set, int update, String key, String value) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return;
 		}
 		PreparedStatement statement = null;
@@ -325,7 +323,7 @@ public enum DB {
 	}
 	
 	public void updateInt(String set, int update, String [] keys, String [] values) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return;
 		}
 		PreparedStatement statement = null;
@@ -348,7 +346,7 @@ public enum DB {
 	}
 	
 	public void updateDouble(String set, double update, String key, String value) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return;
 		}
 		PreparedStatement statement = null;
@@ -367,7 +365,7 @@ public enum DB {
 	}
 	
 	public void updateBoolean(String set, boolean update, String key, String value) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return;
 		}
 		PreparedStatement statement = null;
@@ -386,7 +384,7 @@ public enum DB {
 	}
 	
 	public String getString(String key, String value, String requested) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return "";
 		}
 		PreparedStatement statement = null;
@@ -410,7 +408,7 @@ public enum DB {
 	}
 	
 	public String getString(String [] keys, String [] values, String requested) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return "";
 		}
 		PreparedStatement statement = null;
@@ -442,7 +440,7 @@ public enum DB {
 	}
 	
 	public List<String> getAllStrings(String requested, String key, String value) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return new ArrayList<>();
 		}
 		List<String> results = new ArrayList<String>();
@@ -471,7 +469,7 @@ public enum DB {
 	}
 	
 	public List<String> getAllStrings(String colum, String [] keys, String [] values) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return new ArrayList<>();
 		}
 		List<String> results = new ArrayList<String>();
@@ -500,7 +498,7 @@ public enum DB {
 	}
 
 	public List<String> getAllStrings(String colum, String key, String value, String limit) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return new ArrayList<>();
 		}
 		List<String> results = new ArrayList<String>();
@@ -530,7 +528,7 @@ public enum DB {
 	}
 	
 	public void updateString(String set, String update, String key, String value) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return;
 		}
 		PreparedStatement statement = null;
@@ -549,7 +547,7 @@ public enum DB {
 	}
 	
 	public void updateString(String set, String update, String [] keys, String [] values) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return;
 		}
 		PreparedStatement statement = null;
@@ -572,7 +570,7 @@ public enum DB {
 	}
 	
 	public boolean getBoolean(String key, String value, String requested) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return false;
 		}
 		PreparedStatement statement = null;
@@ -594,7 +592,7 @@ public enum DB {
 	}
 	
 	public int getSize() {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return 0;
 		}
 		PreparedStatement statement = null;
@@ -618,7 +616,7 @@ public enum DB {
 	}
 	
 	public int getSize(String key, String value) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return 0;
 		}
 		PreparedStatement statement = null;
@@ -642,7 +640,7 @@ public enum DB {
 	}
 	
 	public int getSize(String [] keys, String [] values) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return 0;
 		}
 		PreparedStatement statement = null;
@@ -674,7 +672,7 @@ public enum DB {
 	}
 	
 	public List<String> getOrdered(String orderBy, String requested, String key, String value, long limit, boolean descending) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return new ArrayList<>();
 		}
 		List<String> results = new ArrayList<String>();
@@ -706,7 +704,7 @@ public enum DB {
 	}
 	
 	public List<String> getOrdered(String orderBy, String requested, int limit, boolean descending) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return new ArrayList<>();
 		}
 		List<String> results = new ArrayList<String>();
@@ -734,14 +732,14 @@ public enum DB {
 	}
 	
 	public List<String> getOrdered(String orderBy, String requested, int [] limit) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return new ArrayList<>();
 		}
 		return getOrdered(orderBy, requested, limit, false);
 	}
 	
 	public List<String> getOrdered(String orderBy, String requested, int [] limit, boolean descending) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return new ArrayList<>();
 		}
 		List<String> results = new ArrayList<String>();
@@ -769,7 +767,7 @@ public enum DB {
 	}
 	
 	public void delete(String key, String value) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return;
 		}
 		PreparedStatement statement = null;
@@ -788,7 +786,7 @@ public enum DB {
 	}
 	
 	public void delete(String [] keys, String [] values) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return;
 		}
 		PreparedStatement statement = null;
@@ -819,7 +817,7 @@ public enum DB {
 	}
 	
 	public void deleteAll() {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return;
 		}
 		PreparedStatement statement = null;
@@ -838,7 +836,7 @@ public enum DB {
 	}
 	
 	public boolean insert(String values) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return false;
 		}
 		PreparedStatement statement = null;
@@ -861,7 +859,7 @@ public enum DB {
 	}
 	
 	public boolean execute(String sql) {
-		if(!ENABLED) {
+		if(!database.isEnabled()) {
 			return false;
 		}
 		PreparedStatement statement = null;
@@ -918,9 +916,10 @@ public enum DB {
 		PLAYERS, NETWORK, HUB, STAFF;
 		
 		private Connection connection = null;
+		private static boolean enabled = true;
 		
 		public void connect() {
-			if(!ENABLED) {
+			if(!isEnabled()) {
 				return;
 			}
 			try {
@@ -938,11 +937,16 @@ public enum DB {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace();
+				enabled = false;
 			}
 		}
 		
 		public Connection getConnection() {
 			return this.connection;
+		}
+		
+		public boolean isEnabled() {
+			return this.enabled;
 		}
 		
 		public void disconnect() {

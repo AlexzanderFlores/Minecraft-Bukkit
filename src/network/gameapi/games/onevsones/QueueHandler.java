@@ -95,11 +95,13 @@ public class QueueHandler implements Listener {
     }
 
     private void processQueue(boolean priority) {
-        new AsyncDelayedTask(new Runnable() {
+        new DelayedTask(new Runnable() {
             @Override
             public void run() {
             	for(QueueData data : queueData) {
+                    Bukkit.getLogger().info("data = " + data.getPlayer());
         			for(QueueData comparingData : queueData) {
+                        Bukkit.getLogger().info("compare data = " + data.getForcedPlayer());
                         if((data.isPrioirty() == priority || comparingData.isPrioirty() == priority) && data.canJoin(comparingData) && data.isRanked() == comparingData.isRanked()) {
                         	Player playerOne;
                             Player playerTwo;
@@ -180,6 +182,7 @@ public class QueueHandler implements Listener {
         private int counter = 0;
 
         public QueueData(Player player, Player playerTwo, boolean ranked, OneVsOneKit kit) {
+            Bukkit.broadcastMessage(player.getName() + " has joined the queue for " + kit.getName() + " (Size = " + queueData.size() + ")");
             if(Ranks.VIP.hasRank(player) || Ranks.VIP.hasRank(playerTwo)) {
                 priority = true;
             }
@@ -190,8 +193,8 @@ public class QueueHandler implements Listener {
             this.ranked = ranked;
             this.kit = kit;
             queueData.add(this);
-            remove(player);
-            new MapProvider(player, null, player.getWorld(), false, true);
+//            remove(player);
+//            new MapProvider(player, null, player.getWorld(), false, true);
         }
 
         public boolean canJoin(QueueData data) {

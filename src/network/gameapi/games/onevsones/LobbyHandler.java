@@ -225,7 +225,6 @@ public class LobbyHandler implements Listener {
     @EventHandler
     public void onMouseClick(MouseClickEvent event) {
         Player player = event.getPlayer();
-        MessageHandler.sendMessage(player, "Is in lobby = " + isInLobby(player));
         if(isInLobby(player)) {
             ItemStack item = player.getItemInHand();
             if(item.equals(rankedQueue)) {

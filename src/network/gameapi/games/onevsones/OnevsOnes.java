@@ -108,7 +108,7 @@ public class OnevsOnes extends ProPlugin {
         		String playerCount = "&b" + size + " &7/&b " + Network.getMaxPlayers();
         		if(!oldPlayerCount.equals(playerCount)) {
         			oldPlayerCount = playerCount;
-        			removeScore(14);
+        			removeScore(8);
         		}
 
 				setText(new String [] {

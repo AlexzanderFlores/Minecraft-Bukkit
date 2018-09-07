@@ -71,8 +71,8 @@ public class BattleHandler implements Listener {
                             Player competitor = battle.getCompetitor(player);
                             if(competitor != null) {
                                 MessageHandler.sendMessage(competitor, "You were given a kill for your opponent quiting");
-                                StatsHandler.addKill(competitor);
-                                StatsHandler.addDeath(player);
+//                                StatsHandler.addKill(competitor);
+//                                StatsHandler.addDeath(player);
                             }
                             battle.end(player);
                         }

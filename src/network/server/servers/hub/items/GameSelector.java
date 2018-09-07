@@ -99,6 +99,9 @@ public class GameSelector extends HubItemBase {
 			} else if(item.getType() == Material.IRON_SWORD) {
 				player.closeInventory();
 				ProPlugin.sendPlayerToServer(player, "kitpvp1");
+			} else if(item.getType() == Material.FISHING_ROD) {
+				player.closeInventory();
+				ProPlugin.sendPlayerToServer(player, "1v1s1");
 			} else {
 				for(Plugins plugin : Plugins.values()) {
 					if(itemSlots.containsKey(plugin) && itemSlots.get(plugin) == event.getSlot()) {
@@ -167,7 +170,7 @@ public class GameSelector extends HubItemBase {
 		new AsyncDelayedTask(new Runnable() {
 			@Override
 			public void run() {
-				if(!DB.ENABLED) {
+				if(!Databases.NETWORK.isEnabled()) {
 					return;
 				}
 				ResultSet resultSet = null;
