@@ -62,6 +62,7 @@ public class Battle implements Listener {
         this.targetLocation = newTargetLocation;
         this.tournament = tournament;
         this.ranked = ranked;
+
         BattleHandler.addPlayerBattle(playerOne, this);
         if(playerTwo != null) {
             BattleHandler.addPlayerBattle(playerTwo, this);
@@ -69,11 +70,13 @@ public class Battle implements Listener {
         playerOne.getInventory().remove(Material.SLIME_BALL);
         playerOne.getInventory().remove(Material.MAGMA_CREAM);
 
-        Bukkit.getLogger().info(targetLocation.toString());
-        Vector distance = MapProvider.spawnDistances.get(targetLocation.toVector());
-        targetLocation.setY(18);
+        Location firstMap = targetLocation.clone();
+        firstMap.setZ(-30);
+        Bukkit.getLogger().info(firstMap.toString());
+        Vector distance = MapProvider.spawnDistances.get(firstMap);
+        targetLocation.setY(15);
 
-        Location locationOne = targetLocation.clone().add(distance.getX(), 7, distance.getZ());
+        Location locationOne = targetLocation.clone().add(distance.getX() + .5, 0, distance.getZ() + .5);
         playerOne.teleport(locationOne);
         for(PotionEffect effect : playerOne.getActivePotionEffects()) {
             playerOne.removePotionEffect(effect.getType());

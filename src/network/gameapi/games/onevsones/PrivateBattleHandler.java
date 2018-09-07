@@ -65,18 +65,25 @@ public class PrivateBattleHandler implements Listener {
                         if(hasChallengedPlayer(clicker, clicked)) {
                             MessageHandler.sendMessage(clicked, AccountHandler.getPrefix(clicker) + " &6has accepted your battle request");
                             MessageHandler.sendMessage(clicker, "&aYou have accepted " + AccountHandler.getPrefix(clicked) + "&6's battle request");
-                            QueueHandler.remove(clicker);
-                            QueueHandler.remove(clicked);
+
+                            QueueHandler.remove(clicker, true);
+                            QueueHandler.remove(clicked, true);
+
                             ProPlugin.resetPlayer(clicked);
                             ProPlugin.resetPlayer(clicker);
+
                             getInvite(clicked, clicker).getKit().give(clicked);
                             getInvite(clicked, clicker).getKit().give(clicker);
+
                             removeAllInvitesFromPlayer(clicker);
                             removeAllInvitesFromPlayer(clicked);
+
                             battleRequests.remove(clicked.getName());
                             battleRequests.remove(clicker.getName());
-                            final String clickedName = clicked.getName();
-                            final String clickerName = clicker.getName();
+
+                            String clickedName = clicked.getName();
+                            String clickerName = clicker.getName();
+
                             new DelayedTask(new Runnable() {
                                 @Override
                                 public void run() {
@@ -92,7 +99,8 @@ public class PrivateBattleHandler implements Listener {
                             return true;
                         }
                     }
-                    QueueHandler.remove(clicker);
+
+                    QueueHandler.remove(clicker, true);
                     LobbyHandler.openKitSelection(clicker);
                     choosingMatchType.add(clicker.getName());
                     sendingTo.put(clicker.getName(), clicked.getName());
@@ -109,6 +117,7 @@ public class PrivateBattleHandler implements Listener {
         if(challenged == null) {
             return true;
         }
+
         if(battleRequests.containsKey(challenged.getName())) {
             for(PrivateBattle request : battleRequests.get(challenged.getName())) {
                 if(request.getChallenger().getName().equals(challenger.getName())) {
@@ -141,6 +150,7 @@ public class PrivateBattleHandler implements Listener {
                 }
             }
         }
+
         for(String name : names) {
             battleRequests.get(name).remove(getInvite(toRemove, ProPlugin.getPlayer(name)));
         }

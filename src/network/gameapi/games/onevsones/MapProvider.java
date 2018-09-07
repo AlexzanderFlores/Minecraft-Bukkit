@@ -45,6 +45,7 @@ public class MapProvider implements Listener {
                 Location location = mapCheckBlock.getLocation();
                 location.setY(0);
                 maps.put(location, false);
+                Bukkit.getLogger().info(location.toString());
                 ++numberOfMaps;
                 z -= 100;
             }
@@ -60,6 +61,10 @@ public class MapProvider implements Listener {
         spawnDistances.put(new Location(world, 900, 0, -30), new Vector(0, 0, -25));
         spawnDistances.put(new Location(world, 1000, 0, -30), new Vector(20, 0, 0));
         spawnDistances.put(new Location(world, 1100, 0, -30), new Vector(20, 0, -17));
+
+        for(Location location : spawnDistances.keySet()) {
+            Bukkit.getLogger().info(location.toString() + " - " + spawnDistances.get(location).toString());
+        }
 
 //        do {
 //        	mapCheckBlock = world.getBlockAt(382, 4, z);

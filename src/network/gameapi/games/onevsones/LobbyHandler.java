@@ -45,11 +45,13 @@ public class LobbyHandler implements Listener {
 	private static ItemStack rankedQueue = null;
     private static List<String> disabledRequests = null;
     private static List<String> watching = null;
+    private static String kitSelectionname = null;
 
     public LobbyHandler() {
     	rankedQueue = new ItemCreator(Material.ARROW).setName("&aKit Selector").getItemStack();
         disabledRequests = new ArrayList<String>();
         watching = new ArrayList<String>();
+        kitSelectionname = "Kit Selection";
         EventUtil.register(this);
     }
 
@@ -97,20 +99,20 @@ public class LobbyHandler implements Listener {
 
     public static Inventory getKitSelectorInventory(Player player, String name, boolean showUsers) {
         Inventory inventory = Bukkit.createInventory(player, 9, name);
-        List<OneVsOneKit> kits = OneVsOneKit.getKits();
-        for(int a = 0; a < kits.size(); ++a) {
-            OneVsOneKit kit = kits.get(a);
+
+        for(OneVsOneKit kit : OneVsOneKit.getKits()) {
             if(showUsers) {
-                inventory.setItem(a, new ItemCreator(kit.getIcon().clone()).setAmount(kit.getUsers()).getItemStack());
+                inventory.addItem(new ItemCreator(kit.getIcon().clone()).setAmount(kit.getUsers()).getItemStack());
             } else {
-                inventory.setItem(a, new ItemCreator(kit.getIcon().clone()).setAmount(1).getItemStack());
+                inventory.addItem(new ItemCreator(kit.getIcon().clone()).setAmount(1).getItemStack());
             }
         }
+
         return inventory;
     }
 
     public static void openKitSelection(Player player) {
-        player.openInventory(getKitSelectorInventory(player, "Kit Selection", true));
+        player.openInventory(getKitSelectorInventory(player, kitSelectionname, true));
         watching.add(player.getName());
     }
 
@@ -158,14 +160,15 @@ public class LobbyHandler implements Listener {
     @EventHandler
     public void onInventoryItemClick(InventoryItemClickEvent event) {
     	Player player = event.getPlayer();
-        if(event.getTitle().equals("Kit Selection") && !PrivateBattleHandler.choosingMapType(event.getPlayer())) {
+        if(event.getTitle().equals(kitSelectionname) && !PrivateBattleHandler.choosingMapType(event.getPlayer())) {
             event.setCancelled(true);
             player.closeInventory();
             OneVsOneKit kit = OneVsOneKit.getKit(event.getItem());
             if(kit == null) {
                 MessageHandler.sendMessage(player, "&cAn error occured when selecting kit, please try again");
             } else {
-            	run(kit, player);
+                QueueHandler.add(player, kit);
+                EffectUtil.playSound(player, Sound.NOTE_PLING);
             }
         } else if(event.getTitle().equals("Request a Battle")) {
             final String name = event.getItem().getItemMeta().getDisplayName();
@@ -189,10 +192,10 @@ public class LobbyHandler implements Listener {
         }
     }
     
-    private void run(OneVsOneKit kit, Player player) {
-        QueueHandler.add(player, kit);
-        EffectUtil.playSound(player, Sound.NOTE_PLING);
-    }
+//    private void run(OneVsOneKit kit, Player player) {
+//        QueueHandler.add(player, kit);
+//        EffectUtil.playSound(player, Sound.NOTE_PLING);
+//    }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
@@ -222,6 +225,7 @@ public class LobbyHandler implements Listener {
     @EventHandler
     public void onMouseClick(MouseClickEvent event) {
         Player player = event.getPlayer();
+        MessageHandler.sendMessage(player, "Is in lobby = " + isInLobby(player));
         if(isInLobby(player)) {
             ItemStack item = player.getItemInHand();
             if(item.equals(rankedQueue)) {
@@ -238,8 +242,7 @@ public class LobbyHandler implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        spawn(player);
+        spawn(event.getPlayer());
     }
 
     @EventHandler
@@ -250,7 +253,7 @@ public class LobbyHandler implements Listener {
     @EventHandler
     public void onPlayerSpectator(PlayerSpectatorEvent event) {
     	if(event.getState() == SpectatorState.END) {
-    		final Player player = event.getPlayer();
+    		Player player = event.getPlayer();
             new DelayedTask(new Runnable() {
                 @Override
                 public void run() {

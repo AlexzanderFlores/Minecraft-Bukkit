@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 
@@ -30,45 +31,53 @@ public class MonthlyTournaments implements Listener {
         name = "Monthly Tournaments";
         players = new ArrayList<>();
 
-        new NPCEntity(EntityType.ZOMBIE, "&e&n" + name, location, Material.DIAMOND) {
+        new NPCEntity(EntityType.SQUID, "&e&n" + name + "&c (Coming Soon)", location, Material.DIAMOND) {
             @Override
             public void onInteract(Player player) {
-                Inventory inventory = Bukkit.createInventory(player, 9 * 6, name);
-
-                inventory.setItem(38, new ItemCreator(Material.WOOL, DyeColor.LIME.getData())
-                        .setName("&eJoin Monthly Tournament")
-                        .addLore("")
-                        .addLore("&bDifferent ways to enter:")
-                        .addLore("   &e- Diamond Rank (Top " + EloRanking.EloRank.DIAMOND.getPercentRange() + " players)")
-                        .addLore("   &e- Tournament Ticket &b/buy")
-                        .addLore("")
-                        .addLore("&b1st Place:")
-                        .addLore("   &e$20 via PayPal")
-                        .addLore("   &e$20 Store Credit")
-                        .addLore("   &e100 Ranked Matches")
-                        .addLore("").getItemStack());
-
-                inventory.setItem(40, new ItemCreator(Material.WATCH)
-                        .setName("&eQueuing")
-                        .addLore("")
-                        .addLore("&eMonthly Tournaments are ran on the")
-                        .addLore("&e1st Saturday of each month at 3PM PST")
-                        .addLore("").getItemStack());
-
-                inventory.setItem(42, new ItemCreator(Material.WOOL, DyeColor.RED.getData())
-                        .setName("&cLeave Tournament")
-                        .addLore("")
-                        .addLore("&bThis will remove you from the")
-                        .addLore("&bcurrent tournament queue")
-                        .addLore("").getItemStack());
-
-                player.openInventory(inventory);
-
-                setPlayerHeads(player);
+                MessageHandler.sendMessage(player, "&cThese will be released once we have a larger player base.");
+//                Inventory inventory = Bukkit.createInventory(player, 9 * 6, name);
+//
+//                inventory.setItem(38, new ItemCreator(Material.WOOL, DyeColor.LIME.getData())
+//                        .setName("&eJoin Monthly Tournament")
+//                        .addLore("")
+//                        .addLore("&bDifferent ways to enter:")
+//                        .addLore("   &e- Diamond Rank (Top " + EloRanking.EloRank.DIAMOND.getPercentRange() + " players)")
+//                        .addLore("   &e- Tournament Ticket &b/buy")
+//                        .addLore("")
+//                        .addLore("&b1st Place:")
+//                        .addLore("   &e$20 via PayPal")
+//                        .addLore("   &e$20 Store Credit")
+//                        .addLore("   &e100 Ranked Matches")
+//                        .addLore("").getItemStack());
+//
+//                inventory.setItem(40, new ItemCreator(Material.WATCH)
+//                        .setName("&eQueuing")
+//                        .addLore("")
+//                        .addLore("&eMonthly Tournaments are ran on the")
+//                        .addLore("&e1st Saturday of each month at 3PM PST")
+//                        .addLore("").getItemStack());
+//
+//                inventory.setItem(42, new ItemCreator(Material.WOOL, DyeColor.RED.getData())
+//                        .setName("&cLeave Tournament")
+//                        .addLore("")
+//                        .addLore("&bThis will remove you from the")
+//                        .addLore("&bcurrent tournament queue")
+//                        .addLore("").getItemStack());
+//
+//                player.openInventory(inventory);
+//
+//                setPlayerHeads(player);
             }
         };
 
         EventUtil.register(this);
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if(event.getEntityType() == EntityType.SQUID) {
+            event.setCancelled(true);
+        }
     }
 
     private void setPlayerHeads(Player player) {

@@ -38,7 +38,7 @@ public class QueueHandler implements Listener {
     public static void add(Player player, OneVsOneKit kit) {
         remove(player);
         PrivateBattleHandler.removeAllInvitesFromPlayer(player);
-        final boolean ranked = RankedHandler.getMatches(player) > 0;
+        boolean ranked = RankedHandler.getMatches(player) > 0;
         new TitleDisplayer(player, "&e" + kit.getName(), ranked ? "&cRanked Queue" : "&cUnranked Queue &b/vote").display();
         MessageHandler.sendMessage(player, "&e" + kit.getName() + (ranked ? " &cRanked Queue" : " &cUnranked Queue &b/vote"));
         OneVsOneKit.givePlayersKit(player, kit);
@@ -56,22 +56,23 @@ public class QueueHandler implements Listener {
     }
 
     public static void remove(Player player) {
+        remove(player, false);
+    }
+
+    public static void remove(Player player, boolean message) {
         try {
         	Iterator<QueueData> iterator = queueData.iterator();
             while(iterator.hasNext()) {
                 if(iterator.next().getPlayer().equals(player.getName())) {
                     iterator.remove();
-                    MessageHandler.sendMessage(player, "Removed you from your last game search");
+                    if(message) {
+                        MessageHandler.sendMessage(player, "&cYou were removed from the match queue");
+                    }
                     break;
                 }
             }
         } catch(Exception e) {
         	e.printStackTrace();
-        	for(Player online : Bukkit.getOnlinePlayers()) {
-        		if(Ranks.isStaff(online)) {
-        			MessageHandler.sendMessage(online, "&c&lPLEASE TELL LEET OR PAUL THAT AN EXCEPTION OCCURED FROM QUEUEHANDLER.JAVA (&7" + e.getMessage() + "&c&l)");
-        		}
-        	}
         }
         waitingForMap.remove(player.getName());
     }
@@ -93,15 +94,16 @@ public class QueueHandler implements Listener {
         waitingForMap.remove(player.getName());
     }
 
-    private void processQueue(final boolean priority) {
+    private void processQueue(boolean priority) {
         new AsyncDelayedTask(new Runnable() {
             @Override
             public void run() {
-            	for(final QueueData data : queueData) {
-        			for(final QueueData comparingData : queueData) {
+            	for(QueueData data : queueData) {
+        			for(QueueData comparingData : queueData) {
                         if((data.isPrioirty() == priority || comparingData.isPrioirty() == priority) && data.canJoin(comparingData) && data.isRanked() == comparingData.isRanked()) {
-                        	final Player playerOne;
-                            final Player playerTwo;
+                        	Player playerOne;
+                            Player playerTwo;
+
                             if(data.getForcedPlayer() != null && comparingData.getForcedPlayer() != null) {
                                 playerOne = ProPlugin.getPlayer(data.getPlayer());
                                 playerTwo = ProPlugin.getPlayer(comparingData.getForcedPlayer());
@@ -111,18 +113,15 @@ public class QueueHandler implements Listener {
                                 playerOne = ProPlugin.getPlayer(data.getPlayer());
                                 playerTwo = ProPlugin.getPlayer(comparingData.getPlayer());
                             }
+
                             remove(playerOne);
                             remove(playerTwo);
+
                             waitingForMap.add(playerOne.getName());
                             waitingForMap.add(playerTwo.getName());
-                            new DelayedTask(new Runnable() {
-                                @Override
-                                public void run() {
-                                	queueData.remove(data);
-                                	queueData.remove(comparingData);
-                                    new MapProvider(playerOne, playerTwo, playerOne.getWorld(), false, true);
-                                }
-                            });
+
+                            new MapProvider(playerOne, playerTwo, playerOne.getWorld(), false, true);
+
                             return;
                         }
             		}	
@@ -156,7 +155,7 @@ public class QueueHandler implements Listener {
     @EventHandler
     public void onPlayerSpectator(PlayerSpectatorEvent event) {
     	if(event.getState() == SpectatorState.ADDED) {
-    		remove(event.getPlayer());
+    		remove(event.getPlayer(), true);
     	}
     }
 
@@ -191,6 +190,7 @@ public class QueueHandler implements Listener {
             this.ranked = ranked;
             this.kit = kit;
             queueData.add(this);
+            remove(player);
             new MapProvider(player, null, player.getWorld(), false, true);
         }
 
