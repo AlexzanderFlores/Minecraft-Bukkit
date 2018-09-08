@@ -183,7 +183,7 @@ public class BattleHandler implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         if(event.getItemDrop().getItemStack().getType() == Material.POTION) {
             event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
