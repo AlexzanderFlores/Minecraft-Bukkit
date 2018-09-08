@@ -306,7 +306,7 @@ public class Battle implements Listener {
                     }
                     TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(event.getBlock().getLocation().add(0, 1, 0), EntityType.PRIMED_TNT);
                     tnt.setFuseTicks(tnt.getFuseTicks() / 2);
-                } else if(type == Material.FIRE || type == Material.COBBLESTONE || type == Material.LAVA_BUCKET || type == Material.WATER_BUCKET) {
+                } else if(type == Material.FIRE || type == Material.COBBLESTONE) {
                     if(!placedBlocks.contains(event.getBlock())) {
                         placedBlocks.add(event.getBlock());
                     }

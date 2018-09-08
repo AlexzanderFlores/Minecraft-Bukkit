@@ -5,6 +5,9 @@ softdepend: [NPC, Votifier, EffectLib, Citizens]
 authors: [AlexzanderFlores]
 commands:
 # Global Commands
+  testDist:
+    usage: /testDist <x1> <z1> <x2> <z2>
+
   twitter:
     usage: /twitter
 

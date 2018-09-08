@@ -16,7 +16,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -29,6 +31,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +44,7 @@ public class BattleHandler implements Listener {
     private static Map<String, Battle> playerBattles = null;
     private static Map<Location, Integer> mapCoords = null; // <target X, map number>
     private static Map<String, List<Block>> playersPlaced = null;
+    private static Map<String, List<Entity>> spawnedEntities = null;
     private final BlockFace [] faces = new BlockFace [] {
         BlockFace.SELF, BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH,
         BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST
@@ -51,6 +55,7 @@ public class BattleHandler implements Listener {
         playerBattles = new HashMap<String, Battle>();
         mapCoords = new HashMap<Location, Integer>();
         playersPlaced = new HashMap<String, List<Block>>();
+        spawnedEntities = new HashMap<String, List<Entity>>();
         if(Network.getPlugin() == Plugins.ONEVSONE) {
             new CommandBase("quit", true) {
                 @Override
@@ -159,7 +164,15 @@ public class BattleHandler implements Listener {
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
         if(event.getEntity() instanceof Arrow) {
-            event.getEntity().remove();
+            Arrow arrow = (Arrow) event.getEntity();
+            ProjectileSource projectileSource = arrow.getShooter();
+            if(projectileSource instanceof Player) {
+                Player shooter = (Player) projectileSource;
+                Battle battle = getBattle(shooter);
+                if(battle != null) {
+                    addEntity(shooter, arrow);
+                }
+            }
         }
     }
 
@@ -175,25 +188,17 @@ public class BattleHandler implements Listener {
         if(event.getItemDrop().getItemStack().getType() == Material.POTION) {
             event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
         }
+        event.setCancelled(true);
     }
     
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
-    	if(event.getBlockClicked().getY() >= 10) {
-    		event.setCancelled(true);
-    	} else {
-    		Player player = event.getPlayer();
-        	Battle battle = getBattle(player);
-        	if(battle != null && !event.isCancelled()) {
-        		Block block = event.getBlockClicked().getRelative(event.getBlockFace());
-        		List<Block> blocks = playersPlaced.get(player.getName());
-        		if(blocks == null) {
-        			blocks = new ArrayList<Block>();
-        		}
-        		blocks.add(block);
-        		playersPlaced.put(player.getName(), blocks);
-        	}
-    	}
+        Player player = event.getPlayer();
+        Battle battle = getBattle(player);
+        if(battle != null) {
+            Block block = event.getBlockClicked().getRelative(event.getBlockFace());
+            addBlock(player, block);
+        }
     }
     
     @EventHandler
@@ -201,11 +206,21 @@ public class BattleHandler implements Listener {
     	Material type = event.getBlock().getType();
         if(type == Material.WATER || type == Material.STATIONARY_WATER || type == Material.LAVA || type == Material.STATIONARY_LAVA) {
             Block toBlock = event.getToBlock();
-            if(toBlock.getType() == Material.AIR && generatesCobble(type, toBlock)) {
-                event.setCancelled(true);
-            } else {
-                event.setCancelled(false);
+            if(toBlock.getType() == Material.AIR) {
+                Battle currentBattle = null;
+                for(Battle battle : getBattles()) {
+                    Location loc = battle.getTargetLocation();
+                    double distance = loc.distance(toBlock.getLocation());
+                    if(distance <= 60) {
+                        currentBattle = battle;
+                        break;
+                    }
+                }
+                if(currentBattle != null) {
+                    addBlock(currentBattle.getPlayers().get(0), toBlock);
+                }
             }
+            event.setCancelled(false);
         }
     }
     
@@ -214,34 +229,36 @@ public class BattleHandler implements Listener {
     	for(Player player : event.getBattle().getPlayers()) {
     		List<Block> blocks = playersPlaced.get(player.getName());
         	if(blocks != null) {
-        		int range = 5;
-        		for(Block block : blocks) {
-        			for(int x = -range; x <= range; ++x) {
-        				for(int y = -range; y <= range; ++y) {
-        					for(int z = -range; z <= range; ++z) {
-        						Block nearBlock = block.getRelative(x, y, z);
-        						Material type = nearBlock.getType();
-        						if(type == Material.WATER || type == Material.STATIONARY_WATER || type == Material.LAVA || type == Material.STATIONARY_LAVA) {
-        							nearBlock.setType(Material.AIR);
-            						nearBlock.setData((byte) 0);
-        						}
-        					}
-        				}
-        			}
-        		}
+        	    for(Block block : blocks) {
+                    block.setType(Material.AIR);
+                    block.setData((byte) 0);
+                }
         	}
+
+        	List<Entity> entities = spawnedEntities.get(player.getName());
+        	if(entities != null) {
+        	    for(Entity entity : entities) {
+        	        entity.remove();
+                }
+            }
     	}
     }
 
-    public boolean generatesCobble(Material type, Block block) {
-        Material mirrorID1 = (type == Material.WATER || type == Material.STATIONARY_WATER ? Material.LAVA : Material.WATER);
-        Material mirrorID2 = (type == Material.WATER || type == Material.STATIONARY_WATER ? Material.STATIONARY_LAVA : Material.STATIONARY_WATER);
-        for(BlockFace face : faces) {
-            Block relative = block.getRelative(face, 1);
-            if(relative.getType() == mirrorID1 || relative.getType() == mirrorID2) {
-                return true;
-            }
+    private void addBlock(Player player, Block block) {
+        List<Block> blocks = playersPlaced.get(player.getName());
+        if(blocks == null) {
+            blocks = new ArrayList<Block>();
         }
-        return false;
+        blocks.add(block);
+        playersPlaced.put(player.getName(), blocks);
+    }
+
+    private void addEntity(Player player, Entity entity) {
+        List<Entity> entities = spawnedEntities.get(player.getName());
+        if(entities == null) {
+            entities = new ArrayList<Entity>();
+        }
+        entities.add(entity);
+        spawnedEntities.put(player.getName(), entities);
     }
 }

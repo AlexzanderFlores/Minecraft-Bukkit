@@ -930,13 +930,10 @@ public enum DB {
 					String user = config.getConfig().getString("user");
 					String password = config.getConfig().getString("password");
                     String url = "jdbc:mysql://" + address + ":" + port + "/" + toString().toLowerCase();
-                    Bukkit.getLogger().info("");
-                    Bukkit.getLogger().info(url);
-                    Bukkit.getLogger().info("");
 					connection = DriverManager.getConnection(url, user, password);
 				}
 			} catch(SQLException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				enabled = false;
 			}
 		}

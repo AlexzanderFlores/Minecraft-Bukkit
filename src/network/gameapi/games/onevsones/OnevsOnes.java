@@ -11,11 +11,13 @@ import network.gameapi.competitive.EloRanking.EloRank;
 import network.gameapi.competitive.StatDisplayer;
 import network.gameapi.games.onevsones.kits.*;
 import network.gameapi.uhc.GoldenHead;
+import network.player.MessageHandler;
 import network.player.TeamScoreboardHandler;
 import network.player.account.AccountHandler.Ranks;
 import network.player.scoreboard.BelowNameHealthScoreboardUtil;
 import network.player.scoreboard.SidebarScoreboardUtil;
 import network.server.CPSDetector;
+import network.server.CommandBase;
 import network.server.DB;
 import network.server.ServerLogger;
 import network.server.tasks.DelayedTask;
@@ -23,6 +25,7 @@ import network.server.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
@@ -135,6 +138,28 @@ public class OnevsOnes extends ProPlugin {
         new NoDebuff();
         new Skywars();
         new SpeedUHC();
+
+        new CommandBase("testDist", 4,true) {
+        	@Override
+			public boolean execute(CommandSender sender, String [] arguments) {
+				int x1 = Integer.valueOf(arguments[0]);
+				int y1 = 12;
+				int z1 = Integer.valueOf(arguments[1]);
+
+				int x2 = Integer.valueOf(arguments[2]);
+				int y2 = 12;
+				int z2 = Integer.valueOf(arguments[3]);
+
+				Player player = (Player) sender;
+				World world = player.getWorld();
+
+				Location loc1 = new Location(world, x1, y1, z1);
+				Location loc2 = new Location(world, x2, y2, z2);
+
+				MessageHandler.sendMessage(player, "Distance = " + loc1.distance(loc2));
+        		return true;
+			}
+		};
 	}
 	
 	@Override
