@@ -99,9 +99,7 @@ public class QueueHandler implements Listener {
             @Override
             public void run() {
             	for(QueueData data : queueData) {
-                    Bukkit.getLogger().info("data = " + data.getPlayer());
         			for(QueueData comparingData : queueData) {
-                        Bukkit.getLogger().info("compare data = " + data.getForcedPlayer());
                         if((data.isPrioirty() == priority || comparingData.isPrioirty() == priority) && data.canJoin(comparingData) && data.isRanked() == comparingData.isRanked()) {
                         	Player playerOne;
                             Player playerTwo;
@@ -182,7 +180,6 @@ public class QueueHandler implements Listener {
         private int counter = 0;
 
         public QueueData(Player player, Player playerTwo, boolean ranked, OneVsOneKit kit) {
-            Bukkit.broadcastMessage(player.getName() + " has joined the queue for " + kit.getName() + " (Size = " + queueData.size() + ")");
             if(Ranks.VIP.hasRank(player) || Ranks.VIP.hasRank(playerTwo)) {
                 priority = true;
             }

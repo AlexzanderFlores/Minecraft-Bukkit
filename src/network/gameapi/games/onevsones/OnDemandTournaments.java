@@ -130,13 +130,11 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
                             }
                             if(!kickedPlayer) {
                                 MessageHandler.sendMessage(player, "&cThere are no default players to kick. Cannot join tournament.");
-                                player.closeInventory();
                                 event.setCancelled(true);
                                 return;
                             }
                         } else {
                             MessageHandler.sendMessage(player, "&cThis tournament is full. Join full tournaments with " + AccountHandler.Ranks.VIP.getPrefix() + "&b/buy");
-                            player.closeInventory();
                             event.setCancelled(true);
                             return;
                         }
@@ -144,7 +142,6 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
 
                     if(players.contains(player.getName())) {
                         MessageHandler.sendMessage(player, "&cYou are already in this tournament.");
-                        player.closeInventory();
                     } else {
                         players.add(player.getName().toLowerCase());
                         setPlayerHeads(player);
@@ -153,7 +150,6 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
                     if(removePlayer(player.getName())) {
                         MessageHandler.sendMessage(player, "You have left this on demand tournament.");
                     }
-                    player.closeInventory();
                 }
             }
             event.setCancelled(true);

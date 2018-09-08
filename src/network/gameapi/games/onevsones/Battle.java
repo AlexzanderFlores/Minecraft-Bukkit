@@ -19,12 +19,14 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -290,7 +292,7 @@ public class Battle implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if(contains(event.getPlayer()) && event.getBlock().getY() < 10) {
+        if(contains(event.getPlayer())/* && event.getBlock().getY() < 10*/) {
             if(isStarted()) {
                 Material type = event.getBlock().getType();
                 if(type == Material.TNT) {
@@ -304,13 +306,26 @@ public class Battle implements Listener {
                     }
                     TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(event.getBlock().getLocation().add(0, 1, 0), EntityType.PRIMED_TNT);
                     tnt.setFuseTicks(tnt.getFuseTicks() / 2);
-                } else if(type == Material.FIRE || type == Material.COBBLESTONE) {
+                } else if(type == Material.FIRE || type == Material.COBBLESTONE || type == Material.LAVA_BUCKET || type == Material.WATER_BUCKET) {
                     if(!placedBlocks.contains(event.getBlock())) {
                         placedBlocks.add(event.getBlock());
                     }
                     event.setCancelled(false);
                 }
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+        if(event.getItem().getType() == Material.POTION) {
+            new DelayedTask(new Runnable() {
+                @Override
+                public void run() {
+                    event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
+                }
+            });
+            event.setCancelled(false);
         }
     }
 
@@ -337,11 +352,12 @@ public class Battle implements Listener {
         	EnderPearl enderPearl = (EnderPearl) event.getEntity();
         	if(enderPearl.getShooter() instanceof Player) {
         		Player player = (Player) enderPearl.getShooter();
+                String name = player.getName();
+
         		if(contains(player) && getTimer() < startAt) {
         			MessageHandler.sendMessage(player, "&cCannot throw Ender Pearls at this time");
                     event.setCancelled(true);
         		} else {
-        			final String name = player.getName();
             		if(!pearlDelay.contains(name)) {
             			pearlDelay.add(name);
             			new DelayedTask(new Runnable() {
@@ -394,7 +410,7 @@ public class Battle implements Listener {
             if(contains(player)) {
                 if(isStarted()) {
                     Location to = event.getTo();
-                    if(to.getBlockY() > 7 || !player.getLocation().toVector().isInSphere(to.toVector(), 65)) {
+                    if(to.getBlockY() > 16 || !player.getLocation().toVector().isInSphere(to.toVector(), 65)) {
                         player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
                         MessageHandler.sendMessage(player, "&cCannot teleport to that location");
                         event.setCancelled(true);
