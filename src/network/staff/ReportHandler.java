@@ -245,7 +245,7 @@ public class ReportHandler implements Listener {
                                                 if(ints == null) {
                                                     ints = new ArrayList<Integer>();
                                                 }
-//                                                ints.add(id);
+//                                                ints._add(id);
                                                 reportIDs.put(target.getName(), ints);
                                             }
                                         } catch(IllegalArgumentException e) {

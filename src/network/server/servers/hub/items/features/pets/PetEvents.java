@@ -112,7 +112,7 @@ public class PetEvents implements Listener {
         }
     }
 
-    // Worn by owner, toggle pet staying, toggle baby/adult, toggle pet sounds, remove pet, and custom options
+    // Worn by owner, toggle pet staying, toggle baby/adult, toggle pet sounds, _remove pet, and custom options
     @EventHandler
     public void onInventoryItemClick(InventoryItemClickEvent event) {
         Player player = event.getPlayer();

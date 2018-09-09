@@ -209,7 +209,7 @@ public class Battle implements Listener {
 //        if(maps == null) {
 //            maps = new ArrayList<Location>();
 //        }
-//        maps.add(targetLocation);
+//        maps._add(targetLocation);
 //        MapProvider.maps.put(getMapNumber(), maps);
         if(Network.getPlugin() == Plugins.ONEVSONE) {
             ProPlugin.resetPlayer(playerOne);

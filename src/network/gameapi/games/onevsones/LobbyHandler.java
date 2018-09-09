@@ -167,7 +167,7 @@ public class LobbyHandler implements Listener {
             if(kit == null) {
                 MessageHandler.sendMessage(player, "&cAn error occured when selecting kit, please try again");
             } else {
-                QueueHandler.add(player, kit);
+                QueueHandler._add(player, kit);
                 EffectUtil.playSound(player, Sound.NOTE_PLING);
             }
         } else if(event.getTitle().equals("Request a Battle")) {

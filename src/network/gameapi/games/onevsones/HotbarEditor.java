@@ -49,8 +49,8 @@ public class HotbarEditor implements Listener {
     }
 
     public static void open(Player player, OneVsOneKit kit) {
-    	if(QueueHandler.isInQueue(player) || QueueHandler.isWaitingForMap(player)) {
-            QueueHandler.remove(player, true);
+    	if(QueueHandler._isInQueue(player) || QueueHandler._isWaitingForMap(player)) {
+            QueueHandler._remove(player, true);
         }
     	PrivateBattleHandler.removeAllInvitesFromPlayer(player);
     	Inventory inventory = Bukkit.createInventory(player, 9 * 5, "Edit " + kit.getName());

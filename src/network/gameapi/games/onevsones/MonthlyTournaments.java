@@ -60,7 +60,7 @@ public class MonthlyTournaments implements Listener {
 //                inventory.setItem(42, new ItemCreator(Material.WOOL, DyeColor.RED.getData())
 //                        .setName("&cLeave Tournament")
 //                        .addLore("")
-//                        .addLore("&bThis will remove you from the")
+//                        .addLore("&bThis will _remove you from the")
 //                        .addLore("&bcurrent tournament queue")
 //                        .addLore("").getItemStack());
 //

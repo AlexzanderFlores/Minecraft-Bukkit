@@ -3,7 +3,6 @@ package network.gameapi.games.onevsones;
 import network.Network;
 import network.Network.Plugins;
 import network.ProPlugin;
-import network.gameapi.competitive.StatsHandler;
 import network.gameapi.games.onevsones.events.BattleEndEvent;
 import network.player.MessageHandler;
 import network.server.CommandBase;
@@ -18,7 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -61,15 +59,15 @@ public class BattleHandler implements Listener {
                 @Override
                 public boolean execute(CommandSender sender, String[] arguments) {
                     Player player = (Player) sender;
-                    if(QueueHandler.isInQueue(player)) {
-                        QueueHandler.remove(player);
+                    if(QueueHandler._isInQueue(player)) {
+                        QueueHandler._remove(player);
                         ProPlugin.resetPlayer(player);
                         LobbyHandler.spawn(player);
                     } else {
                         Battle battle = getBattle(player);
                         if(battle == null) {
                             MessageHandler.sendMessage(player, "&cNo battle detected, still sending you to the spawn");
-                            QueueHandler.remove(player);
+                            QueueHandler._remove(player);
                             LobbyHandler.spawn(player);
                         } else {
                             MessageHandler.sendMessage(player, "You were given a death for quiting");

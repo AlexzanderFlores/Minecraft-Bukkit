@@ -90,13 +90,13 @@ public abstract class ShopBase implements Listener {
 				ChatColor.GREEN + "",
 			};
 			/*World lobby = OSTB.getMiniGame().getLobby();
-			holograms.add(new Hologram(new Location(lobby, 11, 5, 0, 90.0f, 0.0f), "") {
+			holograms._add(new Hologram(new Location(lobby, 11, 5, 0, 90.0f, 0.0f), "") {
 				@Override
 				public void interact(Player player) {
 					hologramClick(player);
 				}
 			});
-			holograms.add(new Hologram(new Location(lobby, -11, 5, 0, 270.0f, 0.0f), "") {
+			holograms._add(new Hologram(new Location(lobby, -11, 5, 0, 270.0f, 0.0f), "") {
 				@Override
 				public void interact(Player player) {
 					hologramClick(player);

@@ -58,16 +58,16 @@ public class PrivateBattleHandler implements Listener {
                     MessageHandler.sendMessage(clicker, "&cYou are already in a battle");
                 } else if(!LobbyHandler.isInLobby(clicked)) {
                     MessageHandler.sendMessage(clicker, AccountHandler.getPrefix(clicked) + " &cis already in a battle");
-                } else if(QueueHandler.isWaitingForMap(clicker)) {
+                } else if(QueueHandler._isWaitingForMap(clicker)) {
                     MessageHandler.sendMessage(clicker, "&cYou are currently waiting for a map, cannot send another request");
-                } else if(LobbyHandler.isInLobby(clicked) && !QueueHandler.isWaitingForMap(clicked)) {
+                } else if(LobbyHandler.isInLobby(clicked) && !QueueHandler._isWaitingForMap(clicked)) {
                     if(battleRequests.containsKey(clicker.getName())) {
                         if(hasChallengedPlayer(clicker, clicked)) {
                             MessageHandler.sendMessage(clicked, AccountHandler.getPrefix(clicker) + " &6has accepted your battle request");
                             MessageHandler.sendMessage(clicker, "&aYou have accepted " + AccountHandler.getPrefix(clicked) + "&6's battle request");
 
-                            QueueHandler.remove(clicker, true);
-                            QueueHandler.remove(clicked, true);
+                            QueueHandler._remove(clicker, true);
+                            QueueHandler._remove(clicked, true);
 
                             ProPlugin.resetPlayer(clicked);
                             ProPlugin.resetPlayer(clicker);
@@ -100,7 +100,7 @@ public class PrivateBattleHandler implements Listener {
                         }
                     }
 
-                    QueueHandler.remove(clicker, true);
+                    QueueHandler._remove(clicker, true);
                     LobbyHandler.openKitSelection(clicker);
                     choosingMatchType.add(clicker.getName());
                     sendingTo.put(clicker.getName(), clicked.getName());

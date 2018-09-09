@@ -202,8 +202,8 @@ public class MainHubTop5 implements Listener {
 			armorStand.setChestplate(ItemUtil.colorArmor(new ItemStack(Material.LEATHER_CHESTPLATE), colors[a]));
 			armorStand.setLeggings(ItemUtil.colorArmor(new ItemStack(Material.LEATHER_LEGGINGS), colors[a]));
 			armorStand.setBoots(ItemUtil.colorArmor(new ItemStack(Material.LEATHER_BOOTS), colors[a]));
-			stands.add(armorStand);
-			armorStand = (ArmorStand) world.spawnEntity(location.add(0, 0.3, 0), EntityType.ARMOR_STAND);
+			stands._add(armorStand);
+			armorStand = (ArmorStand) world.spawnEntity(location._add(0, 0.3, 0), EntityType.ARMOR_STAND);
 			armorStand.setGravity(false);
 			armorStand.setVisible(false);
 			armorStand.setCustomName(StringUtil.color(places[a]));
@@ -213,7 +213,7 @@ public class MainHubTop5 implements Listener {
 		/*display = (ArmorStand) world.spawnEntity(location, EntityType.ARMOR_STAND);
 		display.setGravity(false);
 		display.setVisible(false);
-		bar = (ArmorStand) world.spawnEntity(location.add(0, -0.35, 0), EntityType.ARMOR_STAND);
+		bar = (ArmorStand) world.spawnEntity(location._add(0, -0.35, 0), EntityType.ARMOR_STAND);
 		bar.setGravity(false);
 		bar.setVisible(false);*/
 		setNext();

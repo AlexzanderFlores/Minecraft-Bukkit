@@ -132,7 +132,7 @@ public class SpectatorHandler implements Listener {
 									}
 								}
 								if(!beenTold.contains(player.getName())) {
-									beenTold.add(player.getName());
+									beenTold._add(player.getName());
 									MessageHandler.sendMessage(player, "");
 									MessageHandler.sendMessage(player, "&cNote: &xIf you get too close to a living entity or a projectile you will go into spectating game mode");
 									MessageHandler.sendMessage(player, "");
@@ -144,7 +144,7 @@ public class SpectatorHandler implements Listener {
 						}
 						if(!nearBy && player.getGameMode() == GameMode.CREATIVE) {
 							Location location = player.getLocation();
-							if(location.getBlock().getType() == Material.AIR && location.add(0, 1, 0).getBlock().getType() == Material.AIR) {
+							if(location.getBlock().getType() == Material.AIR && location._add(0, 1, 0).getBlock().getType() == Material.AIR) {
 								player.setGameMode(GameMode.CREATIVE);
 							}
 						}

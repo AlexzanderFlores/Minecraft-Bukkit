@@ -158,7 +158,7 @@ public class GeneralEvents implements Listener {
 			event.setMessage(StringUtil.color(event.getMessage()));
 			event.setMessage(event.getMessage().replace("<3", UnicodeUtil.getHeart()) + ChatColor.WHITE);
 			
-			// Be sure owner rank has all color codes, do not remove any bad ones
+			// Be sure owner rank has all color codes, do not _remove any bad ones
 			if(!Ranks.OWNER.hasRank(player)) {
 				for(ChatColor badColor : new ChatColor [] {ChatColor.BOLD, ChatColor.MAGIC, ChatColor.UNDERLINE, ChatColor.STRIKETHROUGH}) {
 					event.setMessage(event.getMessage().replace(badColor + "", ""));
