@@ -6,7 +6,7 @@ authors: [AlexzanderFlores]
 commands:
 # Global Commands
   viewQueue:
-    usage: /viewQueue
+    usage: /viewQueue <new | old>
 
   twitter:
     usage: /twitter

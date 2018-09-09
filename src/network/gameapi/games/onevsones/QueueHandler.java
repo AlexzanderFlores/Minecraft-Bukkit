@@ -8,6 +8,7 @@ import network.customevents.player.PlayerSpectatorEvent.SpectatorState;
 import network.customevents.player.PlayerStaffModeEvent;
 import network.customevents.player.PlayerStaffModeEvent.StaffModeEventType;
 import network.gameapi.games.onevsones.events.BattleEndEvent;
+import network.gameapi.games.onevsones.events.QueueEvent;
 import network.gameapi.games.onevsones.kits.OneVsOneKit;
 import network.player.MessageHandler;
 import network.player.TitleDisplayer;
@@ -17,64 +18,113 @@ import network.server.CommandBase;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class QueueHandler implements Listener {
+    private static Map<OneVsOneKit, List<String>> queue = null;
+
     private static List<_QueueData> _queueData = null;
     private static List<String> _waitingForMap = null;
 
     public QueueHandler() {
+        queue = new HashMap<OneVsOneKit, List<String>>();
+
         _queueData = new ArrayList<_QueueData>();
         _waitingForMap = new ArrayList<String>();
 
-        new CommandBase("viewQueue") {
+        new CommandBase("viewQueue", 1) {
             @Override
             public boolean execute(CommandSender sender, String [] arguments) {
                 MessageHandler.sendLine(sender);
-                MessageHandler.sendMessage(sender, "&bQueue Data:");
-                for(_QueueData data : _queueData) {
-                    MessageHandler.sendMessage(sender, "   Player One: " + data.getPlayer());
-                    MessageHandler.sendMessage(sender, "   Player Two: " + data.getForcedPlayer());
-                    MessageHandler.sendMessage(sender, "   Kit: " + data.getKit().getName());
-                    MessageHandler.sendMessage(sender, "   Counter: " + data.getCounter());
-                    MessageHandler.sendMessage(sender, "");
-                }
-                MessageHandler.sendMessage(sender, "&bWaiting for map:");
-                String message = "";
-                for(String name : _waitingForMap) {
-                    message += name + ", ";
-                }
-                if(!message.equalsIgnoreCase("")) {
-                    MessageHandler.sendMessage(sender, message.substring(0, message.length() - 2));
-                    MessageHandler.sendMessage(sender, "");
-                }
-                MessageHandler.sendMessage(sender, "&bIn Battle:");
-                for(Battle battle : BattleHandler.getBattles()) {
-                    MessageHandler.sendMessage(sender, "   Players:");
-                    for(Player player : battle.getPlayers()) {
-                        MessageHandler.sendMessage(sender, "      " + player.getName());
+                if(arguments[0].equalsIgnoreCase("new")) {
+                    MessageHandler.sendMessage(sender, "&bQueue:");
+                    for(OneVsOneKit kit : queue.keySet()) {
+                        MessageHandler.sendMessage(sender, "   &e" + kit.getName() + ":");
+                        String message = "";
+                        for(String name : queue.get(kit)) {
+                            message += name + ", ";
+                        }
+                        if(message.equalsIgnoreCase("")) {
+                            MessageHandler.sendMessage(sender, "   &cNone");
+                        } else {
+                            MessageHandler.sendMessage(sender, "   &e" + message.substring(0, message.length() - 2));
+                        }
                     }
-                    MessageHandler.sendMessage(sender, "   Timer: " + battle.getTimer());
-                    Location loc = battle.getTargetLocation();
-                    MessageHandler.sendMessage(sender, "   Target location: " + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ());
-                    MessageHandler.sendMessage(sender, "Kit: " + battle.getKit().getName());
-                    MessageHandler.sendMessage(sender, "Blocks placed: " + battle.getPlacedBlocks().size());
-                    MessageHandler.sendMessage(sender, "");
+                } else {
+                    MessageHandler.sendMessage(sender, "&bQueue Data:");
+                    for(_QueueData data : _queueData) {
+                        MessageHandler.sendMessage(sender, "   Player One: " + data.getPlayer());
+                        MessageHandler.sendMessage(sender, "   Player Two: " + data.getForcedPlayer());
+                        MessageHandler.sendMessage(sender, "   Kit: " + data.getKit().getName());
+                        MessageHandler.sendMessage(sender, "   Counter: " + data.getCounter());
+                        MessageHandler.sendMessage(sender, "");
+                    }
+                    MessageHandler.sendMessage(sender, "&bWaiting for map:");
+                    String message = "";
+                    for(String name : _waitingForMap) {
+                        message += name + ", ";
+                    }
+                    if(!message.equalsIgnoreCase("")) {
+                        MessageHandler.sendMessage(sender, message.substring(0, message.length() - 2));
+                        MessageHandler.sendMessage(sender, "");
+                    }
+                    MessageHandler.sendMessage(sender, "&bIn Battle:");
+                    for(Battle battle : BattleHandler.getBattles()) {
+                        MessageHandler.sendMessage(sender, "   Players:");
+                        for(Player player : battle.getPlayers()) {
+                            MessageHandler.sendMessage(sender, "      " + player.getName());
+                        }
+                        MessageHandler.sendMessage(sender, "   Timer: " + battle.getTimer());
+                        Location loc = battle.getTargetLocation();
+                        MessageHandler.sendMessage(sender, "   Target location: " + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ());
+                        MessageHandler.sendMessage(sender, "Kit: " + battle.getKit().getName());
+                        MessageHandler.sendMessage(sender, "Blocks placed: " + battle.getPlacedBlocks().size());
+                        MessageHandler.sendMessage(sender, "");
+                    }
+                    MessageHandler.sendLine(sender);
                 }
-                MessageHandler.sendLine(sender);
                 return true;
             }
         };
 
         EventUtil.register(this);
+    }
+
+    public static void add(Player player, OneVsOneKit kit) {
+        QueueEvent event = new QueueEvent(player, kit, QueueEvent.QueueAction.ADD);
+        Bukkit.getPluginManager().callEvent(event);
+
+        String ranked = event.isRanked() ? "&cRanked Queue" : "&cUnranked Queue &b/vote";
+        new TitleDisplayer(player, "&e" + kit.getName(), ranked).display();
+        MessageHandler.sendMessage(player, "&e" + kit.getName() + ranked);
+
+        if(Ranks.VIP.hasRank(player)) {
+            addToList(player, kit);
+        } else {
+            new DelayedTask(new Runnable() {
+                @Override
+                public void run() {
+                    MessageHandler.sendMessage(player, "&a&l[TIP] " + Ranks.VIP.getPrefix() + "&cPerk: &e5x faster queuing time &b/buy");
+                    addToList(player, kit);
+                }
+            }, 20 * 5);
+        }
+    }
+
+    private static void addToList(Player player, OneVsOneKit kit) {
+        List<String> list = queue.get(kit);
+        if(list == null) {
+            list = new ArrayList<String>();
+        }
+        list.add(player.getName());
+        queue.put(kit, list);
     }
 
     public static void _add(Player player, OneVsOneKit kit) {

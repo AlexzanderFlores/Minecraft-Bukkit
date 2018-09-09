@@ -6,11 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import network.gameapi.games.onevsones.events.QueueEvent;
+import network.server.util.EventUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
@@ -23,7 +27,7 @@ import network.server.util.ConfigurationUtil;
 import network.server.util.ItemCreator;
 
 @SuppressWarnings("deprecation")
-public class OneVsOneKit {
+public class OneVsOneKit implements Listener {
     private static List<OneVsOneKit> kits = null;
     private static Map<String, OneVsOneKit> playersKits = null;
     private String name = null;
@@ -49,6 +53,8 @@ public class OneVsOneKit {
         if(playersKits == null) {
         	playersKits = new HashMap<String, OneVsOneKit>();
         }
+
+        EventUtil.register(this);
     }
 
     public static List<OneVsOneKit> getKits() {
@@ -201,6 +207,13 @@ public class OneVsOneKit {
         });
         if(setInMemory) {
             playersKits.put(player.getName(), this);
+        }
+    }
+
+    @EventHandler
+    public void onQueue(QueueEvent event) {
+        if(event.getAction() == QueueEvent.QueueAction.ADD && event.getKit().getName().equalsIgnoreCase(getName())) {
+            give(event.getPlayer());
         }
     }
 
