@@ -190,8 +190,8 @@ public class QueueHandler implements Listener {
             this.ranked = ranked;
             this.kit = kit;
             queueData.add(this);
-            remove(player);
-            new MapProvider(player, null, player.getWorld(), false, true);
+//            remove(player);
+//            new MapProvider(player, null, player.getWorld(), false, true);
         }
 
         public boolean canJoin(QueueData data) {

@@ -138,28 +138,6 @@ public class OnevsOnes extends ProPlugin {
         new NoDebuff();
         new Skywars();
         new SpeedUHC();
-
-        new CommandBase("testDist", 4,true) {
-        	@Override
-			public boolean execute(CommandSender sender, String [] arguments) {
-				int x1 = Integer.valueOf(arguments[0]);
-				int y1 = 12;
-				int z1 = Integer.valueOf(arguments[1]);
-
-				int x2 = Integer.valueOf(arguments[2]);
-				int y2 = 12;
-				int z2 = Integer.valueOf(arguments[3]);
-
-				Player player = (Player) sender;
-				World world = player.getWorld();
-
-				Location loc1 = new Location(world, x1, y1, z1);
-				Location loc2 = new Location(world, x2, y2, z2);
-
-				MessageHandler.sendMessage(player, "Distance = " + loc1.distance(loc2));
-        		return true;
-			}
-		};
 	}
 	
 	@Override

@@ -13,6 +13,7 @@ import network.gameapi.games.onevsones.kits.OneVsOneKit;
 import network.player.MessageHandler;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
+import npc.NPCEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -76,9 +77,9 @@ public class Battle implements Listener {
         firstMap.setZ(-30);
         Bukkit.getLogger().info(firstMap.toString());
         Vector distance = MapProvider.spawnDistances.get(firstMap);
-        targetLocation.setY(15);
 
         Location locationOne = targetLocation.clone().add(distance.getX() + .5, 0, distance.getZ() + .5);
+        locationOne.setY(15);
         playerOne.teleport(locationOne);
         for(PotionEffect effect : playerOne.getActivePotionEffects()) {
             playerOne.removePotionEffect(effect.getType());
@@ -89,6 +90,7 @@ public class Battle implements Listener {
         	kit.give(playerOne);
         }
         Location locationTwo = targetLocation.clone().add(distance.getX() * -1, 0, distance.getZ() * -1);
+        locationTwo.setY(15);
         MessageHandler.sendMessage(playerOne, "To quit this battle do &e/quit");
         if(playerTwo == null) {
 //            MessageHandler.sendMessage(playerOne, "There was an odd number of players, you must wait for a match to be available");
