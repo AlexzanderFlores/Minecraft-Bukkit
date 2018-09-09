@@ -75,7 +75,6 @@ public class Battle implements Listener {
 
         Location firstMap = targetLocation.clone();
         firstMap.setZ(-30);
-        Bukkit.getLogger().info(firstMap.toString());
         Vector distance = MapProvider.spawnDistances.get(firstMap);
 
         Location locationOne = targetLocation.clone().add(distance.getX() + .5, 0, distance.getZ() + .5);

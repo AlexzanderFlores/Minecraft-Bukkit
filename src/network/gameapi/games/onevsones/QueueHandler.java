@@ -108,7 +108,7 @@ public class QueueHandler implements Listener {
             inQueue.add(player.getName());
         }
 
-        String ranked = event.isRanked() ? "&cRanked Queue" : "&cUnranked Queue &b/vote";
+        String ranked = event.isRanked() ? "&cRanked Queue" : "&cUnranked Queue";
         new TitleDisplayer(player, "&e" + kit.getName(), ranked).display();
         MessageHandler.sendMessage(player, "&e" + kit.getName() + " " + ranked);
 
@@ -138,7 +138,7 @@ public class QueueHandler implements Listener {
 
         // New
         if(ticks == 20) {
-            new AsyncDelayedTask(new Runnable() {
+            new DelayedTask(new Runnable() {
                 @Override
                 public void run() {
                     // Process the queue

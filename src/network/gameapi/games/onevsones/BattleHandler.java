@@ -97,7 +97,9 @@ public class BattleHandler implements Listener {
     }
 
     public static void removePlayerBattle(Player player) {
-        playerBattles.remove(player.getName());
+        if(playerBattles != null) {
+            playerBattles.remove(player.getName());
+        }
     }
 
     public static boolean isInBattle(Player player) {
@@ -141,6 +143,7 @@ public class BattleHandler implements Listener {
         if(battle != null) {
             battle.end(event.getPlayer());
         }
+        removePlayerBattle(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -164,7 +167,9 @@ public class BattleHandler implements Listener {
                 MessageHandler.sendMessage(player, event.getDeathMessage());
                 MessageHandler.sendMessage(killer, event.getDeathMessage());
             }
+            removePlayerBattle(killer);
         }
+        removePlayerBattle(player);
         event.setDeathMessage(null);
     }
 

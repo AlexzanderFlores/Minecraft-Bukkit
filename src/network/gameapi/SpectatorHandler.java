@@ -47,6 +47,7 @@ import java.util.Map;
 public class SpectatorHandler implements Listener {
 	private static Map<String, Map<Integer, ItemStack>> items = null;
 	private static Map<String, Integer> levels = null;
+	private static Map<String, Float> flySpeeds = null;
 	private static List<String> spectators = null;
 	private static List<String> beenTold = null;
 	private static ItemStack teleporter = null;
@@ -61,6 +62,7 @@ public class SpectatorHandler implements Listener {
 	public SpectatorHandler() {
 		items = new HashMap<String, Map<Integer, ItemStack>>();
 		levels = new HashMap<String, Integer>();
+		flySpeeds = new HashMap<String, Float>();
 		spectators = new ArrayList<String>();
 		beenTold = new ArrayList<String>();
 
@@ -208,6 +210,7 @@ public class SpectatorHandler implements Listener {
 					items.put(player.getName(), item);
 				}
 				levels.put(player.getName(), player.getLevel());
+				flySpeeds.put(player.getName(), player.getFlySpeed());
 				spectators.add(player.getName());
 				player.getInventory().clear();
 				player.getInventory().setArmorContents(null);
@@ -248,10 +251,12 @@ public class SpectatorHandler implements Listener {
 					online.showPlayer(player);
 				}
 				player.setLevel(levels.get(player.getName()));
+				player.setFlySpeed(flySpeeds.get(player.getName()));
 				player.setGameMode(GameMode.SURVIVAL);
 				player.setFlying(false);
 				player.setAllowFlight(false);
 				levels.remove(player.getName());
+				flySpeeds.remove(player.getName());
 				if(saveItems) {
 					if(items.containsKey(player.getName())) {
 						new DelayedTask(new Runnable() {

@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.avaje.ebean.annotation.EnumValue;
 import network.gameapi.games.onevsones.OnevsOnes;
 import network.gameapi.games.onevsones.events.BattleEndEvent;
+import network.gameapi.games.onevsones.events.BattleStartEvent;
 import network.gameapi.games.onevsones.events.QueueEvent;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler;
@@ -122,10 +124,6 @@ public class OneVsOneKit implements Listener {
         int counter = 0;
         if(playersKits == null) {
             return counter;
-        }
-
-        for(String name : playersKits.keySet()) {
-            Bukkit.getLogger().info(name + ": " + playersKits.get(name).getName());
         }
 
         for(OneVsOneKit kit : playersKits.values()) {
@@ -284,11 +282,18 @@ public class OneVsOneKit implements Listener {
     }
 
     @EventHandler
-    public void onBattleEnd(BattleEndEvent event) {
+    public void onBattleStart(BattleStartEvent event) {
         for(Player player : event.getBattle().getPlayers()) {
             removePlayerKit(player);
         }
     }
+
+//    @EventHandler
+//    public void onBattleEnd(BattleEndEvent event) {
+//        for(Player player : event.getBattle().getPlayers()) {
+//            removePlayerKit(player);
+//        }
+//    }
 
     public enum ArmorSlot {
         HELMET(39), CHESTPLATE(38), LEGGINGS(37), BOOTS(36);
