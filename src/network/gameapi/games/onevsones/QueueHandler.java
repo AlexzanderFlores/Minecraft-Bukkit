@@ -122,9 +122,10 @@ public class QueueHandler implements Listener {
         QueueEvent event = new QueueEvent(player, null, QueueEvent.QueueAction.REMOVE, -1);
         Bukkit.getPluginManager().callEvent(event);
 
-        inQueue.remove(player.getName());
-
-        MessageHandler.sendMessage(player, "&cRemoved from the queue");
+        if(inQueue.contains(player.getName())) {
+            inQueue.remove(player.getName());
+            MessageHandler.sendMessage(player, "&cRemoved from the queue");
+        }
     }
 
     public static boolean isInQueue(Player player) {
