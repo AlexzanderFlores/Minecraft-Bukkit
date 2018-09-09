@@ -5,6 +5,9 @@ softdepend: [NPC, Votifier, EffectLib, Citizens]
 authors: [AlexzanderFlores]
 commands:
 # Global Commands
+  viewQueue:
+    usage: /viewQueue
+
   twitter:
     usage: /twitter
 

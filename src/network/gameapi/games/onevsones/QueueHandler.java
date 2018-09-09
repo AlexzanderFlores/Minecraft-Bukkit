@@ -13,10 +13,13 @@ import network.player.MessageHandler;
 import network.player.TitleDisplayer;
 import network.player.account.AccountHandler;
 import network.player.account.AccountHandler.Ranks;
+import network.server.CommandBase;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,6 +35,46 @@ public class QueueHandler implements Listener {
     public QueueHandler() {
         queueData = new ArrayList<QueueData>();
         waitingForMap = new ArrayList<String>();
+
+        new CommandBase("viewQueue") {
+            @Override
+            public boolean execute(CommandSender sender, String [] arguments) {
+                MessageHandler.sendLine(sender);
+                MessageHandler.sendMessage(sender, "&bQueue Data:");
+                for(QueueData data : queueData) {
+                    MessageHandler.sendMessage(sender, "   Player One: " + data.getPlayer());
+                    MessageHandler.sendMessage(sender, "   Player Two: " + data.getForcedPlayer());
+                    MessageHandler.sendMessage(sender, "   Kit: " + data.getKit().getName());
+                    MessageHandler.sendMessage(sender, "   Counter: " + data.getCounter());
+                    MessageHandler.sendMessage(sender, "");
+                }
+                MessageHandler.sendMessage(sender, "&bWaiting for map:");
+                String message = "";
+                for(String name : waitingForMap) {
+                    message += name + ", ";
+                }
+                if(!message.equalsIgnoreCase("")) {
+                    MessageHandler.sendMessage(sender, message.substring(0, message.length() - 2));
+                    MessageHandler.sendMessage(sender, "");
+                }
+                MessageHandler.sendMessage(sender, "&bIn Battle:");
+                for(Battle battle : BattleHandler.getBattles()) {
+                    MessageHandler.sendMessage(sender, "   Players:");
+                    for(Player player : battle.getPlayers()) {
+                        MessageHandler.sendMessage(sender, "      " + player.getName());
+                    }
+                    MessageHandler.sendMessage(sender, "   Timer: " + battle.getTimer());
+                    Location loc = battle.getTargetLocation();
+                    MessageHandler.sendMessage(sender, "   Target location: " + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ());
+                    MessageHandler.sendMessage(sender, "Kit: " + battle.getKit().getName());
+                    MessageHandler.sendMessage(sender, "Blocks placed: " + battle.getPlacedBlocks().size());
+                    MessageHandler.sendMessage(sender, "");
+                }
+                MessageHandler.sendLine(sender);
+                return true;
+            }
+        };
+
         EventUtil.register(this);
     }
 
@@ -95,7 +138,7 @@ public class QueueHandler implements Listener {
     }
 
     private void processQueue(boolean priority) {
-        new DelayedTask(new Runnable() {
+        new AsyncDelayedTask(new Runnable() {
             @Override
             public void run() {
             	for(QueueData data : queueData) {
@@ -190,8 +233,11 @@ public class QueueHandler implements Listener {
             this.ranked = ranked;
             this.kit = kit;
             queueData.add(this);
-//            remove(player);
-//            new MapProvider(player, null, player.getWorld(), false, true);
+
+            if(ProPlugin.getPlayers().size() == 1 && Ranks.OWNER.hasRank(player)) {
+                remove(player);
+                new MapProvider(player, null, player.getWorld(), false, true);
+            }
         }
 
         public boolean canJoin(QueueData data) {

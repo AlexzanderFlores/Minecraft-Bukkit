@@ -171,7 +171,7 @@ public class LobbyHandler implements Listener {
                 EffectUtil.playSound(player, Sound.NOTE_PLING);
             }
         } else if(event.getTitle().equals("Request a Battle")) {
-            final String name = event.getItem().getItemMeta().getDisplayName();
+            String name = event.getItem().getItemMeta().getDisplayName();
             new DelayedTask(new Runnable() {
                 @Override
                 public void run() {
@@ -191,11 +191,6 @@ public class LobbyHandler implements Listener {
         	event.setCancelled(true);
         }
     }
-    
-//    private void run(OneVsOneKit kit, Player player) {
-//        QueueHandler.add(player, kit);
-//        EffectUtil.playSound(player, Sound.NOTE_PLING);
-//    }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
@@ -292,14 +287,6 @@ public class LobbyHandler implements Listener {
     		event.setCancelled(true);
     	}
     }
-
-//    @EventHandler
-//    public void onPlayerAFK(PlayerAFKEvent event) {
-//        Player player = event.getPlayer();
-//        if(isInLobby(player) && player.getWorld().getSpawnLocation().distance(player.getLocation()) >= 10) {
-//        	spawn(player);
-//        }
-//    }
 
     @EventHandler
     public void onPlayerLeave(PlayerLeaveEvent event) {
