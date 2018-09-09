@@ -6,7 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import network.gameapi.games.onevsones.OnevsOnes;
 import network.gameapi.games.onevsones.events.QueueEvent;
+import network.player.MessageHandler;
+import network.player.account.AccountHandler;
+import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,7 +25,6 @@ import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
 
 import network.ProPlugin;
-import network.gameapi.games.onevsones.HotbarEditor;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.ConfigurationUtil;
 import network.server.util.ItemCreator;
@@ -33,6 +36,7 @@ public class OneVsOneKit implements Listener {
     private String name = null;
     private ItemStack icon = null;
     private Map<Integer, ItemStack> items = null;
+    private Map<Integer, List<String>> queue = null; // <team size> <list of player names>
 
     public OneVsOneKit(String name, Material icon) {
         this(name, new ItemStack(icon));
@@ -40,16 +44,25 @@ public class OneVsOneKit implements Listener {
 
     public OneVsOneKit(String name, ItemStack icon) {
         this.name = name;
+
         ItemCreator itemCreator = new ItemCreator(icon).setAmount(0).setName("&e" + name);
         if(!icon.getType().toString().contains("SWORD")) {
         	itemCreator.addLore("");
         }
         this.icon = itemCreator.getItemStack();
+
         items = new HashMap<Integer, ItemStack>();
+
+        queue = new HashMap<Integer, List<String>>();
+        for(int teamSize : OnevsOnes.getTeamSizes()) {
+            queue.put(teamSize, new ArrayList<String>());
+        }
+
         if(kits == null) {
             kits = new ArrayList<OneVsOneKit>();
         }
         kits.add(this);
+
         if(playersKits == null) {
         	playersKits = new HashMap<String, OneVsOneKit>();
         }
@@ -163,45 +176,45 @@ public class OneVsOneKit implements Listener {
                 Player player = ProPlugin.getPlayer(name);
                 if(player != null) {
                     player.getInventory().clear();
-                    boolean hotbarSetup = false;
-                    String path = HotbarEditor.getPath().replace("%", name);
-                    File file = new File(path, kitName);
-                	if(file.exists()) {
-                		hotbarSetup = true;
-                        ConfigurationUtil config = new ConfigurationUtil(path);
-                        for(String key : config.getConfig().getKeys(false)) {
-                            String item = config.getConfig().getString(key);
-                            String [] itemData = item.split(":");
-                            int id = Integer.valueOf(itemData[0]);
-                            byte data = Byte.valueOf(itemData[1]);
-                            int amount = Integer.valueOf(itemData[2]);
-                            String typeName = itemData[3];
-                            if(typeName.equals("NULL")) {
-                                ItemStack itemStack = new ItemStack(id, amount, data);
-                                if(itemData.length > 6) {
-                                    for(int a = 6; a < itemData.length; ++a) {
-                                        if(a % 2 == 0) {
-                                            Enchantment enchant = Enchantment.getByName(itemData[a]);
-                                            int level = Integer.valueOf(itemData[a + 1]);
-                                            itemStack.addEnchantment(enchant, level);
-                                        }
-                                    }
-                                }
-                                player.getInventory().setItem(Integer.valueOf(key), itemStack);
-                            } else {
-                                PotionType type = PotionType.valueOf(typeName);
-                                int level = Integer.valueOf(itemData[4]);
-                                boolean splash = itemData[5].equals("1");
-                                player.getInventory().setItem(Integer.valueOf(key), new Potion(type, level, splash).toItemStack(amount));
-                            }
-                        }
-                	}
-                    if(!hotbarSetup) {
+//                    boolean hotbarSetup = false;
+//                    String path = HotbarEditor.getPath().replace("%", name);
+//                    File file = new File(path, kitName);
+//                	if(file.exists()) {
+//                		hotbarSetup = true;
+//                        ConfigurationUtil config = new ConfigurationUtil(path);
+//                        for(String key : config.getConfig().getKeys(false)) {
+//                            String item = config.getConfig().getString(key);
+//                            String [] itemData = item.split(":");
+//                            int id = Integer.valueOf(itemData[0]);
+//                            byte data = Byte.valueOf(itemData[1]);
+//                            int amount = Integer.valueOf(itemData[2]);
+//                            String typeName = itemData[3];
+//                            if(typeName.equals("NULL")) {
+//                                ItemStack itemStack = new ItemStack(id, amount, data);
+//                                if(itemData.length > 6) {
+//                                    for(int a = 6; a < itemData.length; ++a) {
+//                                        if(a % 2 == 0) {
+//                                            Enchantment enchant = Enchantment.getByName(itemData[a]);
+//                                            int level = Integer.valueOf(itemData[a + 1]);
+//                                            itemStack.addEnchantment(enchant, level);
+//                                        }
+//                                    }
+//                                }
+//                                player.getInventory().setItem(Integer.valueOf(key), itemStack);
+//                            } else {
+//                                PotionType type = PotionType.valueOf(typeName);
+//                                int level = Integer.valueOf(itemData[4]);
+//                                boolean splash = itemData[5].equals("1");
+//                                player.getInventory().setItem(Integer.valueOf(key), new Potion(type, level, splash).toItemStack(amount));
+//                            }
+//                        }
+//                	}
+//                    if(!hotbarSetup) {
                         for(int slot : items.keySet()) {
                             player.getInventory().setItem(slot, items.get(slot));
                         }
                         player.updateInventory();
-                    }
+//                    }
                 }
             }
         });
@@ -210,10 +223,51 @@ public class OneVsOneKit implements Listener {
         }
     }
 
+    public List<String> getQueue(int teamSize) {
+        return this.queue.get(teamSize);
+    }
+
+    public void addToQueue(Player player, int teamSize) {
+        queue.get(teamSize).add(name);
+    }
+
+    public void removeFromQueue(String name) {
+        for(int teamSize : OnevsOnes.getTeamSizes()) {
+            this.queue.get(teamSize).remove(name);
+        }
+    }
+
     @EventHandler
     public void onQueue(QueueEvent event) {
-        if(event.getAction() == QueueEvent.QueueAction.ADD && event.getKit().getName().equalsIgnoreCase(getName())) {
-            give(event.getPlayer());
+        QueueEvent.QueueAction action = event.getAction();
+        int teamSize = event.getTeamSize(); // 1v1s = 1, 2v2s = 2, etc.
+        Player player = event.getPlayer();
+        String name = player.getName();
+
+        if(action == QueueEvent.QueueAction.REMOVE) {
+            // If they are being removed from the queue
+            removeFromQueue(name);
+        } else if(event.getKit().getName().equalsIgnoreCase(getName()) && action == QueueEvent.QueueAction.ADD) {
+            // If they are being added to the queue for this kit
+
+            // Give them the kit items
+            give(player);
+
+            if(AccountHandler.Ranks.VIP.hasRank(player)) {
+                // Add them to the queue instantly if they're a ranked player
+                addToQueue(player, teamSize);
+            } else {
+                // Wait 5 seconds to add them to the queue if they're a default player
+                MessageHandler.sendMessage(player, "&a&l[TIP] " + AccountHandler.Ranks.VIP.getPrefix() + "&cPerk: &e5x faster queuing time &b/buy");
+                new DelayedTask(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(player.isOnline()) {
+                            addToQueue(player, teamSize);
+                        }
+                    }
+                }, 20 * 5);
+            }
         }
     }
 

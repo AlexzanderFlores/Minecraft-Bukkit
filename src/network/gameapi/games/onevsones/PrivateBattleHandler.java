@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import network.gameapi.games.onevsones.events.BattleRequestEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -37,52 +38,53 @@ public class PrivateBattleHandler implements Listener {
         battleRequests = new HashMap<String, List<PrivateBattle>>();
         sendingTo = new HashMap<String, String>();
         choosingMatchType = new ArrayList<String>();
+
         new CommandBase("battle", 1, true) {
             @Override
             public boolean execute(CommandSender sender, String[] arguments) {
-                Player clicker = (Player) sender;
-                Player clicked = ProPlugin.getPlayer(arguments[0]);
-                if(clicked == null) {
-                    MessageHandler.sendMessage(clicker, "&c" + arguments[0] + " is not online");
-                } else if(clicker.getInventory().contains(Material.MAGMA_CREAM)) {
-                    MessageHandler.sendMessage(clicker, "&cCannot send request: You have your battle requests disabled");
-                } else if(clicked.getInventory().contains(Material.MAGMA_CREAM)) {
-                    MessageHandler.sendMessage(clicker, AccountHandler.getPrefix(clicked) + " &chas battle requests disabled");
-                } else if(SpectatorHandler.contains(clicker)) {
-                    MessageHandler.sendMessage(clicker, "&cCannot send request while spectating");
-                } else if(SpectatorHandler.contains(clicked)) {
-                    MessageHandler.sendMessage(clicked, "&cCannot send request to a spectator");
-                } else if(clicker.getName().equals(clicked.getName())) {
+                Player playerOne = (Player) sender;
+                Player playerTwo = ProPlugin.getPlayer(arguments[0]);
+
+                if(playerTwo == null) {
+                    MessageHandler.sendMessage(playerOne, "&c" + arguments[0] + " is not online");
+                    return true;
+                } else if(playerOne.getInventory().contains(Material.MAGMA_CREAM)) {
+                    MessageHandler.sendMessage(playerOne, "&cCannot send request: You have your battle requests disabled");
+                    return true;
+                } else if(playerTwo.getInventory().contains(Material.MAGMA_CREAM)) {
+                    MessageHandler.sendMessage(playerOne, AccountHandler.getPrefix(playerTwo) + " &chas battle requests disabled");
+                    return true;
+                } else if(playerOne.getName().equals(playerTwo.getName())) {
                     MessageHandler.sendMessage(sender, "&cYou can't battle yourself");
-                } else if(!LobbyHandler.isInLobby(clicker)) {
-                    MessageHandler.sendMessage(clicker, "&cYou are already in a battle");
-                } else if(!LobbyHandler.isInLobby(clicked)) {
-                    MessageHandler.sendMessage(clicker, AccountHandler.getPrefix(clicked) + " &cis already in a battle");
-                } else if(QueueHandler._isWaitingForMap(clicker)) {
-                    MessageHandler.sendMessage(clicker, "&cYou are currently waiting for a map, cannot send another request");
-                } else if(LobbyHandler.isInLobby(clicked) && !QueueHandler._isWaitingForMap(clicked)) {
-                    if(battleRequests.containsKey(clicker.getName())) {
-                        if(hasChallengedPlayer(clicker, clicked)) {
-                            MessageHandler.sendMessage(clicked, AccountHandler.getPrefix(clicker) + " &6has accepted your battle request");
-                            MessageHandler.sendMessage(clicker, "&aYou have accepted " + AccountHandler.getPrefix(clicked) + "&6's battle request");
+                    return true;
+                }
 
-                            QueueHandler._remove(clicker, true);
-                            QueueHandler._remove(clicked, true);
+                BattleRequestEvent event = new BattleRequestEvent(playerOne, playerTwo);
+                Bukkit.getPluginManager().callEvent(event);
 
-                            ProPlugin.resetPlayer(clicked);
-                            ProPlugin.resetPlayer(clicker);
+                if(!event.isCancelled()) {
+                    if(battleRequests.containsKey(playerOne.getName())) {
+                        if(hasChallengedPlayer(playerOne, playerTwo)) {
+                            MessageHandler.sendMessage(playerTwo, AccountHandler.getPrefix(playerOne) + " &6has accepted your battle request");
+                            MessageHandler.sendMessage(playerOne, "&aYou have accepted " + AccountHandler.getPrefix(playerTwo) + "&6's battle request");
 
-                            getInvite(clicked, clicker).getKit().give(clicked);
-                            getInvite(clicked, clicker).getKit().give(clicker);
+                            QueueHandler.remove(playerOne);
+                            QueueHandler.remove(playerTwo);
 
-                            removeAllInvitesFromPlayer(clicker);
-                            removeAllInvitesFromPlayer(clicked);
+                            ProPlugin.resetPlayer(playerTwo);
+                            ProPlugin.resetPlayer(playerOne);
 
-                            battleRequests.remove(clicked.getName());
-                            battleRequests.remove(clicker.getName());
+                            getInvite(playerTwo, playerOne).getKit().give(playerTwo);
+                            getInvite(playerTwo, playerOne).getKit().give(playerOne);
 
-                            String clickedName = clicked.getName();
-                            String clickerName = clicker.getName();
+                            removeAllInvitesFromPlayer(playerOne);
+                            removeAllInvitesFromPlayer(playerTwo);
+
+                            battleRequests.remove(playerTwo.getName());
+                            battleRequests.remove(playerOne.getName());
+
+                            String clickedName = playerTwo.getName();
+                            String clickerName = playerOne.getName();
 
                             new DelayedTask(new Runnable() {
                                 @Override
@@ -100,13 +102,60 @@ public class PrivateBattleHandler implements Listener {
                         }
                     }
 
-                    QueueHandler._remove(clicker, true);
-                    LobbyHandler.openKitSelection(clicker);
-                    choosingMatchType.add(clicker.getName());
-                    sendingTo.put(clicker.getName(), clicked.getName());
-                } else {
-                    MessageHandler.sendMessage(clicker, "&cThis player is currently in a match please wait");
+                    QueueHandler.remove(playerOne);
+                    LobbyHandler.openKitSelection(playerOne);
+                    sendingTo.put(playerOne.getName(), playerTwo.getName());
                 }
+
+//                if(QueueHandler._isWaitingForMap(playerOne)) {
+//                    MessageHandler.sendMessage(playerOne, "&cYou are currently waiting for a map, cannot send another request");
+//                } else if(LobbyHandler.isInLobby(playerTwo) && !QueueHandler._isWaitingForMap(playerTwo)) {
+//                    if(battleRequests.containsKey(playerOne.getName())) {
+//                        if(hasChallengedPlayer(playerOne, playerTwo)) {
+//                            MessageHandler.sendMessage(playerTwo, AccountHandler.getPrefix(playerOne) + " &6has accepted your battle request");
+//                            MessageHandler.sendMessage(playerOne, "&aYou have accepted " + AccountHandler.getPrefix(playerTwo) + "&6's battle request");
+//
+//                            QueueHandler._remove(playerOne, true);
+//                            QueueHandler._remove(playerTwo, true);
+//
+//                            ProPlugin.resetPlayer(playerTwo);
+//                            ProPlugin.resetPlayer(playerOne);
+//
+//                            getInvite(playerTwo, playerOne).getKit().give(playerTwo);
+//                            getInvite(playerTwo, playerOne).getKit().give(playerOne);
+//
+//                            removeAllInvitesFromPlayer(playerOne);
+//                            removeAllInvitesFromPlayer(playerTwo);
+//
+//                            battleRequests.remove(playerTwo.getName());
+//                            battleRequests.remove(playerOne.getName());
+//
+//                            String clickedName = playerTwo.getName();
+//                            String clickerName = playerOne.getName();
+//
+//                            new DelayedTask(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Player clicked = ProPlugin.getPlayer(clickedName);
+//                                    if(clicked != null) {
+//                                        Player clicker = ProPlugin.getPlayer(clickerName);
+//                                        if(clicker != null) {
+//                                            new MapProvider(clicked, clicker, clicked.getWorld(), false, false);
+//                                        }
+//                                    }
+//                                }
+//                            }, 20 * 2);
+//                            return true;
+//                        }
+//                    }
+//
+//                    QueueHandler._remove(playerOne, true);
+//                    LobbyHandler.openKitSelection(playerOne);
+//                    choosingMatchType.add(playerOne.getName());
+//                    sendingTo.put(playerOne.getName(), playerTwo.getName());
+//                } else {
+//                    MessageHandler.sendMessage(playerOne, "&cThis player is currently in a match please wait");
+//                }
                 return true;
             }
         };

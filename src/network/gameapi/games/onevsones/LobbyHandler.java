@@ -9,6 +9,7 @@ import network.customevents.player.PlayerLeaveEvent;
 import network.customevents.player.PlayerSpectatorEvent;
 import network.customevents.player.PlayerSpectatorEvent.SpectatorState;
 import network.gameapi.SpectatorHandler;
+import network.gameapi.games.onevsones.events.BattleRequestEvent;
 import network.gameapi.games.onevsones.kits.OneVsOneKit;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler.Ranks;
@@ -167,7 +168,7 @@ public class LobbyHandler implements Listener {
             if(kit == null) {
                 MessageHandler.sendMessage(player, "&cAn error occured when selecting kit, please try again");
             } else {
-                QueueHandler._add(player, kit);
+                QueueHandler.add(player, kit, 1);
                 EffectUtil.playSound(player, Sound.NOTE_PLING);
             }
         } else if(event.getTitle().equals("Request a Battle")) {

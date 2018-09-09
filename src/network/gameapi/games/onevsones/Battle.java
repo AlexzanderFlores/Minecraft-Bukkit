@@ -86,9 +86,9 @@ public class Battle implements Listener {
         }
         playerOne.setAllowFlight(false);
         playerOne.getLocation().setPitch(0.0f);
-        if(!HotbarEditor.load(playerOne, kit)) {
-        	kit.give(playerOne);
-        }
+//        if(!HotbarEditor.load(playerOne, kit)) {
+//        	kit.give(playerOne);
+//        }
         Location locationTwo = targetLocation.clone().add(distance.getX() * -1, 0, distance.getZ() * -1);
         locationTwo.setY(15);
         MessageHandler.sendMessage(playerOne, "To quit this battle do &e/quit");
@@ -104,9 +104,9 @@ public class Battle implements Listener {
             }
             playerTwo.setAllowFlight(false);
             playerTwo.getLocation().setPitch(0.0f);
-            if(!HotbarEditor.load(playerTwo, kit)) {
-            	kit.give(playerTwo);
-            }
+//            if(!HotbarEditor.load(playerTwo, kit)) {
+//            	kit.give(playerTwo);
+//            }
         }
         BattleHandler.addBattle(this);
 //        BattleHandler.setTargetX(targetLocation, map);

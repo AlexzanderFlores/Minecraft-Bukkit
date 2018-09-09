@@ -124,7 +124,7 @@ public class PlayerTracker implements Listener {
 					@Override
 					public void run() {
 						/*String name = queue.get(0);
-						Player player = ProPlugin.getPlayer(name);
+						Player player = ProPlugin.getPlayerOne(name);
 						if(player != null) {
 							UUID uuid = player.getUniqueId();
 							DB.PLAYERS_LOCATIONS.insert("'" + uuid.toString() + "', '" + AccountHandler.getPrefix(player) + "', '" + Network.getServerName() + "'");

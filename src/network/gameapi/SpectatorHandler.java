@@ -19,8 +19,7 @@ import network.staff.StaffMode;
 import npc.NPCEntity;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -55,7 +54,7 @@ public class SpectatorHandler implements Listener {
 	private static ItemStack exit = null;
 	private static ItemStack nextGame = null;
 	private static boolean enabled = false;
-	//private static final double range = 10;
+	private static final double range = 10;
 	private static String settingsName = null;
 	
 	public SpectatorHandler() {
@@ -63,16 +62,20 @@ public class SpectatorHandler implements Listener {
 		levels = new HashMap<String, Integer>();
 		spectators = new ArrayList<String>();
 		beenTold = new ArrayList<String>();
+
 		teleporter = new ItemCreator(Material.WATCH).setName("&aTeleport to Player").getItemStack();
 		settings = new ItemCreator(Material.REDSTONE_COMPARATOR).setName("&aSpectator Settings").getItemStack();
 		nextGame = new ItemCreator(Material.DIAMOND_SWORD).setName("&aJoin Next Game").getItemStack();
+
 		if(Network.getMiniGame() == null) {
 			exit = new ItemCreator(Material.WOOD_DOOR).setName("&aExit Spectating").getItemStack();
 		} else {
 			exit = new ItemCreator(Material.WOOD_DOOR).setName("&aReturn to Hub").getItemStack();
 		}
+
 		enabled = true;
 		settingsName = "Spectator Settings";
+
 		new CommandBase("toggleSpectator", 0, 1) {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
@@ -100,6 +103,7 @@ public class SpectatorHandler implements Listener {
 				return true;
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		new CommandBase("spec", 1, true) {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
@@ -117,7 +121,8 @@ public class SpectatorHandler implements Listener {
 				return true;
 			}
 		}.setRequiredRank(Ranks.VIP);
-		/*Bukkit.getScheduler().runTaskTimer(Network.getInstance(), new Runnable() {
+
+		Bukkit.getScheduler().runTaskTimer(Network.getInstance(), new Runnable() {
 			@Override
 			public void run() {
 				if(spectators != null && !spectators.isEmpty()) {
@@ -132,7 +137,7 @@ public class SpectatorHandler implements Listener {
 									}
 								}
 								if(!beenTold.contains(player.getName())) {
-									beenTold._add(player.getName());
+									beenTold.add(player.getName());
 									MessageHandler.sendMessage(player, "");
 									MessageHandler.sendMessage(player, "&cNote: &xIf you get too close to a living entity or a projectile you will go into spectating game mode");
 									MessageHandler.sendMessage(player, "");
@@ -144,14 +149,15 @@ public class SpectatorHandler implements Listener {
 						}
 						if(!nearBy && player.getGameMode() == GameMode.CREATIVE) {
 							Location location = player.getLocation();
-							if(location.getBlock().getType() == Material.AIR && location._add(0, 1, 0).getBlock().getType() == Material.AIR) {
+							if(location.getBlock().getType() == Material.AIR && location.add(0, 1, 0).getBlock().getType() == Material.AIR) {
 								player.setGameMode(GameMode.CREATIVE);
 							}
 						}
 					}
 				}
 			}
-		}, 20, 20);*/
+		}, 20, 20);
+
 		EventUtil.register(this);
 	}
 	

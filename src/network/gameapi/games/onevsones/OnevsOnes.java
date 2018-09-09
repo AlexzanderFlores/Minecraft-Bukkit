@@ -35,6 +35,7 @@ import java.util.List;
 
 public class OnevsOnes extends ProPlugin {
 	private static String oldPlayerCount = null;
+	private static List<Integer> teamSizes = null;
 	
 	public OnevsOnes() {
 		super("1v1");
@@ -48,6 +49,9 @@ public class OnevsOnes extends ProPlugin {
         setAllowInventoryClicking(true);
         setAllowItemSpawning(true);
         setAutoVanishStaff(true);
+
+        teamSizes = Arrays.asList(1, 2, 3, 4);
+
 		resetWorld();
         World world = Bukkit.getWorlds().get(0);
         Location target = new Location(world, 0.5, 12, -30.5);
@@ -57,9 +61,10 @@ public class OnevsOnes extends ProPlugin {
         new QueueHandler();
         new BattleHandler();
         new MapProvider(world);
-        new SpectatorHandler().createNPC(new Location(world, 8.5, 13, -43.5), target);
+//        new SpectatorHandler().createNPC(new Location(world, 8.5, 13, -43.5), target);
+        new SpectatorHandler1v1s(world, target);
         new PrivateBattleHandler();
-        new HotbarEditor();
+//        new HotbarEditor();
         new EloHandler(DB.PLAYERS_ONE_VS_ONE_ELO, 1400);
         new ServerLogger();
         //Arrays.asList(ImageMap.getItemFrame(world, -16, 10, -34))
@@ -138,6 +143,10 @@ public class OnevsOnes extends ProPlugin {
         new NoDebuff();
         new Skywars();
         new SpeedUHC();
+	}
+
+	public static List<Integer> getTeamSizes() {
+		return teamSizes;
 	}
 	
 	@Override

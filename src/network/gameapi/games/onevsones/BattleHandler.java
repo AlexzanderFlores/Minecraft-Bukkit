@@ -4,7 +4,10 @@ import network.Network;
 import network.Network.Plugins;
 import network.ProPlugin;
 import network.gameapi.games.onevsones.events.BattleEndEvent;
+import network.gameapi.games.onevsones.events.BattleRequestEvent;
+import network.gameapi.games.onevsones.events.QuitCommandEvent;
 import network.player.MessageHandler;
+import network.player.account.AccountHandler;
 import network.server.CommandBase;
 import network.server.util.DoubleUtil;
 import network.server.util.EffectUtil;
@@ -54,31 +57,25 @@ public class BattleHandler implements Listener {
         mapCoords = new HashMap<Location, Integer>();
         playersPlaced = new HashMap<String, List<Block>>();
         spawnedEntities = new HashMap<String, List<Entity>>();
+
         if(Network.getPlugin() == Plugins.ONEVSONE) {
             new CommandBase("quit", true) {
                 @Override
                 public boolean execute(CommandSender sender, String[] arguments) {
                     Player player = (Player) sender;
-                    if(QueueHandler._isInQueue(player)) {
-                        QueueHandler._remove(player);
-                        ProPlugin.resetPlayer(player);
-                        LobbyHandler.spawn(player);
-                    } else {
-                        Battle battle = getBattle(player);
-                        if(battle == null) {
-                            MessageHandler.sendMessage(player, "&cNo battle detected, still sending you to the spawn");
-                            QueueHandler._remove(player);
-                            LobbyHandler.spawn(player);
-                        } else {
-                            MessageHandler.sendMessage(player, "You were given a death for quiting");
-                            Player competitor = battle.getCompetitor(player);
-                            if(competitor != null) {
-                                MessageHandler.sendMessage(competitor, "You were given a kill for your opponent quiting");
+                    QuitCommandEvent event = new QuitCommandEvent(player);
+                    Bukkit.getPluginManager().callEvent(event);
+
+                    Battle battle = getBattle(player);
+                    if(battle != null) {
+                        MessageHandler.sendMessage(player, "You were given a death for quiting");
+                        Player competitor = battle.getCompetitor(player);
+                        if(competitor != null) {
+                            MessageHandler.sendMessage(competitor, "You were given a kill for your opponent quiting");
 //                                StatsHandler.addKill(competitor);
 //                                StatsHandler.addDeath(player);
-                            }
-                            battle.end(player);
                         }
+                        battle.end(player);
                     }
                     return true;
                 }
@@ -125,6 +122,17 @@ public class BattleHandler implements Listener {
 
     public static void removeMapCoord(Location targetLocation) {
         mapCoords.remove(targetLocation);
+    }
+
+    @EventHandler
+    public void onBattleRequest(BattleRequestEvent event) {
+        if(getBattle(event.getPlayerOne()) != null) {
+            MessageHandler.sendMessage(event.getPlayerOne(), "&cYou are already in a battle");
+            event.setCancelled(true);
+        } else if(getBattle(event.getPlayerTwo()) != null) {
+            MessageHandler.sendMessage(event.getPlayerOne(), AccountHandler.getPrefix(event.getPlayerTwo()) + " &cis already in a battle");
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
