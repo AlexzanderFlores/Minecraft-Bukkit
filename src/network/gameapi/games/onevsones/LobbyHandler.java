@@ -10,6 +10,8 @@ import network.customevents.player.PlayerSpectatorEvent;
 import network.customevents.player.PlayerSpectatorEvent.SpectatorState;
 import network.gameapi.SpectatorHandler;
 import network.gameapi.games.onevsones.events.BattleRequestEvent;
+import network.gameapi.games.onevsones.events.QueueEvent;
+import network.gameapi.games.onevsones.events.QuitCommandEvent;
 import network.gameapi.games.onevsones.kits.OneVsOneKit;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler.Ranks;
@@ -232,6 +234,13 @@ public class LobbyHandler implements Listener {
             		MessageHandler.sendMessage(player, "&cGet unlimited ranked matches with " + Ranks.VIP.getPrefix() + "&b/buy");
             	}
             }
+        }
+    }
+
+    @EventHandler
+    public void onQueue(QueueEvent event) {
+        if(event.getAction() == QueueEvent.QueueAction.REMOVE) {
+            spawn(event.getPlayer());
         }
     }
 

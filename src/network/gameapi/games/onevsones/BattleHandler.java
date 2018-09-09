@@ -135,6 +135,14 @@ public class BattleHandler implements Listener {
         }
     }
 
+    @EventHandler
+    public void onQuitCommand(QuitCommandEvent event) {
+        Battle battle = getBattle(event.getPlayer());
+        if(battle != null) {
+            battle.end(event.getPlayer());
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();

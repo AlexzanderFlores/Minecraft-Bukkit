@@ -40,30 +40,28 @@ public class QueueHandler implements Listener {
 //        _queueData = new ArrayList<_QueueData>();
 //        _waitingForMap = new ArrayList<String>();
 
-        new CommandBase("viewQueue", 1) {
+        new CommandBase("viewQueue") {
             @Override
             public boolean execute(CommandSender sender, String [] arguments) {
                 MessageHandler.sendLine(sender);
-                if(arguments[0].equalsIgnoreCase("new")) {
-                    MessageHandler.sendMessage(sender, "&bQueue:");
-                    for(OneVsOneKit kit : OneVsOneKit.getKits()) {
-                        for(int teamSize : OnevsOnes.getTeamSizes()) {
-                            List<String> queue = kit.getQueue(teamSize);
-                            if(!queue.isEmpty()) {
-                                MessageHandler.sendMessage(sender, "   &b" + kit.getName() + ":");
-                                String message = "";
-                                for(String name : queue) {
-                                    message += name + ", ";
-                                }
-                                if(message.equalsIgnoreCase("")) {
-                                    MessageHandler.sendMessage(sender, "&cNone");
-                                } else {
-                                    MessageHandler.sendMessage(sender, message.substring(0, message.length() - 2));
-                                }
+                MessageHandler.sendMessage(sender, "&bQueue:");
+                for(OneVsOneKit kit : OneVsOneKit.getKits()) {
+                    for(int teamSize : OnevsOnes.getTeamSizes()) {
+                        List<String> queue = kit.getQueue(teamSize);
+                        if(!queue.isEmpty()) {
+                            MessageHandler.sendMessage(sender, "   &b" + kit.getName() + ":");
+                            String message = "";
+                            for(String name : queue) {
+                                message += name + ", ";
+                            }
+                            if(message.equalsIgnoreCase("")) {
+                                MessageHandler.sendMessage(sender, "      &cNone");
+                            } else {
+                                MessageHandler.sendMessage(sender, "      " + message.substring(0, message.length() - 2));
                             }
                         }
                     }
-                } else {
+                }
 //                    MessageHandler.sendMessage(sender, "&bQueue Data:");
 //                    for(_QueueData data : _queueData) {
 //                        MessageHandler.sendMessage(sender, "   Player One: " + data.getPlayerOne());
@@ -94,8 +92,7 @@ public class QueueHandler implements Listener {
 //                        MessageHandler.sendMessage(sender, "Blocks placed: " + battle.getPlacedBlocks().size());
 //                        MessageHandler.sendMessage(sender, "");
 //                    }
-//                    MessageHandler.sendLine(sender);
-                }
+                MessageHandler.sendLine(sender);
                 return true;
             }
         };
@@ -113,7 +110,12 @@ public class QueueHandler implements Listener {
 
         String ranked = event.isRanked() ? "&cRanked Queue" : "&cUnranked Queue &b/vote";
         new TitleDisplayer(player, "&e" + kit.getName(), ranked).display();
-        MessageHandler.sendMessage(player, "&e" + kit.getName() + ranked);
+        MessageHandler.sendMessage(player, "&e" + kit.getName() + " " + ranked);
+
+        if(Bukkit.getOnlinePlayers().size() == 1 && Ranks.OWNER.hasRank(player)) {
+            remove(player);
+            new MapProvider(player, null, player.getWorld(), false, true);
+        }
     }
 
     public static void remove(Player player) {
@@ -190,10 +192,7 @@ public class QueueHandler implements Listener {
 
     @EventHandler
     public void onQuitCommand(QuitCommandEvent event) {
-        Player player = event.getPlayer();
-
-        remove(player);
-        ProPlugin.resetPlayer(player);
+        remove(event.getPlayer());
     }
 
     @EventHandler

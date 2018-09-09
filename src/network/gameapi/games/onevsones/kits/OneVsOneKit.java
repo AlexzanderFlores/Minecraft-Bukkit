@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import network.gameapi.games.onevsones.OnevsOnes;
+import network.gameapi.games.onevsones.events.BattleEndEvent;
 import network.gameapi.games.onevsones.events.QueueEvent;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler;
@@ -96,8 +97,12 @@ public class OneVsOneKit implements Listener {
     }
 
     public static void removePlayerKit(Player player) {
-        if(playersKits != null && playersKits.containsKey(player.getName())) {
-            playersKits.remove(player.getName());
+        removePlayerKit(player.getName());
+    }
+
+    public static void removePlayerKit(String name) {
+        if(playersKits != null) {
+            playersKits.remove(name);
         }
     }
 
@@ -118,6 +123,11 @@ public class OneVsOneKit implements Listener {
         if(playersKits == null) {
             return counter;
         }
+
+        for(String name : playersKits.keySet()) {
+            Bukkit.getLogger().info(name + ": " + playersKits.get(name).getName());
+        }
+
         for(OneVsOneKit kit : playersKits.values()) {
             if(kit.getName().equals(getName())) {
                 ++counter;
@@ -228,13 +238,15 @@ public class OneVsOneKit implements Listener {
     }
 
     public void addToQueue(Player player, int teamSize) {
-        queue.get(teamSize).add(name);
+        queue.get(teamSize).add(player.getName());
     }
 
     public void removeFromQueue(String name) {
         for(int teamSize : OnevsOnes.getTeamSizes()) {
             this.queue.get(teamSize).remove(name);
         }
+
+        removePlayerKit(name);
     }
 
     @EventHandler
@@ -268,6 +280,13 @@ public class OneVsOneKit implements Listener {
                     }
                 }, 20 * 5);
             }
+        }
+    }
+
+    @EventHandler
+    public void onBattleEnd(BattleEndEvent event) {
+        for(Player player : event.getBattle().getPlayers()) {
+            removePlayerKit(player);
         }
     }
 

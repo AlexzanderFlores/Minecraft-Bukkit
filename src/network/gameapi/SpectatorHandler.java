@@ -54,6 +54,7 @@ public class SpectatorHandler implements Listener {
 	private static ItemStack exit = null;
 	private static ItemStack nextGame = null;
 	private static boolean enabled = false;
+	protected static boolean saveItems = true;
 	private static final double range = 10;
 	private static String settingsName = null;
 	
@@ -196,14 +197,16 @@ public class SpectatorHandler implements Listener {
 			PlayerSpectatorEvent playerSpectateStartEvent = new PlayerSpectatorEvent(player, SpectatorState.STARTING);
 			Bukkit.getPluginManager().callEvent(playerSpectateStartEvent);
 			if(!playerSpectateStartEvent.isCancelled()) {
-				Map<Integer, ItemStack> item = items.get(player.getName());
-				if(item == null) {
-					item = new HashMap<Integer, ItemStack>();
+				if(saveItems) {
+					Map<Integer, ItemStack> item = items.get(player.getName());
+					if(item == null) {
+						item = new HashMap<Integer, ItemStack>();
+					}
+					for(int a = 0; a <= 39; ++a) {
+						item.put(a, player.getInventory().getItem(a));
+					}
+					items.put(player.getName(), item);
 				}
-				for(int a = 0; a <= 39; ++a) {
-					item.put(a, player.getInventory().getItem(a));
-				}
-				items.put(player.getName(), item);
 				levels.put(player.getName(), player.getLevel());
 				spectators.add(player.getName());
 				player.getInventory().clear();
@@ -249,18 +252,20 @@ public class SpectatorHandler implements Listener {
 				player.setFlying(false);
 				player.setAllowFlight(false);
 				levels.remove(player.getName());
-				if(items.containsKey(player.getName())) {
-					new DelayedTask(new Runnable() {
-						@Override
-						public void run() {
-							Map<Integer, ItemStack> item = items.get(player.getName());
-							for(int a : item.keySet()) {
-								player.getInventory().setItem(a, item.get(a));
+				if(saveItems) {
+					if(items.containsKey(player.getName())) {
+						new DelayedTask(new Runnable() {
+							@Override
+							public void run() {
+								Map<Integer, ItemStack> item = items.get(player.getName());
+								for(int a : item.keySet()) {
+									player.getInventory().setItem(a, item.get(a));
+								}
+								items.get(player.getName()).clear();
+								items.remove(player.getName());
 							}
-							items.get(player.getName()).clear();
-							items.remove(player.getName());
-						}
-					});
+						});
+					}
 				}
 			}
 		}

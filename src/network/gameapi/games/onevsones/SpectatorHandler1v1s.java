@@ -11,6 +11,7 @@ public class SpectatorHandler1v1s extends SpectatorHandler {
     public SpectatorHandler1v1s(World world, Location target) {
         super();
         createNPC(new Location(world, 8.5, 13, -43.5), target);
+        saveItems = false;
     }
 
     @EventHandler
