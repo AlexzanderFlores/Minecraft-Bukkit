@@ -521,6 +521,7 @@ public class ProPlugin extends CountDownUtil implements Listener {
 		player.setMaxHealth(20.0d);
 		player.setHealth(player.getMaxHealth());
 		player.setFoodLevel(20);
+		player.setFireTicks(0);
 		player.setGameMode(GameMode.SURVIVAL);
 		if(player.getAllowFlight()) {
 			player.setFlying(false);

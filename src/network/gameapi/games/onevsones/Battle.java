@@ -1,7 +1,5 @@
 package network.gameapi.games.onevsones;
 
-import network.Network;
-import network.Network.Plugins;
 import network.ProPlugin;
 import network.customevents.player.PlayerLeaveEvent;
 import network.customevents.player.PlayerStaffModeEvent;
@@ -9,11 +7,11 @@ import network.customevents.player.StatsChangeEvent;
 import network.gameapi.competitive.EloHandler;
 import network.gameapi.games.onevsones.events.BattleEndEvent;
 import network.gameapi.games.onevsones.events.BattleStartEvent;
+import network.gameapi.games.onevsones.events.QuitCommandEvent;
 import network.gameapi.games.onevsones.kits.OneVsOneKit;
 import network.player.MessageHandler;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
-import npc.NPCEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,7 +25,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -36,6 +34,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -44,8 +43,8 @@ public class Battle implements Listener {
     private List<String> pearlDelay = null;
     private List<Block> placedBlocks = null;
     private List<Item> items = null;
-    private Player playerOne = null;
-    private Player playerTwo = null;
+    private List<Entity> entities = null;
+    private List<Team> teams = null;
     private OneVsOneKit kit = null;
     private int timer = 0;
     private int startAt = 3;
@@ -54,89 +53,82 @@ public class Battle implements Listener {
     private boolean tournament = false;
     private boolean ranked = true;
 
-    public Battle(Location newTargetLocation, Player playerOne, Player playerTwo, boolean tournament, boolean ranked) {
+    public Battle(Location newTargetLocation, boolean tournament, boolean ranked, Team ... teamList) {
         this.sentMessage = new ArrayList<String>();
         this.pearlDelay = new ArrayList<String>();
         this.placedBlocks = new ArrayList<Block>();
         this.items = new ArrayList<Item>();
-        this.playerOne = playerOne;
-        this.playerTwo = playerTwo;
-        this.kit = OneVsOneKit.getPlayersKit(playerOne);
+        this.entities = new ArrayList<Entity>();
+        this.teams = Arrays.asList(teamList);
+        this.kit = teamList[0].getKit();
         this.targetLocation = newTargetLocation;
         this.tournament = tournament;
         this.ranked = ranked;
 
-        BattleHandler.addPlayerBattle(playerOne, this);
-        if(playerTwo != null) {
-            BattleHandler.addPlayerBattle(playerTwo, this);
+        for(Team team : this.teams) {
+            for(Player player : team.getPlayers()) {
+                BattleHandler.addPlayerBattle(player, this);
+                for(PotionEffect effect : player.getActivePotionEffects()) {
+                    player.removePotionEffect(effect.getType());
+                }
+                player.setAllowFlight(false);
+                player.getLocation().setPitch(0.0f);
+                MessageHandler.sendMessage(player, "To quit this battle do &e/quit");
+            }
         }
-        playerOne.getInventory().remove(Material.SLIME_BALL);
-        playerOne.getInventory().remove(Material.MAGMA_CREAM);
 
         Location firstMap = targetLocation.clone();
         firstMap.setZ(-30);
         Vector distance = MapProvider.spawnDistances.get(firstMap);
 
-        Location locationOne = targetLocation.clone().add(distance.getX() + .5, 0, distance.getZ() + .5);
-        locationOne.setY(15);
-        playerOne.teleport(locationOne);
-        for(PotionEffect effect : playerOne.getActivePotionEffects()) {
-            playerOne.removePotionEffect(effect.getType());
+        Location teamOneLocation = targetLocation.clone().add(distance.getX() + .5, 0, distance.getZ() + .5);
+        teamOneLocation.setY(15);
+        teamOneLocation.setPitch(0.0f);
+        for(Player player : teams.get(0).getPlayers()) {
+            player.teleport(teamOneLocation);
         }
-        playerOne.setAllowFlight(false);
-        playerOne.getLocation().setPitch(0.0f);
-//        if(!HotbarEditor.load(playerOne, kit)) {
-//        	kit.give(playerOne);
-//        }
-        Location locationTwo = targetLocation.clone().add(distance.getX() * -1, 0, distance.getZ() * -1);
-        locationTwo.setY(15);
-        MessageHandler.sendMessage(playerOne, "To quit this battle do &e/quit");
-        if(playerTwo == null) {
-//            MessageHandler.sendMessage(playerOne, "There was an odd number of players, you must wait for a match to be available");
-        } else {
-            playerOne.hidePlayer(playerTwo);
-            playerTwo.hidePlayer(playerOne);
-            MessageHandler.sendMessage(playerTwo, "To quit this battle do &e/quit");
-            playerTwo.teleport(locationTwo);
-            for(PotionEffect effect : playerTwo.getActivePotionEffects()) {
-                playerTwo.removePotionEffect(effect.getType());
+
+        if(teams.size() > 1) {
+            Location teamTwoLocation = targetLocation.clone().add(distance.getX() * -1, 0, distance.getZ() * -1);
+            teamTwoLocation.setY(15);
+            teamTwoLocation.setPitch(0.0f);
+            for(Player player : teams.get(1).getPlayers()) {
+                player.teleport(teamTwoLocation);
             }
-            playerTwo.setAllowFlight(false);
-            playerTwo.getLocation().setPitch(0.0f);
-//            if(!HotbarEditor.load(playerTwo, kit)) {
-//            	kit.give(playerTwo);
-//            }
         }
+
         BattleHandler.addBattle(this);
-//        BattleHandler.setTargetX(targetLocation, map);
         EventUtil.register(this);
     }
 
     public boolean contains(Player player) {
-        try {
-        	return playerOne.getName().equals(player.getName()) || playerTwo.getName().equals(player.getName());
-        } catch(NullPointerException e) {
-        	return false;
-        }
+        return getTeam(player) != null;
     }
 
-    public Player getCompetitor(Player player) {
-        if(playerOne.getName().equals(player.getName())) {
-            return playerTwo;
-        } else {
-            return playerOne;
-        }
-    }
+//    public Team getCompetitor(Player player) {
+//        if(teamOne.isInTeam(player)) {
+//            return teamOne;
+//        } else {
+//            return teamTwo;
+//        }
+//    }
     
     public List<Player> getPlayers() {
         List<Player> players = new ArrayList<Player>();
-        if(playerOne != null) {
-            players.add(playerOne);
-        }
-        if(playerTwo != null) {
-            players.add(playerTwo);
+        for(Team team : teams) {
+            players.addAll(team.getPlayers());
         }
     	return players;
+    }
+
+    public void removePlayer(Player player) {
+        Team team = getTeam(player);
+        if(team != null) {
+            if(team.removePlayer(player)) {
+                end(team);
+            }
+        }
+        BattleHandler.removePlayerBattle(player);
     }
 
     public List<Block> getPlacedBlocks() {
@@ -155,8 +147,8 @@ public class Battle implements Listener {
         return this.targetLocation;
     }
 
-    public void incrementTimer() {
-        ++this.timer;
+    public int incrementTimer() {
+        return ++this.timer;
     }
 
     public int getTimer() {
@@ -171,19 +163,36 @@ public class Battle implements Listener {
         return tournament;
     }
 
+    public Team getTeam(Player player) {
+        for(Team team : teams) {
+            if(team.isInTeam(player)) {
+                return team;
+            }
+        }
+        return null;
+    }
+
+    public List<Team> getTeams() {
+        return this.teams;
+    }
+
+    public List<Team> getOtherTeams(Team team) {
+        List<Team> otherTeams = new ArrayList<Team>();
+        for(Team t : teams) {
+            if(t.getColor() != team.getColor()) {
+                otherTeams.add(t);
+            }
+        }
+        return otherTeams;
+    }
+
     public void start() {
         started = true;
-        if(playerTwo != null) {
-            playerOne.showPlayer(playerTwo);
-            playerTwo.showPlayer(playerOne);
-        }
-        OneVsOneKit kit = OneVsOneKit.getPlayersKit(playerOne);
         if(kit != null) {
             String name = kit.getName();
             if(name.equals("One Hit Wonder") || name.equals("Quickshot")) {
-                playerOne.setHealth(1.0d);
-                if(playerTwo != null) {
-                    playerTwo.setHealth(1.0d);
+                for(Player player : getPlayers()) {
+                    player.setHealthScale(1.0d);
                 }
             }
         }
@@ -194,68 +203,64 @@ public class Battle implements Listener {
         return this.started;
     }
 
-    public void end(Player loser) {
-    	Player winner = getCompetitor(loser);
-    	Bukkit.getPluginManager().callEvent(new BattleEndEvent(this));
-    	if(ranked) {
-        	EloHandler.calculateWin(winner, loser, 1);
+    public void end(Team losingTeam) {
+        if(ranked) {
+            Team winningTeam = getOtherTeams(losingTeam).get(0);
+    	    Player winner = winningTeam.getPlayers().get(0);
+    	    Player loser = losingTeam.getPlayers().get(0);
+            EloHandler.calculateWin(winner, loser, 1);
     	}
-        playerOne.setFireTicks(0);
-        if(playerTwo != null) {
-            playerTwo.setFireTicks(0);
+
+    	for(Player player : getPlayers()) {
+    	    ProPlugin.resetPlayer(player);
+    	    LobbyHandler.spawn(player);
+    	    BattleHandler.removePlayerBattle(player);
         }
-//        List<Location> maps = MapProvider.maps.get(getMapNumber());
-//        if(maps == null) {
-//            maps = new ArrayList<Location>();
-//        }
-//        maps._add(targetLocation);
-//        MapProvider.maps.put(getMapNumber(), maps);
-        if(Network.getPlugin() == Plugins.ONEVSONE) {
-            ProPlugin.resetPlayer(playerOne);
-            if(playerTwo != null) {
-                ProPlugin.resetPlayer(playerTwo);
-            }
-            if(!tournament) {
-                LobbyHandler.spawn(playerOne);
-                if(playerTwo != null) {
-                    LobbyHandler.spawn(playerTwo);
-                }
-            }
-        }
-        sentMessage.remove(playerOne.getName());
-        if(playerTwo != null) {
-            sentMessage.remove(playerTwo.getName());
-        }
-        BattleHandler.removePlayerBattle(playerOne);
-        if(playerTwo != null) {
-            BattleHandler.removePlayerBattle(playerTwo);
-        }
-        playerOne = null;
-        playerTwo = null;
+
+        Bukkit.getPluginManager().callEvent(new BattleEndEvent(this));
+
+//        teams.clear();
+    	teams = null;
+
         if(placedBlocks != null) {
             for(Block block : placedBlocks) {
                 block.setType(Material.AIR);
                 block.setData((byte) 0);
             }
             placedBlocks.clear();
-            placedBlocks = null;
         }
-        BattleHandler.removeBattle(this);
-        BattleHandler.removeMapCoord(targetLocation);
-        HandlerList.unregisterAll(this);
+
         for(Item item : items) {
         	if(item != null && !item.isDead()) {
         		item.remove();
         	}
         }
         items.clear();
-        items = null;
+
+        sentMessage.clear();
+
+        BattleHandler.removeBattle(this);
+        BattleHandler.removeMapCoord(targetLocation);
+        HandlerList.unregisterAll(this);
+    }
+
+    @EventHandler
+    public void onQuitCommand(QuitCommandEvent event) {
+        Player player = event.getPlayer();
+
+        if(contains(player)) {
+            MessageHandler.sendMessage(player, "You were given a death for quiting");
+//            StatsHandler.addDeath(player);
+            removePlayer(player);
+        }
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerLeaveEvent event) {
-        if(contains(event.getPlayer())) {
-            end(event.getPlayer());
+        Player player = event.getPlayer();
+
+        if(contains(player)) {
+            removePlayer(player);
         }
     }
 
@@ -273,15 +278,22 @@ public class Battle implements Listener {
     }
 
     @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        event.setKeepInventory(true);
+    }
+
+    @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        if(contains(event.getPlayer())) {
-        	for(Entity entity : event.getPlayer().getNearbyEntities(5, 5, 5)) {
-    			if(entity instanceof Item) {
-    				entity.remove();
-    			}
-    		}
-            end(event.getPlayer());
-        }
+        Player player = event.getPlayer();
+
+        new DelayedTask(new Runnable() {
+            @Override
+            public void run() {
+                if(contains(player)) {
+                    removePlayer(player);
+                }
+            }
+        });
     }
 
     @EventHandler

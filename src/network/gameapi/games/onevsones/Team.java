@@ -2,27 +2,25 @@ package network.gameapi.games.onevsones;
 
 import network.ProPlugin;
 import network.customevents.player.PlayerLeaveEvent;
+import network.gameapi.games.onevsones.kits.OneVsOneKit;
 import network.server.util.EventUtil;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Team implements Listener {
     private DyeColor color = null;
-    private Location location = null;
-    private Vector distance = null;
+    private OneVsOneKit kit = null;
     private List<String> players = null;
 
-    public Team(DyeColor color, Location location, Vector distance, Player ...players) {
+    public Team(DyeColor color, OneVsOneKit kit, Player ...players) {
         this.color = color;
-        this.location = location;
-        this.distance = distance;
+        this.kit = kit;
         this.players = new ArrayList<String>();
 
         for(Player player : players) {
@@ -36,6 +34,10 @@ public class Team implements Listener {
         return this.color;
     }
 
+    public OneVsOneKit getKit() {
+        return this.kit;
+    }
+
     public List<Player> getPlayers() {
         List<Player> players = new ArrayList<Player>();
         for(String name : this.players) {
@@ -47,29 +49,26 @@ public class Team implements Listener {
         return players;
     }
 
-    public void teleport(int mult) {
-        distance = distance.multiply(mult);
-        boolean directionIsX = distance.getX() != 0;
-        int distanceToAdd = 0;
+    public boolean isInTeam(Player player) {
+        return this.players.contains(player.getName());
+    }
 
+    public boolean removePlayer(Player player) {
+        if(players.size() <= 1) {
+            return true;
+        }
+        players.remove(player.getName());
+        return false;
+    }
+
+    public void teleport(Location location) {
         for(Player player : getPlayers()) {
-            Vector toAddVector;
-            if(directionIsX) {
-                toAddVector = new Vector(distanceToAdd, 0, 0);
-            } else {
-                toAddVector = new Vector(0, 0, distanceToAdd);
-            }
-
-            Location loc = location.clone();
-            loc.add(toAddVector);
-
-            player.teleport(loc);
-            distanceToAdd += 2;
+            player.teleport(location);
         }
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerLeaveEvent event) {
-        players.remove(event.getPlayer().getName());
+        removePlayer(event.getPlayer());
     }
 }

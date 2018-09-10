@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
@@ -19,7 +18,6 @@ import java.util.Random;
 public class MapProvider implements Listener {
     public static Map<Location, Boolean> maps = null; // <Center Block> <In Use>
     public static Map<Location, Vector> spawnDistances = null;
-    private static int numberOfMaps = 0;
 
     public MapProvider(World world) {
         maps = new HashMap<Location, Boolean>();
@@ -44,7 +42,6 @@ public class MapProvider implements Listener {
                 Location location = mapCheckBlock.getLocation();
                 location.setY(0);
                 maps.put(location, false);
-                ++numberOfMaps;
                 z -= 100;
             }
         }
@@ -63,17 +60,17 @@ public class MapProvider implements Listener {
         EventUtil.register(this);
     }
 
-    public MapProvider(Player playerOne, Player playerTwo, boolean tournament, boolean ranked) {
+    public MapProvider(boolean tournament, boolean ranked, Team ... teams) {
         Location map = null;
         do {
             map = (Location) maps.keySet().toArray()[new Random().nextInt(maps.size())];
         } while(map == null || maps.get(map));
 
         Bukkit.getLogger().info("");
-        Bukkit.getLogger().info("In use = " + maps.get(map) + " (" + playerOne.getName() + ", " + playerTwo.getName() + ")");
+        Bukkit.getLogger().info("In use = " + maps.get(map) + " (" + teams[0].getPlayers().get(0).getName() + ")");
         Bukkit.getLogger().info("");
 
-        new Battle(map, playerOne, playerTwo, tournament, ranked);
+        new Battle(map, tournament, ranked, teams);
     }
 
     @EventHandler
@@ -81,8 +78,7 @@ public class MapProvider implements Listener {
         long ticks = event.getTicks();
         if(ticks == 20) {
             for(Battle battle : BattleHandler.getBattles()) {
-                battle.incrementTimer();
-                if(battle.getTimer() == 5) {
+                if(battle.incrementTimer() == 5) {
                     battle.start();
                 }
             }

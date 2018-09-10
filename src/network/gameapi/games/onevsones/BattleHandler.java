@@ -2,7 +2,6 @@ package network.gameapi.games.onevsones;
 
 import network.Network;
 import network.Network.Plugins;
-import network.ProPlugin;
 import network.gameapi.games.onevsones.events.BattleEndEvent;
 import network.gameapi.games.onevsones.events.BattleRequestEvent;
 import network.gameapi.games.onevsones.events.QuitCommandEvent;
@@ -65,22 +64,35 @@ public class BattleHandler implements Listener {
                     Player player = (Player) sender;
                     QuitCommandEvent event = new QuitCommandEvent(player);
                     Bukkit.getPluginManager().callEvent(event);
-
-                    Battle battle = getBattle(player);
-                    if(battle != null) {
-                        MessageHandler.sendMessage(player, "You were given a death for quiting");
-                        Player competitor = battle.getCompetitor(player);
-                        if(competitor != null) {
-                            MessageHandler.sendMessage(competitor, "You were given a kill for your opponent quiting");
-//                                StatsHandler.addKill(competitor);
-//                                StatsHandler.addDeath(player);
-                        }
-                        battle.end(player);
-                    }
                     return true;
                 }
             };
         }
+
+        new CommandBase("viewTeams") {
+            @Override
+            public boolean execute(CommandSender sender, String [] arguments) {
+                MessageHandler.sendLine(sender);
+                MessageHandler.sendMessage(sender, "&eTeams:");
+                for(Battle battle : getBattles()) {
+                    for(Team team : battle.getTeams()) {
+                        String players = "";
+                        for(Player player : team.getPlayers()) {
+                            players += player.getName() + ", ";
+                        }
+                        MessageHandler.sendMessage(sender, "   " + team.getColor().toString() + ":");
+                        if(players.equalsIgnoreCase("")) {
+                            MessageHandler.sendMessage(sender, "      &cNone");
+                        } else {
+                            MessageHandler.sendMessage(sender, "      " + players.substring(0, players.length() - 2));
+                        }
+                    }
+                }
+                MessageHandler.sendLine(sender);
+                return true;
+            }
+        };
+
         EventUtil.register(this);
     }
 
@@ -135,15 +147,6 @@ public class BattleHandler implements Listener {
             MessageHandler.sendMessage(event.getPlayerOne(), AccountHandler.getPrefix(event.getPlayerTwo()) + " &cis already in a battle");
             event.setCancelled(true);
         }
-    }
-
-    @EventHandler
-    public void onQuitCommand(QuitCommandEvent event) {
-        Battle battle = getBattle(event.getPlayer());
-        if(battle != null) {
-            battle.end(event.getPlayer());
-        }
-        removePlayerBattle(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

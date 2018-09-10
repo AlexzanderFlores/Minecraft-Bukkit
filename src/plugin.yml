@@ -8,6 +8,9 @@ commands:
   viewQueue:
     usage: /viewQueue
 
+  viewTeams:
+    usage: /viewTeams
+
   twitter:
     usage: /twitter
 
@@ -326,3 +329,4 @@ commands:
 
   quit:
     usage: /quit
+    aliases: [leave]

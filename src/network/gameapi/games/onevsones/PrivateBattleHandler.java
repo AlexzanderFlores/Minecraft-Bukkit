@@ -8,6 +8,7 @@ import java.util.Map;
 import network.gameapi.games.onevsones.events.BattleRequestEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -68,34 +69,22 @@ public class PrivateBattleHandler implements Listener {
                             MessageHandler.sendMessage(playerTwo, AccountHandler.getPrefix(playerOne) + " &6has accepted your battle request");
                             MessageHandler.sendMessage(playerOne, "&aYou have accepted " + AccountHandler.getPrefix(playerTwo) + "&6's battle request");
 
-                            QueueHandler.remove(playerOne);
-                            QueueHandler.remove(playerTwo);
+                            OneVsOneKit kit = OneVsOneKit.getPlayersKit(playerOne);
+                            Team teamOne = new Team(DyeColor.RED, kit, playerOne);
+                            Team teamTwo = new Team(DyeColor.BLUE, kit, playerTwo);
 
-                            ProPlugin.resetPlayer(playerTwo);
-                            ProPlugin.resetPlayer(playerOne);
-
-                            getInvite(playerTwo, playerOne).getKit().give(playerTwo);
-                            getInvite(playerTwo, playerOne).getKit().give(playerOne);
-
-                            removeAllInvitesFromPlayer(playerOne);
-                            removeAllInvitesFromPlayer(playerTwo);
-
-                            battleRequests.remove(playerTwo.getName());
-                            battleRequests.remove(playerOne.getName());
-
-                            String clickedName = playerTwo.getName();
-                            String clickerName = playerOne.getName();
+                            for(Player player : new Player [] { playerOne, playerTwo }) {
+                                QueueHandler.remove(player);
+                                ProPlugin.resetPlayer(player);
+                                kit.give(player);
+                                removeAllInvitesFromPlayer(player);
+                                battleRequests.remove(player.getName());
+                            }
 
                             new DelayedTask(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Player clicked = ProPlugin.getPlayer(clickedName);
-                                    if(clicked != null) {
-                                        Player clicker = ProPlugin.getPlayer(clickerName);
-                                        if(clicker != null) {
-                                            new MapProvider(clicked, clicker, false, false);
-                                        }
-                                    }
+                                    new MapProvider(false, false, teamOne, teamTwo);
                                 }
                             }, 20 * 2);
                             return true;

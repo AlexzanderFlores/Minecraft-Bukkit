@@ -20,6 +20,7 @@ import network.server.tasks.AsyncDelayedTask;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -114,7 +115,8 @@ public class QueueHandler implements Listener {
 
         if(Bukkit.getOnlinePlayers().size() == 1 && Ranks.OWNER.hasRank(player)) {
             remove(player);
-            new MapProvider(player, null, false, true);
+            Team team = new Team(DyeColor.RED, kit, player);
+            new MapProvider(false, false, team);
         }
     }
 
@@ -169,9 +171,13 @@ public class QueueHandler implements Listener {
                                     for(Player player : new Player [] { playerOne, playerTwo }) {
                                         queue.remove(player.getName());
                                         MessageHandler.sendMessage(player, "Match found!");
+                                        inQueue.remove(player.getName());
                                     }
 
-                                    new MapProvider(playerOne, playerTwo, false, true);
+                                    Team teamOne = new Team(DyeColor.RED, kit, playerOne);
+                                    Team teamTwo = new Team(DyeColor.BLUE, kit, playerTwo);
+
+                                    new MapProvider(false, true, teamOne, teamTwo);
                                 }
                             }
                         }
