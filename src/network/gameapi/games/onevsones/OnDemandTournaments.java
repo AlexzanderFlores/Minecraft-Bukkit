@@ -20,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
 
     public OnDemandTournaments(Location location) {
         name = "On Demand Tournaments";
-        players = new ArrayList<>();
+        players = new ArrayList<String>();
 
         new NPCEntity(EntityType.ZOMBIE, "&e&n" + name, location, Material.GOLDEN_APPLE) {
             @Override
@@ -87,6 +88,11 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
     private void setPlayerHeads(Player player) {
         InventoryView view = player.getOpenInventory();
         int slot = 10;
+        for(int a = slot; a <= 25; ++a) {
+            view.getTopInventory().setItem(a, new ItemStack(Material.AIR));
+        }
+
+        slot = 10;
         for(String name : players) {
             view.getTopInventory().setItem(slot++, new ItemCreator(ItemUtil.getSkull(name)).setName(name).getItemStack());
             if(slot == 17) {
@@ -96,7 +102,6 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
     }
 
     private boolean removePlayer(String name) {
-        name = name.toLowerCase();
         if(players.contains(name)) {
             players.remove(name);
             return true;
@@ -143,12 +148,13 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
                     if(players.contains(player.getName())) {
                         MessageHandler.sendMessage(player, "&cYou are already in this tournament.");
                     } else {
-                        players.add(player.getName().toLowerCase());
+                        players.add(player.getName());
                         setPlayerHeads(player);
                     }
                 } else if(data == DyeColor.RED.getData()) {
                     if(removePlayer(player.getName())) {
                         MessageHandler.sendMessage(player, "You have left this on demand tournament.");
+                        setPlayerHeads(player);
                     }
                 }
             }
