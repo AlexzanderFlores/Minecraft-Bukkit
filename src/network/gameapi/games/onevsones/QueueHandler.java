@@ -114,7 +114,7 @@ public class QueueHandler implements Listener {
 
         if(Bukkit.getOnlinePlayers().size() == 1 && Ranks.OWNER.hasRank(player)) {
             remove(player);
-            new MapProvider(player, null, player.getWorld(), false, true);
+            new MapProvider(player, null, false, true);
         }
     }
 
@@ -171,7 +171,7 @@ public class QueueHandler implements Listener {
                                         MessageHandler.sendMessage(player, "Match found!");
                                     }
 
-                                    new MapProvider(playerOne, playerTwo, playerOne.getWorld(), false, true);
+                                    new MapProvider(playerOne, playerTwo, false, true);
                                 }
                             }
                         }

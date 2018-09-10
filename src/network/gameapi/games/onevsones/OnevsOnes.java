@@ -75,13 +75,14 @@ public class OnevsOnes extends ProPlugin {
         new TeamMatchHandler(new Location(world, 3.5, 13, -44.5));
         new OnDemandTournaments(new Location(world, -2.5, 13, -44.5));
         new MonthlyTournaments(new Location(world, -7.5, 13, -43.5));
+        
         new DelayedTask(new Runnable() {
 			@Override
 			public void run() {
 				List<Location> locations = Arrays.asList(
-					new Location(world, -5.5, 18.5, -47),
-					new Location(world, 0.5, 18.5, -49),
-					new Location(world, 6.5, 18.5, -47)
+					new Location(world, 13.5, 18.5, -25),
+					new Location(world, 13.5, 18.5, -31),
+					new Location(world, 13.5, 18.5, -37)
 				);
 				new StatDisplayer(locations);
 				List<Hologram> holograms = new ArrayList<Hologram>();

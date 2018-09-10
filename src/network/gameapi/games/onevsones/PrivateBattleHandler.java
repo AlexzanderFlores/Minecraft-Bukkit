@@ -93,7 +93,7 @@ public class PrivateBattleHandler implements Listener {
                                     if(clicked != null) {
                                         Player clicker = ProPlugin.getPlayer(clickerName);
                                         if(clicker != null) {
-                                            new MapProvider(clicked, clicker, clicked.getWorld(), false, false);
+                                            new MapProvider(clicked, clicker, false, false);
                                         }
                                     }
                                 }

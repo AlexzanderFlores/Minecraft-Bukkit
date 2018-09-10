@@ -63,11 +63,15 @@ public class MapProvider implements Listener {
         EventUtil.register(this);
     }
 
-    public MapProvider(Player playerOne, Player playerTwo, World world, boolean tournament, boolean ranked) {
+    public MapProvider(Player playerOne, Player playerTwo, boolean tournament, boolean ranked) {
         Location map = null;
         do {
             map = (Location) maps.keySet().toArray()[new Random().nextInt(maps.size())];
         } while(map == null || maps.get(map));
+
+        Bukkit.getLogger().info("");
+        Bukkit.getLogger().info("In use = " + maps.get(map) + " (" + playerOne.getName() + ", " + playerTwo.getName() + ")");
+        Bukkit.getLogger().info("");
 
         new Battle(map, playerOne, playerTwo, tournament, ranked);
     }

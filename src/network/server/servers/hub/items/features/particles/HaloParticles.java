@@ -65,9 +65,7 @@ public class HaloParticles extends FeatureBase {
 		SLIME(23, "Slime Halo Particles", Rarity.COMMON, Material.SLIME_BALL),
 		HEART(24, "Heart Halo Particles", Rarity.UNCOMMON, Material.RED_ROSE),
 		FIREWORKS_SPARK(25, "Firework Spark Halo Particles", Rarity.RARE, Material.FIREWORK),
-		NONE(33, "&cSet No Halo Particles", Rarity.COMMON, Material.WEB, false)
-		
-		;
+		NONE(33, "&cSet No Halo Particles", Rarity.COMMON, Material.WEB, false);
 		
 		private int slot = 0;
 		private String name = null;
@@ -272,7 +270,7 @@ public class HaloParticles extends FeatureBase {
 		}
 		loadItem.setLores(new String [] {
 			"",
-			"&7This toggles wheather or not your halo",
+			"&7This toggles weather or not your halo",
 			"&7particles will load when you join a hub",
 			"",
 			"&7This is for " + Ranks.VIP.getPrefix() + "&7rank and above only to",
