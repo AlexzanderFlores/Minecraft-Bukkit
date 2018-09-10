@@ -9,6 +9,7 @@ import network.gameapi.competitive.EloHandler;
 import network.gameapi.competitive.EloRanking;
 import network.gameapi.competitive.EloRanking.EloRank;
 import network.gameapi.competitive.StatDisplayer;
+import network.gameapi.competitive.StatsNPC;
 import network.gameapi.games.onevsones.kits.*;
 import network.gameapi.uhc.GoldenHead;
 import network.player.MessageHandler;
@@ -73,6 +74,7 @@ public class OnevsOnes extends ProPlugin {
         new OnDemandTournaments(new Location(world, -2.5, 13, -44.5));
         new MonthlyTournaments(new Location(world, -7.5, 13, -43.5));
 		new DailyRewards(new Location(world, 0.5, 12, -20.5));
+		new StatsNPC(new Location(world, -16.5, 12, -34.5));
 
         new DelayedTask(new Runnable() {
 			@Override
