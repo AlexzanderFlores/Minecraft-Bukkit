@@ -4,6 +4,7 @@ import network.Network;
 import network.ProPlugin;
 import network.player.LevelHandler;
 import network.player.TeamScoreboardHandler;
+import network.server.DailyRewards;
 import network.server.ServerLogger;
 import network.server.servers.hub.crate.Crate;
 import network.server.servers.hub.crate.KeyExchange;
@@ -15,6 +16,8 @@ import network.server.servers.hub.items.Profile;
 import network.server.servers.hub.parkours.EndlessParkour;
 import network.server.util.FileHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.io.File;
 
@@ -30,6 +33,7 @@ public class HubBase extends ProPlugin {
 		resetWorld(12250);
 		hubNumber = Integer.valueOf(Network.getServerName().replaceAll("[^\\d.]", ""));
 		LevelHandler.enable();
+		World world = Bukkit.getWorlds().get(0);
 		new Events();
 		new Crate();
 		new KeyExchange();
@@ -39,7 +43,7 @@ public class HubBase extends ProPlugin {
 		new Profile();
 		new HubSelector();
 		new ServerLogger();
-		new DailyRewards();
+		new DailyRewards(new Location(world, 1684.5, 5, -1295.5));
 		new TeamScoreboardHandler();
 		new ParkourNPC();
 		new EndlessParkour();

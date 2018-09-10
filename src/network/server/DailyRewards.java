@@ -1,4 +1,4 @@
-package network.server.servers.hub;
+package network.server;
 
 import java.util.UUID;
 
@@ -31,11 +31,11 @@ public class DailyRewards implements Listener {
 	private String streakName = null;
 	private final int coins = 20;
 	
-	public DailyRewards() {
+	public DailyRewards(Location location) {
 		name = "Daily Rewards";
 		rewardsName = "Rewards";
 		streakName = "Streaks";
-		Villager villager = (Villager) new NPCEntity(EntityType.VILLAGER, "&e&n" + name, new Location(Bukkit.getWorlds().get(0), 1684.5, 5, -1295.5)) {
+		Villager villager = (Villager) new NPCEntity(EntityType.VILLAGER, "&e&n" + name, location) {
 			@Override
 			public void onInteract(Player player) {
 				open(player);
@@ -48,6 +48,7 @@ public class DailyRewards implements Listener {
 	
 	private void open(Player player) {
 		Inventory inventory = Bukkit.createInventory(player, 9 * 3, name);
+
 		inventory.setItem(12, new ItemCreator(Material.DIAMOND).setName("&bVote").setLores(new String [] {
 			"",
 			"&eVote each day for cool rewards",
@@ -56,6 +57,7 @@ public class DailyRewards implements Listener {
 			"&7Right click - &aView voting rewards",
 			""
 		}).getItemStack());
+
 		inventory.setItem(14, new ItemCreator(Material.DIAMOND).setName("&bVoting Streaks").setLores(new String [] {
 			"",
 			"&eVoting each day will create a streak",
@@ -64,6 +66,7 @@ public class DailyRewards implements Listener {
 			"&7Click - &aView streak information",
 			""
 		}).getItemStack());
+
 		player.openInventory(inventory);
 	}
 	

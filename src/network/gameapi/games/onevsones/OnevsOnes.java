@@ -16,10 +16,7 @@ import network.player.TeamScoreboardHandler;
 import network.player.account.AccountHandler.Ranks;
 import network.player.scoreboard.BelowNameHealthScoreboardUtil;
 import network.player.scoreboard.SidebarScoreboardUtil;
-import network.server.CPSDetector;
-import network.server.CommandBase;
-import network.server.DB;
-import network.server.ServerLogger;
+import network.server.*;
 import network.server.tasks.DelayedTask;
 import network.server.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -75,7 +72,8 @@ public class OnevsOnes extends ProPlugin {
         new TeamMatchHandler(new Location(world, 3.5, 13, -44.5));
         new OnDemandTournaments(new Location(world, -2.5, 13, -44.5));
         new MonthlyTournaments(new Location(world, -7.5, 13, -43.5));
-        
+		new DailyRewards(new Location(world, 0.5, 12, -20.5));
+
         new DelayedTask(new Runnable() {
 			@Override
 			public void run() {
