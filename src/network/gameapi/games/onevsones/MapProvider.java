@@ -1,28 +1,30 @@
 package network.gameapi.games.onevsones;
 
 import network.customevents.TimeEvent;
+import network.customevents.player.PlayerLeaveEvent;
 import network.gameapi.games.onevsones.events.BattleEndEvent;
+import network.player.MessageHandler;
 import network.server.util.EventUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class MapProvider implements Listener {
     private static Map<Location, Boolean> maps = null; // <Center Block> <In Use>
     private static Map<Location, Vector> spawnDistances = null;
+    private static List<String> noMapMessage = null;
 
     public MapProvider(World world) {
         maps = new HashMap<Location, Boolean>();
         spawnDistances = new HashMap<Location, Vector>();
+        noMapMessage = new ArrayList<String>();
         Block mapCheckBlock = null;
         int x = 200;
         final int y = 12;
@@ -62,11 +64,35 @@ public class MapProvider implements Listener {
     }
 
     public MapProvider(boolean tournament, boolean ranked, Team ... teams) {
+        // Check if there's at least 1 open map
+        boolean openMap = false;
+        for(boolean inUse : maps.values()) {
+            if(!inUse) {
+                openMap = true;
+                break;
+            }
+        }
+        if(!openMap) {
+            for(Team team : teams) {
+                for(Player player : team.getPlayers()) {
+                    if(!noMapMessage.contains(player.getName())) {
+                        noMapMessage.add(player.getName());
+                        MessageHandler.sendMessage(player, "&cThere are no open maps at the moment, please wait.");
+                    }
+                }
+            }
+            return;
+        }
+
+        noMapMessage.clear();
+
+        // Get a random map from the current open maps
         Location map = null;
         do {
             map = (Location) maps.keySet().toArray()[new Random().nextInt(maps.size())];
         } while(map == null || maps.get(map));
 
+        // Set that map to "in use"
         maps.put(map, true);
 
         new Battle(map, tournament, ranked, teams);
@@ -91,5 +117,10 @@ public class MapProvider implements Listener {
     @EventHandler
     public void onBattleEnd(BattleEndEvent event) {
         maps.put(event.getBattle().getTargetLocation(), false);
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerLeaveEvent event) {
+        noMapMessage.remove(event.getPlayer().getName());
     }
 }
