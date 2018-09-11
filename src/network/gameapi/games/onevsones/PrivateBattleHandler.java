@@ -49,12 +49,6 @@ public class PrivateBattleHandler implements Listener {
                 if(playerTwo == null) {
                     MessageHandler.sendMessage(playerOne, "&c" + arguments[0] + " is not online");
                     return true;
-                } else if(playerOne.getInventory().contains(Material.MAGMA_CREAM)) {
-                    MessageHandler.sendMessage(playerOne, "&cCannot send request: You have your battle requests disabled");
-                    return true;
-                } else if(playerTwo.getInventory().contains(Material.MAGMA_CREAM)) {
-                    MessageHandler.sendMessage(playerOne, AccountHandler.getPrefix(playerTwo) + " &chas battle requests disabled");
-                    return true;
                 } else if(playerOne.getName().equals(playerTwo.getName())) {
                     MessageHandler.sendMessage(sender, "&cYou can't battle yourself");
                     return true;

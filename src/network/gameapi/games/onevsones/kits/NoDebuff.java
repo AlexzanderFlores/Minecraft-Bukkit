@@ -1,7 +1,12 @@
 package network.gameapi.games.onevsones.kits;
 
+import network.gameapi.games.onevsones.BattleHandler;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.Potion.Tier;
@@ -23,9 +28,10 @@ public class NoDebuff extends OneVsOneKit {
         setItem(9, new ItemStack(Material.ARROW, 64));
         Potion health = new Potion(PotionType.INSTANT_HEAL, 1, true);
         health.setTier(Tier.TWO);
-        for(int a = 2; a <= 6; ++a) {
+        for(int a = 2; a <= 5; ++a) {
             setItem(a, health.toItemStack(1));
         }
+        setItem(6, new ItemStack(Material.COOKED_BEEF, 64));
         Potion fireResistance = new Potion(PotionType.FIRE_RESISTANCE, 1, false);
         fireResistance.setHasExtendedDuration(true);
         setItem(7, fireResistance.toItemStack(1));
@@ -36,6 +42,16 @@ public class NoDebuff extends OneVsOneKit {
         }
         for(int slot : new int [] {9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32}) {
             setItem(slot, health.toItemStack(1));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+        if(event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if(BattleHandler.isInBattle(player) && hasKit(player)) {
+                event.setCancelled(false);
+            }
         }
     }
 }

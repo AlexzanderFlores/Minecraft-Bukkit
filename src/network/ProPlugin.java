@@ -1005,13 +1005,13 @@ public class ProPlugin extends CountDownUtil implements Listener {
 		});
 	}
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
 		if(DEBUG) {
 			Bukkit.getLogger().info(event.toString());
 		}
 		if(!getAllowFoodLevelChange()) {
-			event.setFoodLevel(20);
+			event.setCancelled(true);
 		}
 		if(event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();

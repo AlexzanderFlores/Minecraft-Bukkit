@@ -81,6 +81,7 @@ public class LobbyHandler implements Listener {
                 giveItems(player);
             }
         }
+        player.setFoodLevel(20);
         Network.getSidebar().update(player);
         return location;
     }
