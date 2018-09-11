@@ -2,6 +2,7 @@ package network.gameapi;
 
 import network.Network;
 import network.ProPlugin;
+import network.customevents.TimeEvent;
 import network.customevents.player.MouseClickEvent;
 import network.customevents.player.PlayerLeaveEvent;
 import network.customevents.player.PlayerSpectatorEvent;
@@ -18,6 +19,7 @@ import network.server.util.ItemUtil;
 import network.staff.StaffMode;
 import npc.NPCEntity;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -48,6 +50,7 @@ public class SpectatorHandler implements Listener {
 	private static Map<String, Map<Integer, ItemStack>> items = null;
 	private static Map<String, Integer> levels = null;
 	private static Map<String, Float> flySpeeds = null;
+	private static List<String> isNearEntity = null;
 	private static List<String> spectators = null;
 	private static List<String> beenTold = null;
 	private static ItemStack teleporter = null;
@@ -56,13 +59,14 @@ public class SpectatorHandler implements Listener {
 	private static ItemStack nextGame = null;
 	private static boolean enabled = false;
 	protected static boolean saveItems = true;
-	private static final double range = 10;
+	private static final double nearByEntityRange = 10;
 	private static String settingsName = null;
 	
 	public SpectatorHandler() {
 		items = new HashMap<String, Map<Integer, ItemStack>>();
 		levels = new HashMap<String, Integer>();
 		flySpeeds = new HashMap<String, Float>();
+		isNearEntity = new ArrayList<String>();
 		spectators = new ArrayList<String>();
 		beenTold = new ArrayList<String>();
 
@@ -124,42 +128,6 @@ public class SpectatorHandler implements Listener {
 				return true;
 			}
 		}.setRequiredRank(Ranks.VIP);
-
-		Bukkit.getScheduler().runTaskTimer(Network.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				if(spectators != null && !spectators.isEmpty()) {
-					for(Player player : getPlayers()) {
-						boolean nearBy = false;
-						for(Entity entity : player.getNearbyEntities(range, range, range)) {
-							if(entity instanceof LivingEntity || entity instanceof Projectile) {
-								if(entity instanceof Player) {
-									Player nearPlayer = (Player) entity;
-									if(contains(nearPlayer)) {
-										continue;
-									}
-								}
-								if(!beenTold.contains(player.getName())) {
-									beenTold.add(player.getName());
-									MessageHandler.sendMessage(player, "");
-									MessageHandler.sendMessage(player, "&cNote: &xIf you get too close to a living entity or a projectile you will go into spectating game mode");
-									MessageHandler.sendMessage(player, "");
-								}
-								nearBy = true;
-								player.setGameMode(GameMode.CREATIVE);
-								break;
-							}
-						}
-						if(!nearBy && player.getGameMode() == GameMode.CREATIVE) {
-							Location location = player.getLocation();
-							if(location.getBlock().getType() == Material.AIR && location.add(0, 1, 0).getBlock().getType() == Material.AIR) {
-								player.setGameMode(GameMode.CREATIVE);
-							}
-						}
-					}
-				}
-			}
-		}, 20, 20);
 
 		EventUtil.register(this);
 	}
@@ -255,6 +223,7 @@ public class SpectatorHandler implements Listener {
 				player.setGameMode(GameMode.SURVIVAL);
 				player.setFlying(false);
 				player.setAllowFlight(false);
+				isNearEntity.remove(player.getName());
 				levels.remove(player.getName());
 				flySpeeds.remove(player.getName());
 				if(saveItems) {
@@ -563,5 +532,68 @@ public class SpectatorHandler implements Listener {
 		if(contains(player) && player.getVehicle() != null && player.getVehicle() instanceof Player) {
 			player.leaveVehicle();
 		}
+	}
+
+	@EventHandler
+	public void onTime(TimeEvent event) {
+		long ticks = event.getTicks();
+
+		if(ticks == 1) {
+			if(spectators != null && !spectators.isEmpty()) {
+				for(Player player : getPlayers()) {
+					if(isSpectatorNearEntity(player)) {
+						// Let the player know why their game mode changed
+						if(!beenTold.contains(player.getName())) {
+							beenTold.add(player.getName());
+							MessageHandler.sendMessage(player, "");
+							MessageHandler.sendMessage(player, "&cNote: &xIf you get too close to a living entity or a projectile you will go into spectating game mode temporarily");
+							MessageHandler.sendMessage(player, "");
+						}
+
+						isNearEntity.add(player.getName());
+						player.setGameMode(GameMode.SPECTATOR);
+					} else {
+						isNearEntity.remove(player.getName());
+					}
+				}
+			}
+		} else if(ticks == 20 * 2) {
+			// Remove spectators in the "spectating" game mode if they're away from entities and blocks
+			for(Player player : getPlayers()) {
+				if(player.getGameMode() == GameMode.SPECTATOR && !isNearEntity.contains(player.getName())) {
+					Location location = player.getLocation();
+					Block block = location.getBlock();
+					int range = 2;
+					for(int x = -range; x <= range; ++x) {
+						for(int y = -range; y <= range; ++y) {
+							for(int z = -range; z <= range; ++z) {
+								if(block.getRelative(x, y, z).getType() != Material.AIR) {
+									return;
+								}
+							}
+						}
+					}
+					player.setGameMode(GameMode.CREATIVE);
+				}
+			}
+		}
+	}
+
+	private boolean isSpectatorNearEntity(Player player) {
+		for(Entity entity : player.getNearbyEntities(nearByEntityRange, nearByEntityRange, nearByEntityRange)) {
+			if(entity instanceof LivingEntity || entity instanceof Projectile) {
+				// Don't change game modes if we're near another spectator
+				if(entity instanceof Player) {
+					Player nearPlayer = (Player) entity;
+					if(contains(nearPlayer)) {
+						continue;
+					}
+				}
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

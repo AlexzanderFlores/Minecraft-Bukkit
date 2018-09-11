@@ -2,6 +2,9 @@ package network.gameapi.games.onevsones.kits;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
@@ -28,5 +31,15 @@ public class SpeedUHC extends OneVsOneKit {
         setItem(6, swift.toItemStack(1));
         setItem(7, new ItemStack(Material.COBBLESTONE, 32));
         setItem(8, new ItemStack(Material.DIAMOND_PICKAXE));
+    }
+
+    @EventHandler
+    public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+        if(event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED && event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if(hasKit(player)) {
+                event.setCancelled(true);
+            }
+        }
     }
 }

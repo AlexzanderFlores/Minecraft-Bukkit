@@ -1,14 +1,11 @@
 package network.gameapi.games.onevsones.kits;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.avaje.ebean.annotation.EnumValue;
 import network.gameapi.games.onevsones.OnevsOnes;
-import network.gameapi.games.onevsones.events.BattleEndEvent;
 import network.gameapi.games.onevsones.events.BattleStartEvent;
 import network.gameapi.games.onevsones.events.QueueEvent;
 import network.player.MessageHandler;
@@ -18,18 +15,14 @@ import network.server.util.EventUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionType;
 
 import network.ProPlugin;
 import network.server.tasks.AsyncDelayedTask;
-import network.server.util.ConfigurationUtil;
 import network.server.util.ItemCreator;
 
 @SuppressWarnings("deprecation")
@@ -132,6 +125,14 @@ public class OneVsOneKit implements Listener {
             }
         }
         return counter;
+    }
+
+    public boolean hasKit(Player player) {
+        OneVsOneKit kit = getPlayersKit(player);
+        if(kit != null && kit.getName().equalsIgnoreCase(getName())) {
+            return true;
+        }
+        return false;
     }
 
     public void setArmor(Material armor) {
@@ -287,13 +288,6 @@ public class OneVsOneKit implements Listener {
             removePlayerKit(player);
         }
     }
-
-//    @EventHandler
-//    public void onBattleEnd(BattleEndEvent event) {
-//        for(Player player : event.getBattle().getPlayers()) {
-//            removePlayerKit(player);
-//        }
-//    }
 
     public enum ArmorSlot {
         HELMET(39), CHESTPLATE(38), LEGGINGS(37), BOOTS(36);

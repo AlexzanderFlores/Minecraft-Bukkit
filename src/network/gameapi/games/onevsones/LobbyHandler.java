@@ -49,6 +49,7 @@ public class LobbyHandler implements Listener {
     private static List<String> disabledRequests = null;
     private static List<String> watching = null;
     private static String kitSelectionname = null;
+    private static int maxCoords = 100;
 
     public LobbyHandler() {
     	rankedQueue = new ItemCreator(Material.ARROW).setName("&aKit Selector").getItemStack();
@@ -199,14 +200,11 @@ public class LobbyHandler implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if(!Ranks.OWNER.hasRank(player)) {
-        	Location to = event.getTo();
-            if(player.isFlying() && to.getY() >= 23) {
-                event.setTo(event.getFrom());
-            }
             if(isInLobby(player) && !SpectatorHandler.contains(player)) {
+                Location to = event.getTo();
                 int x = to.getBlockX();
                 int z = to.getBlockZ();
-                if(x >= 70 || x <= -70 || z >= 80 || z <= -80) {
+                if(x >= maxCoords || x <= -maxCoords || z >= maxCoords || z <= -maxCoords) {
                     event.setTo(event.getFrom());
                 }
             }
