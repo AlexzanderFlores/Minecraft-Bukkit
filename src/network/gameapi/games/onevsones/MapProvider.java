@@ -1,6 +1,7 @@
 package network.gameapi.games.onevsones;
 
 import network.customevents.TimeEvent;
+import network.gameapi.games.onevsones.events.BattleEndEvent;
 import network.server.util.EventUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,8 +17,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class MapProvider implements Listener {
-    public static Map<Location, Boolean> maps = null; // <Center Block> <In Use>
-    public static Map<Location, Vector> spawnDistances = null;
+    private static Map<Location, Boolean> maps = null; // <Center Block> <In Use>
+    private static Map<Location, Vector> spawnDistances = null;
 
     public MapProvider(World world) {
         maps = new HashMap<Location, Boolean>();
@@ -66,11 +67,13 @@ public class MapProvider implements Listener {
             map = (Location) maps.keySet().toArray()[new Random().nextInt(maps.size())];
         } while(map == null || maps.get(map));
 
-        Bukkit.getLogger().info("");
-        Bukkit.getLogger().info("In use = " + maps.get(map) + " (" + teams[0].getPlayers().get(0).getName() + ")");
-        Bukkit.getLogger().info("");
+        maps.put(map, true);
 
         new Battle(map, tournament, ranked, teams);
+    }
+
+    public static Vector getSpawnDistance(Location location) {
+        return spawnDistances.get(location);
     }
 
     @EventHandler
@@ -83,5 +86,10 @@ public class MapProvider implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onBattleEnd(BattleEndEvent event) {
+        maps.put(event.getBattle().getTargetLocation(), false);
     }
 }

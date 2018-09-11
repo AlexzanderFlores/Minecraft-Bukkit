@@ -79,7 +79,7 @@ public class Battle implements Listener {
 
         Location firstMap = targetLocation.clone();
         firstMap.setZ(-30);
-        Vector distance = MapProvider.spawnDistances.get(firstMap);
+        Vector distance = MapProvider.getSpawnDistance(firstMap);
 
         Location teamOneLocation = targetLocation.clone().add(distance.getX() + .5, 0, distance.getZ() + .5);
         teamOneLocation.setY(15);
