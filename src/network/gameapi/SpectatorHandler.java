@@ -41,12 +41,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SpectatorHandler implements Listener {
+	private static SpectatorHandler instance = null;
+	private static SpectatorOnlyEvents spectatorOnlyEvents = null;
 	private static Map<String, Map<Integer, ItemStack>> items = null;
 	private static Map<String, Integer> levels = null;
 	private static Map<String, Float> flySpeeds = null;
@@ -90,9 +89,9 @@ public class SpectatorHandler implements Listener {
 					if(sender instanceof Player) {
 						Player player = (Player) sender;
 						if(SpectatorHandler.contains(player)) {
-							SpectatorHandler.remove(player);
+							getInstance().remove(player);
 						} else {
-							SpectatorHandler.add(player);
+							getInstance().add(player);
 						}
 					} else {
 						MessageHandler.sendPlayersOnly(sender);
@@ -102,9 +101,9 @@ public class SpectatorHandler implements Listener {
 					if(player == null) {
 						MessageHandler.sendMessage(sender, "&c" + arguments[0] + " is not online");
 					} else if(SpectatorHandler.contains(player)) {
-						SpectatorHandler.remove(player);
+						getInstance().remove(player);
 					} else {
-						SpectatorHandler.add(player);
+						getInstance().add(player);
 					}
 				}
 				return true;
@@ -129,7 +128,12 @@ public class SpectatorHandler implements Listener {
 			}
 		}.setRequiredRank(Ranks.VIP);
 
-		EventUtil.register(this);
+		instance = this;
+		EventUtil.register(instance);
+	}
+
+	public static SpectatorHandler getInstance() {
+		return instance;
 	}
 	
 	public void createNPC(Location location) {
@@ -141,7 +145,7 @@ public class SpectatorHandler implements Listener {
 			@Override
 			public void onInteract(Player player) {
 				if(contains(player)) {
-					SpectatorHandler.remove(player);
+					getInstance().remove(player);
 				} else {
 					add(player);
 				}
@@ -162,7 +166,7 @@ public class SpectatorHandler implements Listener {
 		}
 	}
 	
-	public static void add(Player player) {
+	public void add(Player player) {
 		if(!contains(player)) {
 			PlayerSpectatorEvent playerSpectateStartEvent = new PlayerSpectatorEvent(player, SpectatorState.STARTING);
 			Bukkit.getPluginManager().callEvent(playerSpectateStartEvent);
@@ -199,13 +203,18 @@ public class SpectatorHandler implements Listener {
 				player.setGameMode(GameMode.CREATIVE);
 				player.setAllowFlight(true);
 				player.setFlying(true);
+
 				playerSpectateStartEvent = new PlayerSpectatorEvent(player, SpectatorState.ADDED);
 				Bukkit.getPluginManager().callEvent(playerSpectateStartEvent);
+
+				if(spectatorOnlyEvents == null) {
+					spectatorOnlyEvents = new SpectatorOnlyEvents();
+				}
 			}
 		}
 	}
 	
-	public static void remove(final Player player) {
+	public void remove(final Player player) {
 		if(contains(player)) {
 			PlayerSpectatorEvent spectateEndEvent = new PlayerSpectatorEvent(player, SpectatorState.END);
 			Bukkit.getPluginManager().callEvent(spectateEndEvent);
@@ -226,6 +235,12 @@ public class SpectatorHandler implements Listener {
 				isNearEntity.remove(player.getName());
 				levels.remove(player.getName());
 				flySpeeds.remove(player.getName());
+
+				if(spectators.isEmpty() && spectatorOnlyEvents != null) {
+					TimeEvent.getHandlerList().unregister(spectatorOnlyEvents);
+					spectatorOnlyEvents = null;
+				}
+
 				if(saveItems) {
 					if(items.containsKey(player.getName())) {
 						new DelayedTask(new Runnable() {
@@ -281,220 +296,7 @@ public class SpectatorHandler implements Listener {
 			return (gameState == GameStates.STARTING && !miniGame.getCanJoinWhileStarting()) || gameState == GameStates.STARTED;
 		}
 	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		if(wouldSpectate()) {
-			add(event.getPlayer());
-		}
-		for(Player spectator : getPlayers()) {
-			event.getPlayer().hidePlayer(spectator);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerLeave(PlayerLeaveEvent event) {
-		remove(event.getPlayer());
-		beenTold.remove(event.getPlayer().getName());
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onBlockPlace(BlockPlaceEvent event) {
-		if(contains(event.getPlayer())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onBlockBreak(BlockBreakEvent event) {
-		if(contains(event.getPlayer())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onEntityDamage(EntityDamageEvent event) {
-		if(event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			if(contains(player)) {
-				if(event.getCause() == DamageCause.VOID) {
-					player.teleport(player.getWorld().getSpawnLocation());
-				}
-				event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-		if(event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			if(contains(player)) {
-				event.setCancelled(true);
-			}
-		}
-		if(event.getDamager() instanceof Player) {
-			Player damager = (Player) event.getDamager();
-			if(contains(damager)) {
-				event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerInteract(PlayerInteractEvent event) {
-		if(contains(event.getPlayer())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onMouseClick(MouseClickEvent event) {
-		Player player = event.getPlayer();
-		if(contains(player) || (Network.getMiniGame() != null && Network.getMiniGame().getGameState() == GameStates.ENDING)) {
-			ItemStack item = player.getItemInHand();
-			if(item != null) {
-				if(item.getType() == Material.WATCH) {
-					Inventory inventory = ItemUtil.getPlayerSelector(player, item.getItemMeta().getDisplayName());
-					if(inventory != null) {
-						player.openInventory(inventory);
-					}
-				} else if(item.getType() == Material.WOOD_DOOR) {
-					if(Network.getMiniGame() == null) {
-						remove(player);
-					} else {
-						ProPlugin.sendPlayerToServer(player, "hub");
-					}
-				} else if(item.getType() == Material.DIAMOND_SWORD) {
-					AutoJoinHandler.send(player);
-				} else if(item.getType() == Material.REDSTONE_COMPARATOR) {
-					Inventory inventory = Bukkit.createInventory(player, 9 * 3, settingsName);
-					int [] slot = new int [] {10, 12, 14};
-					for(int a = 0; a < slot.length; ++a) {
-						inventory.setItem(slot[a], new ItemCreator(Material.FEATHER).setAmount(a + 1).setName("&eFly Speed " + (a + 1)).getItemStack());
-					}
-					inventory.setItem(16, new ItemCreator(Material.TORCH).setName("&eToggle Night Vision").getItemStack());
-					player.openInventory(inventory);
-				}
-			}
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onInventoryClick(InventoryClickEvent event) {
-		if(event.getWhoClicked() instanceof Player) {
-			Player player = (Player) event.getWhoClicked();
-			if(contains(player)) {
-				ItemStack item = event.getCurrentItem();
-				if(item != null && item.getItemMeta() != null) {
-					if(event.getInventory().getName().equals(teleporter.getItemMeta().getDisplayName())) {
-						Player target = ProPlugin.getPlayer(item.getItemMeta().getDisplayName());
-						if(target == null) {
-							MessageHandler.sendMessage(player, "&cThat player is no longer playing");
-						} else {
-							player.teleport(target);
-							MessageHandler.sendMessage(player, "&eNote: &aYou can also teleport with &c/spec <player name>");
-						}
-					} else if(event.getInventory().getTitle().equals(settingsName)) {
-						if(item.getType() == Material.FEATHER) {
-							if(Ranks.VIP.hasRank(player)) {
-								player.setFlySpeed((float) (item.getAmount() * 0.10));
-							} else {
-								MessageHandler.sendMessage(player, Ranks.VIP.getNoPermission());
-							}
-						} else if(item.getType() == Material.TORCH) {
-							if(Ranks.VIP.hasRank(player)) {
-								if(player.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
-									player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-								} else {
-									player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 999999999, 100));
-								}
-							} else {
-								MessageHandler.sendMessage(player, Ranks.VIP.getNoPermission());
-							}
-						}
-						player.closeInventory();
-					}
-				}
-				event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-		if(contains(event.getPlayer())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerDropItem(PlayerDropItemEvent event) {
-		if(contains(event.getPlayer())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-		Player player = event.getPlayer();
-		if(contains(player)) {
-			if(Network.getMiniGame() != null && Network.getMiniGame().getUseSpectatorChatChannel()) {
-				for(Player online : Bukkit.getOnlinePlayers()) {
-					if(!contains(online) && !Ranks.isStaff(online)) {
-						event.getRecipients().remove(online);
-					}
-				}
-			}
-			event.setFormat(ChatColor.GRAY + "[Spec] " + AccountHandler.getPrefix(player, false) + ": " + event.getMessage());
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerExpChange(PlayerExpChangeEvent event) {
-		if(contains(event.getPlayer())) {
-			event.setAmount(0);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onVehicleEnter(VehicleEnterEvent event) {
-		if(event.getEntered() instanceof Player) {
-			Player player = (Player) event.getEntered();
-			if(contains(player)) {
-				event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onVehicleDamage(VehicleDamageEvent event) {
-		if(event.getAttacker() instanceof Player) {
-			Player player = (Player) event.getAttacker();
-			if(contains(player)) {
-				event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onVehicleDestroy(VehicleDestroyEvent event) {
-		if(event.getAttacker() instanceof Player) {
-			Player player = (Player) event.getAttacker();
-			if(contains(player)) {
-				event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-		if(contains(event.getPlayer())) {
-			event.setCancelled(true);
-		}
-	}
-	
+
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		if(Network.getMiniGame() != null && Network.getMiniGame().getPlayersHaveOneLife()) {
@@ -509,79 +311,24 @@ public class SpectatorHandler implements Listener {
 		}
 	}
 	
-	@EventHandler
-	public void onFoodLevelChange(FoodLevelChangeEvent event) {
-		if(event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			if(contains(player)) {
-				event.setFoodLevel(20);
-			}
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		if(wouldSpectate()) {
+			add(event.getPlayer());
+		}
+		for(Player spectator : getPlayers()) {
+			event.getPlayer().hidePlayer(spectator);
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerTeleport(PlayerTeleportEvent event) {
-		Player player = event.getPlayer();
-		if(player.getPassenger() != null && player.getPassenger() instanceof Player) {
-			Player passenger = (Player) player.getPassenger();
-			if(contains(passenger)) {
-				MessageHandler.sendMessage(passenger, "&cYou have been moved off this player due to them teleporting");
-				player.eject();
-			}
-		}
-		if(contains(player) && player.getVehicle() != null && player.getVehicle() instanceof Player) {
-			player.leaveVehicle();
-		}
-	}
-
-	@EventHandler
-	public void onTime(TimeEvent event) {
-		long ticks = event.getTicks();
-
-		if(ticks == 1) {
-			if(spectators != null && !spectators.isEmpty()) {
-				for(Player player : getPlayers()) {
-					if(isSpectatorNearEntity(player)) {
-						// Let the player know why their game mode changed
-						if(!beenTold.contains(player.getName())) {
-							beenTold.add(player.getName());
-							MessageHandler.sendMessage(player, "");
-							MessageHandler.sendMessage(player, "&cNote: &xIf you get too close to a living entity or a projectile you will go into spectating game mode temporarily");
-							MessageHandler.sendMessage(player, "");
-						}
-
-						isNearEntity.add(player.getName());
-						player.setGameMode(GameMode.SPECTATOR);
-					} else {
-						isNearEntity.remove(player.getName());
-					}
-				}
-			}
-		} else if(ticks == 20 * 2) {
-			// Remove spectators in the "spectating" game mode if they're away from entities and blocks
-			for(Player player : getPlayers()) {
-				if(player.getGameMode() == GameMode.SPECTATOR && !isNearEntity.contains(player.getName())) {
-					Location location = player.getLocation();
-					Block block = location.getBlock();
-					int range = 2;
-					for(int x = -range; x <= range; ++x) {
-						for(int y = -range; y <= range; ++y) {
-							for(int z = -range; z <= range; ++z) {
-								if(block.getRelative(x, y, z).getType() != Material.AIR) {
-									return;
-								}
-							}
-						}
-					}
-					player.setGameMode(GameMode.CREATIVE);
-				}
-			}
-		}
+	public void onPlayerLeave(PlayerLeaveEvent event) {
+		beenTold.remove(event.getPlayer().getName());
 	}
 
 	private boolean isSpectatorNearEntity(Player player) {
 		for(Entity entity : player.getNearbyEntities(nearByEntityRange, nearByEntityRange, nearByEntityRange)) {
-			if(entity instanceof LivingEntity || entity instanceof Projectile) {
+			if(entity instanceof Player || entity instanceof Projectile) {
 				// Don't change game modes if we're near another spectator
 				if(entity instanceof Player) {
 					Player nearPlayer = (Player) entity;
@@ -595,5 +342,285 @@ public class SpectatorHandler implements Listener {
 		}
 
 		return false;
+	}
+
+	private class SpectatorOnlyEvents implements Listener {
+		SpectatorOnlyEvents() {
+			spectatorOnlyEvents = this;
+			EventUtil.register(spectatorOnlyEvents);
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onMouseClick(MouseClickEvent event) {
+			Player player = event.getPlayer();
+			if(contains(player)) {
+				ItemStack item = player.getItemInHand();
+				if(item != null) {
+					if(item.getType() == Material.WATCH) {
+						Inventory inventory = ItemUtil.getPlayerSelector(player, item.getItemMeta().getDisplayName());
+						if(inventory != null) {
+							player.openInventory(inventory);
+						}
+					} else if(item.getType() == Material.WOOD_DOOR) {
+						if(Network.getMiniGame() == null) {
+							remove(player);
+						} else {
+							ProPlugin.sendPlayerToServer(player, "hub");
+						}
+					} else if(item.getType() == Material.DIAMOND_SWORD) {
+						AutoJoinHandler.send(player);
+					} else if(item.getType() == Material.REDSTONE_COMPARATOR) {
+						Inventory inventory = Bukkit.createInventory(player, 9 * 3, settingsName);
+						int [] slot = new int [] {10, 12, 14};
+						for(int a = 0; a < slot.length; ++a) {
+							inventory.setItem(slot[a], new ItemCreator(Material.FEATHER).setAmount(a + 1).setName("&eFly Speed " + (a + 1)).getItemStack());
+						}
+						inventory.setItem(16, new ItemCreator(Material.TORCH).setName("&eToggle Night Vision").getItemStack());
+						player.openInventory(inventory);
+					}
+				}
+				event.setCancelled(true);
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onBlockPlace(BlockPlaceEvent event) {
+			if(contains(event.getPlayer())) {
+				event.setCancelled(true);
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onBlockBreak(BlockBreakEvent event) {
+			if(contains(event.getPlayer())) {
+				event.setCancelled(true);
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onEntityDamage(EntityDamageEvent event) {
+			if(event.getEntity() instanceof Player) {
+				Player player = (Player) event.getEntity();
+				if(contains(player)) {
+					if(event.getCause() == DamageCause.VOID) {
+						player.teleport(player.getWorld().getSpawnLocation());
+					}
+					event.setCancelled(true);
+				}
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+			if(event.getEntity() instanceof Player) {
+				Player player = (Player) event.getEntity();
+				if(contains(player)) {
+					event.setCancelled(true);
+				}
+			}
+			if(event.getDamager() instanceof Player) {
+				Player damager = (Player) event.getDamager();
+				if(contains(damager)) {
+					event.setCancelled(true);
+				}
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onPlayerInteract(PlayerInteractEvent event) {
+			if(contains(event.getPlayer())) {
+				event.setCancelled(true);
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onInventoryClick(InventoryClickEvent event) {
+			if(event.getWhoClicked() instanceof Player) {
+				Player player = (Player) event.getWhoClicked();
+				if(contains(player)) {
+					ItemStack item = event.getCurrentItem();
+					if(item != null && item.getItemMeta() != null) {
+						if(event.getInventory().getName().equals(teleporter.getItemMeta().getDisplayName())) {
+							Player target = ProPlugin.getPlayer(item.getItemMeta().getDisplayName());
+							if(target == null) {
+								MessageHandler.sendMessage(player, "&cThat player is no longer playing");
+							} else {
+								player.teleport(target);
+								MessageHandler.sendMessage(player, "&eNote: &aYou can also teleport with &c/spec <player name>");
+							}
+						} else if(event.getInventory().getTitle().equals(settingsName)) {
+							if(item.getType() == Material.FEATHER) {
+								if(Ranks.VIP.hasRank(player)) {
+									player.setFlySpeed((float) (item.getAmount() * 0.10));
+								} else {
+									MessageHandler.sendMessage(player, Ranks.VIP.getNoPermission());
+								}
+							} else if(item.getType() == Material.TORCH) {
+								if(Ranks.VIP.hasRank(player)) {
+									if(player.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
+										player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+									} else {
+										player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 999999999, 100));
+									}
+								} else {
+									MessageHandler.sendMessage(player, Ranks.VIP.getNoPermission());
+								}
+							}
+							player.closeInventory();
+						}
+					}
+					event.setCancelled(true);
+				}
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+			if(contains(event.getPlayer())) {
+				event.setCancelled(true);
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onPlayerDropItem(PlayerDropItemEvent event) {
+			if(contains(event.getPlayer())) {
+				event.setCancelled(true);
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+			Player player = event.getPlayer();
+			if(contains(player)) {
+				if(Network.getMiniGame() != null && Network.getMiniGame().getUseSpectatorChatChannel()) {
+					for(Player online : Bukkit.getOnlinePlayers()) {
+						if(!contains(online) && !Ranks.isStaff(online)) {
+							event.getRecipients().remove(online);
+						}
+					}
+				}
+				event.setFormat(ChatColor.GRAY + "[Spec] " + AccountHandler.getPrefix(player, false) + ": " + event.getMessage());
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onPlayerExpChange(PlayerExpChangeEvent event) {
+			if(contains(event.getPlayer())) {
+				event.setAmount(0);
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onVehicleEnter(VehicleEnterEvent event) {
+			if(event.getEntered() instanceof Player) {
+				Player player = (Player) event.getEntered();
+				if(contains(player)) {
+					event.setCancelled(true);
+				}
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onVehicleDamage(VehicleDamageEvent event) {
+			if(event.getAttacker() instanceof Player) {
+				Player player = (Player) event.getAttacker();
+				if(contains(player)) {
+					event.setCancelled(true);
+				}
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onVehicleDestroy(VehicleDestroyEvent event) {
+			if(event.getAttacker() instanceof Player) {
+				Player player = (Player) event.getAttacker();
+				if(contains(player)) {
+					event.setCancelled(true);
+				}
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+			if(contains(event.getPlayer())) {
+				event.setCancelled(true);
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onPlayerLeave(PlayerLeaveEvent event) {
+			remove(event.getPlayer());
+		}
+
+		@EventHandler
+		public void onFoodLevelChange(FoodLevelChangeEvent event) {
+			if(event.getEntity() instanceof Player) {
+				Player player = (Player) event.getEntity();
+				if(contains(player)) {
+					event.setFoodLevel(20);
+				}
+			}
+		}
+
+		@EventHandler(priority = EventPriority.HIGH)
+		public void onPlayerTeleport(PlayerTeleportEvent event) {
+			Player player = event.getPlayer();
+			if(player.getPassenger() != null && player.getPassenger() instanceof Player) {
+				Player passenger = (Player) player.getPassenger();
+				if(contains(passenger)) {
+					MessageHandler.sendMessage(passenger, "&cYou have been moved off this player due to them teleporting");
+					player.eject();
+				}
+			}
+			if(contains(player) && player.getVehicle() != null && player.getVehicle() instanceof Player) {
+				player.leaveVehicle();
+			}
+		}
+
+		@EventHandler
+		public void onTime(TimeEvent event) {
+			long ticks = event.getTicks();
+
+			if(ticks == 1) {
+				if(spectators != null && !spectators.isEmpty()) {
+					for(Player player : getPlayers()) {
+						if(!isNearEntity.contains(player.getName()) && isSpectatorNearEntity(player)) {
+							// Let the player know why their game mode changed
+							if(!beenTold.contains(player.getName())) {
+								beenTold.add(player.getName());
+								MessageHandler.sendMessage(player, "");
+								MessageHandler.sendMessage(player, "&cNote: &xIf you get too close to a living entity or a projectile you will go into spectating game mode temporarily");
+								MessageHandler.sendMessage(player, "");
+							}
+
+							isNearEntity.add(player.getName());
+							player.setGameMode(GameMode.SPECTATOR);
+						} else {
+							isNearEntity.remove(player.getName());
+						}
+					}
+				}
+			} else if(ticks == 20 * 2) {
+				Bukkit.getLogger().info("2 seconds ran");
+				// Remove spectators in the "spectating" game mode if they're away from entities and blocks
+				for(Player player : getPlayers()) {
+					if(player.getGameMode() == GameMode.SPECTATOR && !isNearEntity.contains(player.getName())) {
+						Location location = player.getLocation();
+						Block block = location.getBlock();
+						int range = 2;
+						for(int x = -range; x <= range; ++x) {
+							for(int y = -range; y <= range; ++y) {
+								for(int z = -range; z <= range; ++z) {
+									if(block.getRelative(x, y, z).getType() != Material.AIR) {
+										return;
+									}
+								}
+							}
+						}
+						player.setGameMode(GameMode.CREATIVE);
+					}
+				}
+			}
+		}
 	}
 }

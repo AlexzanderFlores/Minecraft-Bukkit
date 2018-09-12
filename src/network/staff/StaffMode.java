@@ -93,7 +93,7 @@ public class StaffMode implements Listener {
 					new DelayedTask(new Runnable() {
 						@Override
 						public void run() {
-							SpectatorHandler.remove(player);
+							SpectatorHandler.getInstance().remove(player);
 						}
 					});
 				}
@@ -123,7 +123,7 @@ public class StaffMode implements Listener {
 			if(!staffModeEvent.isCancelled()) {
 				if(SpectatorHandler.isEnabled() && !SpectatorHandler.contains(player)) {
 					if(Network.getMiniGame() == null) {
-						SpectatorHandler.add(player);
+						SpectatorHandler.getInstance().add(player);
 					} else {
 						MessageHandler.sendMessage(player, "&cYou must be a spectator to do this");
 						return;
