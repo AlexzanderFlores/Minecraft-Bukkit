@@ -1,20 +1,24 @@
 package network.gameapi.games.onevsones.kits;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import network.gameapi.games.onevsones.HotBarEditor;
 import network.gameapi.games.onevsones.OnevsOnes;
 import network.gameapi.games.onevsones.events.BattleStartEvent;
 import network.gameapi.games.onevsones.events.QueueEvent;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler;
 import network.server.tasks.DelayedTask;
+import network.server.util.ConfigurationUtil;
 import network.server.util.EventUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,6 +28,8 @@ import org.bukkit.inventory.ItemStack;
 import network.ProPlugin;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.ItemCreator;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionType;
 
 @SuppressWarnings("deprecation")
 public class OneVsOneKit implements Listener {
@@ -177,53 +183,73 @@ public class OneVsOneKit implements Listener {
     }
 
     public void give(Player player, boolean setInMemory) {
-        final String name = player.getName();
-        final String kitName = getName().replace(" ", "_");
+        String name = player.getName();
+        OneVsOneKit kit = this;
+
         new AsyncDelayedTask(new Runnable() {
             @Override
             public void run() {
                 Player player = ProPlugin.getPlayer(name);
                 if(player != null) {
                     player.getInventory().clear();
-//                    boolean hotbarSetup = false;
-//                    String path = HotbarEditor.getPath().replace("%", name);
-//                    File file = new File(path, kitName);
-//                	if(file.exists()) {
-//                		hotbarSetup = true;
-//                        ConfigurationUtil config = new ConfigurationUtil(path);
-//                        for(String key : config.getConfig().getKeys(false)) {
-//                            String item = config.getConfig().getString(key);
-//                            String [] itemData = item.split(":");
-//                            int id = Integer.valueOf(itemData[0]);
-//                            byte data = Byte.valueOf(itemData[1]);
-//                            int amount = Integer.valueOf(itemData[2]);
-//                            String typeName = itemData[3];
-//                            if(typeName.equals("NULL")) {
-//                                ItemStack itemStack = new ItemStack(id, amount, data);
-//                                if(itemData.length > 6) {
-//                                    for(int a = 6; a < itemData.length; ++a) {
-//                                        if(a % 2 == 0) {
-//                                            Enchantment enchant = Enchantment.getByName(itemData[a]);
-//                                            int level = Integer.valueOf(itemData[a + 1]);
-//                                            itemStack.addEnchantment(enchant, level);
-//                                        }
-//                                    }
-//                                }
-//                                player.getInventory().setItem(Integer.valueOf(key), itemStack);
-//                            } else {
-//                                PotionType type = PotionType.valueOf(typeName);
-//                                int level = Integer.valueOf(itemData[4]);
-//                                boolean splash = itemData[5].equals("1");
-//                                player.getInventory().setItem(Integer.valueOf(key), new Potion(type, level, splash).toItemStack(amount));
-//                            }
-//                        }
-//                	}
-//                    if(!hotbarSetup) {
+                    String path = HotBarEditor.getPath(player, kit);
+                    File file = new File(path);
+
+                    if(file.exists()) {
+                        ConfigurationUtil config = new ConfigurationUtil(path);
+                        for(String key : config.getConfig().getKeys(false)) {
+                            ItemStack itemStack = null;
+
+                            int slot = Integer.valueOf(key);
+                            String item = config.getConfig().getString(key);
+
+                            String [] split = item.split("\\|");
+                            String enchantments = split.length > 1 ? split[1] : "";
+                            split = split[0].split(":");
+
+                            Material material = Material.valueOf(split[0]);
+                            int amount = Integer.valueOf(split[1]);
+
+                            if(material == Material.POTION) {
+                                PotionType type = PotionType.valueOf(split[2]);
+                                int level = Integer.valueOf(split[3]);
+                                boolean splash = Boolean.valueOf(split[4]);
+                                Potion.Tier tier = Potion.Tier.valueOf(split[5]);
+                                boolean extended = Boolean.valueOf(split[6]);
+
+                                Potion potion = new Potion(type, level);
+                                potion.setSplash(splash);
+                                potion.setTier(tier);
+                                if(extended) {
+                                    potion.setHasExtendedDuration(extended);
+                                }
+
+                                itemStack = potion.toItemStack(amount);
+                            } else {
+                                byte data = Byte.valueOf(split[2]);
+                                itemStack = new ItemStack(material, amount, data);
+
+                                if(!enchantments.equalsIgnoreCase("")) {
+                                    for(String enchantment : enchantments.split(",")) {
+                                        split = enchantment.split(":");
+                                        itemStack.addEnchantment(Enchantment.getByName(split[0]), Integer.valueOf(split[1]));
+                                    }
+                                }
+                            }
+
+                            player.getInventory().setItem(slot, itemStack);
+
+                            // Set the armor
+                            for(int a = 36; a <= 39; ++a) {
+                                player.getInventory().setItem(a, items.get(a));
+                            }
+                        }
+                    } else {
                         for(int slot : items.keySet()) {
                             player.getInventory().setItem(slot, items.get(slot));
                         }
-                        player.updateInventory();
-//                    }
+                    }
+                    player.updateInventory();
                 }
             }
         });

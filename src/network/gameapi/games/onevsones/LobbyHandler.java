@@ -9,9 +9,7 @@ import network.customevents.player.PlayerLeaveEvent;
 import network.customevents.player.PlayerSpectatorEvent;
 import network.customevents.player.PlayerSpectatorEvent.SpectatorState;
 import network.gameapi.SpectatorHandler;
-import network.gameapi.games.onevsones.events.BattleRequestEvent;
 import network.gameapi.games.onevsones.events.QueueEvent;
-import network.gameapi.games.onevsones.events.QuitCommandEvent;
 import network.gameapi.games.onevsones.kits.OneVsOneKit;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler.Ranks;
@@ -94,7 +92,7 @@ public class LobbyHandler implements Listener {
         player.getInventory().setBoots(new ItemStack(Material.AIR));
         player.getInventory().setHeldItemSlot(0);
         player.getInventory().setItem(0, rankedQueue);
-//        player.getInventory().setItem(1, HotbarEditor.getItem());
+        player.getInventory().setItem(1, HotBarEditor.getItem());
         player.updateInventory();
     }
 
@@ -119,6 +117,15 @@ public class LobbyHandler implements Listener {
     public static void openKitSelection(Player player) {
         player.openInventory(getKitSelectorInventory(player, kitSelectionname, true));
         watching.add(player.getName());
+    }
+
+    private boolean isArmor(ItemStack itemStack) {
+        String name = itemStack.getType().toString();
+        if(name.contains("_")) {
+            name = name.split("_")[1];
+            return name.matches("(HELMET|CHESTPLATE|LEGGINGS|BOOTS).*");
+        }
+        return false;
     }
 
     @EventHandler
@@ -165,17 +172,22 @@ public class LobbyHandler implements Listener {
     @EventHandler
     public void onInventoryItemClick(InventoryItemClickEvent event) {
     	Player player = event.getPlayer();
+
+    	// Selecting a kit
         if(event.getTitle().equals(kitSelectionname) && !PrivateBattleHandler.choosingMapType(event.getPlayer())) {
             event.setCancelled(true);
             player.closeInventory();
             OneVsOneKit kit = OneVsOneKit.getKit(event.getItem());
             if(kit == null) {
-                MessageHandler.sendMessage(player, "&cAn error occured when selecting kit, please try again");
+                MessageHandler.sendMessage(player, "&cAn error occurred when selecting kit, please try again");
             } else {
                 QueueHandler.add(player, kit, 1);
                 EffectUtil.playSound(player, Sound.NOTE_PLING);
             }
-        } else if(event.getTitle().equals("Request a Battle")) {
+        }
+
+        // Requesting to battle another player
+        else if(event.getTitle().equals("Request a Battle")) {
             String name = event.getItem().getItemMeta().getDisplayName();
             new DelayedTask(new Runnable() {
                 @Override
@@ -188,12 +200,19 @@ public class LobbyHandler implements Listener {
             });
             player.closeInventory();
             event.setCancelled(true);
-        } else if(event.getTitle().startsWith("Preview of")) {
+        }
+
+        // Previewing a kit
+        else if(event.getTitle().startsWith("Preview of")) {
         	Material type = event.getItem().getType();
         	if(type == Material.WOOD_DOOR) {
         		openKitSelection(player);
         	}
         	event.setCancelled(true);
+        }
+        // Don't allow players to move armor in their inventory while they're in the lobby
+        else if(event.getTitle().equalsIgnoreCase("container.crafting") && isArmor(event.getItem()) && isInLobby(player)) {
+            event.setCancelled(true);
         }
     }
 

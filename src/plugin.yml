@@ -322,6 +322,8 @@ commands:
     usage: /uhc
 
 # 1v1 Commands
+  saveHotBar:
+    usage: /saveHotBar
 
   battle:
     usage: /battle <name of opponent>

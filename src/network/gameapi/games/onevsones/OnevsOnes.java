@@ -4,7 +4,6 @@ import de.inventivegames.hologram.Hologram;
 import de.inventivegames.hologram.HologramAPI;
 import network.Network;
 import network.ProPlugin;
-import network.gameapi.SpectatorHandler;
 import network.gameapi.competitive.EloHandler;
 import network.gameapi.competitive.EloRanking;
 import network.gameapi.competitive.EloRanking.EloRank;
@@ -12,7 +11,6 @@ import network.gameapi.competitive.StatDisplayer;
 import network.gameapi.competitive.StatsNPC;
 import network.gameapi.games.onevsones.kits.*;
 import network.gameapi.uhc.GoldenHead;
-import network.player.MessageHandler;
 import network.player.TeamScoreboardHandler;
 import network.player.account.AccountHandler.Ranks;
 import network.player.scoreboard.BelowNameHealthScoreboardUtil;
@@ -23,7 +21,6 @@ import network.server.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
@@ -62,7 +59,7 @@ public class OnevsOnes extends ProPlugin {
 //        new SpectatorHandler().createNPC(new Location(world, 8.5, 13, -43.5), target);
         new SpectatorHandler1v1s(world, target);
         new PrivateBattleHandler();
-//        new HotbarEditor();
+//        new HotBarEditor();
         new EloHandler(DB.PLAYERS_ONE_VS_ONE_ELO, 1400);
         new ServerLogger();
         //Arrays.asList(ImageMap.getItemFrame(world, -16, 10, -34))
@@ -70,6 +67,7 @@ public class OnevsOnes extends ProPlugin {
         new CPSDetector(new Location(world, -20.5, 13, -24.5), target);
         new GoldenHead();
         new RankedHandler();
+        new HotBarEditor();
         new TeamMatchHandler(new Location(world, 3.5, 13, -44.5));
         new OnDemandTournaments(new Location(world, -2.5, 13, -44.5));
         new MonthlyTournaments(new Location(world, -7.5, 13, -43.5));
