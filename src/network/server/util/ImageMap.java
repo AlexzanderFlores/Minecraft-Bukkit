@@ -1,17 +1,8 @@
 package network.server.util;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.imageio.ImageIO;
-
+import network.player.account.AccountHandler.Ranks;
+import network.server.CommandBase;
+import network.server.DB;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,9 +17,13 @@ import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
-import network.player.account.AccountHandler.Ranks;
-import network.server.CommandBase;
-import network.server.DB;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class ImageMap {
@@ -134,8 +129,8 @@ public class ImageMap {
 				int id = -1;
 				if(itemFrameMaps.containsKey(frame)) {
 					id = itemFrameMaps.get(frame);
-				} else if(DB.NETWORK_MAP_IDS.isKeySet("name", name)) {
-					id = DB.NETWORK_MAP_IDS.getInt("name", name, "map_id");
+				} else if(!DB.NETWORK_MAP_IDS.isKeySet("name", name)) {
+//					id = DB.NETWORK_MAP_IDS.getInt("name", name, "map_id");
 					itemFrameMaps.put(frame, id);
 				} else {
 					Bukkit.getLogger().info("Unknown map id logged for \"" + name + "\"");

@@ -1,8 +1,6 @@
 package network.server.servers.hub;
 
 import network.customevents.TimeEvent;
-import network.player.account.AccountHandler;
-import network.server.DB;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EventUtil;
 import network.server.util.FileHandler;
@@ -16,8 +14,6 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,8 +31,8 @@ public class RecentSupporters implements Listener {
 		World world = Bukkit.getWorlds().get(0);
 		
 		itemFrames.add(ImageMap.getItemFrame(world, 1689, 8, -1260));
-		itemFrames.add(ImageMap.getItemFrame(world, 1685, 14, -1301));
-		itemFrames.add(ImageMap.getItemFrame(world, 1681, 14, -1301));
+		itemFrames.add(ImageMap.getItemFrame(world, 1685, 8, -1260));
+		itemFrames.add(ImageMap.getItemFrame(world, 1681, 8, -1260));
 		
 		try {
 			nameStands.add((ArmorStand) world.spawnEntity(itemFrames.get(0).getLocation().clone().add(1, 6, -1), EntityType.ARMOR_STAND));
@@ -56,7 +52,7 @@ public class RecentSupporters implements Listener {
 			update();
 			EventUtil.register(this);
 		} catch(Exception e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 			Bukkit.getLogger().info("ARE THE RECENT SUPPORTER BLOCKS ARE MISSING?");
 		}
 	}
@@ -76,25 +72,35 @@ public class RecentSupporters implements Listener {
 				List<UUID> uuids = new ArrayList<UUID>();
 				List<String> packageNames = new ArrayList<String>();
 				List<String> names = new ArrayList<String>();
+
+				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
+				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
+				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
+				packageNames.add("VIP+");
+				packageNames.add("VIP+");
+				packageNames.add("VIP+");
+				names.add("AlexzanderFlores");
+				names.add("AlexzanderFlores");
+				names.add("AlexzanderFlores");
 				
-				ResultSet resultSet = null;
-				try {
-					resultSet = DB.Databases.NETWORK.getConnection().prepareStatement("SELECT uuid,package FROM recent_supporters ORDER BY id DESC LIMIT 3").executeQuery();
-					while(resultSet.next()) {
-						uuids.add(UUID.fromString(resultSet.getString("uuid")));
-						packageNames.add(resultSet.getString("package"));
-					}
-				} catch(SQLException e) {
-					Bukkit.getLogger().info(e.getMessage());
-				} finally {
-					DB.close(resultSet);
-				}
+//				ResultSet resultSet = null;
+//				try {
+//					resultSet = DB.Databases.NETWORK.getConnection().prepareStatement("SELECT uuid,package FROM recent_supporters ORDER BY id DESC LIMIT 3").executeQuery();
+//					while(resultSet.next()) {
+//						uuids.add(UUID.fromString(resultSet.getString("uuid")));
+//						packageNames.add(resultSet.getString("package"));
+//					}
+//				} catch(SQLException e) {
+//					Bukkit.getLogger().info(e.getMessage());
+//				} finally {
+//					DB.close(resultSet);
+//				}
 				
-				for(UUID uuid : uuids) {
-					names.add(AccountHandler.getName(uuid));
-				}
+//				for(UUID uuid : uuids) {
+//					names.add(AccountHandler.getName(uuid));
+//				}
 				for(int a = 0; a < 3; ++a) {
-					new ImageMap(itemFrames.get(a), "Supporter " + a, loadImage(names.get(a), a), 3, 4);
+					new ImageMap(itemFrames.get(a), "Supporter " + a, loadImage(uuids.get(a), a), 3, 4);
 					nameStands.get(a).setCustomName(StringUtil.color("&a&l" + names.get(a)));
 					packageStands.get(a).setCustomName(StringUtil.color("&b&l" + packageNames.get(a)));
 				}
@@ -112,17 +118,17 @@ public class RecentSupporters implements Listener {
 		armorStand.setCustomNameVisible(true);
 	}
 	
-	private String loadImage(String ign, int index) {
+	private String loadImage(UUID uuid, int index) {
 		String url = "";
 		switch(index) {
 		case 0:
-			url = "http://www.minecraft-skin-viewer.net/3d.php?layers=true&aa=true&a=0&w=340&wt=20&abg=240&abd=130&ajg=330&ajd=30&ratio=15&format=png&login=" + ign + "&headOnly=false&displayHairs=true&randomness=186";
+			url = "https://crafatar.com/renders/body/" + uuid + "?scale=10";
 			break;
 		case 1:
-			url = "http://www.minecraft-skin-viewer.net/3d.php?layers=true&aa=true&a=0&w=330&wt=30&abg=310&abd=50&ajg=340&ajd=30&ratio=15&format=png&login=" + ign + "&headOnly=false&displayHairs=true&randomness=727";
+			url = "https://crafatar.com/renders/body/" + uuid + "?scale=10";
 			break;
 		case 2:
-			url = "http://www.minecraft-skin-viewer.net/3d.php?layers=true&aa=true&a=10&w=330&wt=30&abg=330&abd=110&ajg=350&ajd=10&ratio=15&format=png&login=" + ign + "&headOnly=false&displayHairs=true&randomness=761";
+			url = "https://crafatar.com/renders/body/" + uuid + "?scale=10";
 			break;
 		default:
 			return null;
