@@ -14,6 +14,7 @@ import network.server.DB;
 import network.server.DB.Databases;
 import network.server.servers.hub.HubBase;
 import network.server.servers.hub.HubItemBase;
+import network.server.servers.hub.ParkourNPC;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EffectUtil;
 import network.server.util.ItemCreator;
@@ -94,8 +95,7 @@ public class GameSelector extends HubItemBase {
 		String title = event.getTitle();
 		if(title.equals(ChatColor.stripColor(getName()))) {
 			if(item.getType() == Material.DIAMOND_BOOTS) {
-				player.closeInventory();
-				player.teleport(new Location(player.getWorld(), 1675.5, 5, -1289.5, -222.0f, 0.0f));
+				ParkourNPC.openParkourInventory(player);
 			} else if(item.getType() == Material.IRON_SWORD) {
 				player.closeInventory();
 				ProPlugin.sendPlayerToServer(player, "kitpvp1");
@@ -313,6 +313,12 @@ public class GameSelector extends HubItemBase {
 		}).getItemStack();
 		inventory.setItem(15, item);
 
+		displayGameGlass(inventory);
+
+		player.openInventory(inventory);
+	}
+
+	public static void displayGameGlass(Inventory inventory) {
 		for(int slot : slots) {
 			try {
 				ItemStack itemStack = inventory.getItem(slot);
@@ -324,8 +330,6 @@ public class GameSelector extends HubItemBase {
 				e.printStackTrace();
 			}
 		}
-
-		player.openInventory(inventory);
 	}
 	
 	private static byte getWoolColor(int priority) {

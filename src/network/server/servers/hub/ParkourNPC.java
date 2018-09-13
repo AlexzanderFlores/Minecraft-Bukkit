@@ -15,9 +15,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 
+import static network.server.servers.hub.items.GameSelector.displayGameGlass;
+
 public class ParkourNPC implements Listener {
 	private LivingEntity livingEntity = null;
-	private String name = null;
+	private static String name = null;
 	private static Location endlessLocation = null;
 	private static Location courseLocation = null;
 	
@@ -30,19 +32,18 @@ public class ParkourNPC implements Listener {
 		livingEntity = new NPCEntity(EntityType.SKELETON, "&e" + name, new Location(world, 1673.5, 5, -1291.5)) {
 			@Override
 			public void onInteract(Player player) {
-				Inventory inventory = Bukkit.createInventory(player, 9 * 3, name);
-				inventory.setItem(11, new ItemCreator(Material.GOLD_BOOTS).setName("&bEndless Parkour").getItemStack());
-				inventory.setItem(15, new ItemCreator(Material.CHAINMAIL_BOOTS).setName("&bParkour Course").getItemStack());
-				player.openInventory(inventory);
+				openParkourInventory(player);
 			}
 		}.getLivingEntity();
 		livingEntity.getEquipment().setBoots(new ItemCreator(Material.DIAMOND_BOOTS).setGlow(true).getItemStack());
+
 		new NPCEntity(EntityType.SKELETON, "&eTo Spawn", new Location(world, 1597.5, 5, -1264.5), endlessLocation) {
 			@Override
 			public void onInteract(Player player) {
 				player.teleport(Events.getSpawn());
 			}
 		};
+
 		new NPCEntity(EntityType.SKELETON, "&eTo Spawn", new Location(world, 1597.5, 5, -1296.5), courseLocation) {
 			@Override
 			public void onInteract(Player player) {
@@ -50,6 +51,14 @@ public class ParkourNPC implements Listener {
 			}
 		};
 		EventUtil.register(this);
+	}
+	
+	public static void openParkourInventory(Player player) {
+		Inventory inventory = Bukkit.createInventory(player, 9 * 3, name);
+		inventory.setItem(12, new ItemCreator(Material.GOLD_BOOTS).setName("&bEndless Parkour").getItemStack());
+		inventory.setItem(14, new ItemCreator(Material.CHAINMAIL_BOOTS).setName("&bParkour Course").getItemStack());
+		displayGameGlass(inventory);
+		player.openInventory(inventory);
 	}
 	
 	public static Location getEndlessLocation() {
