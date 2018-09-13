@@ -1,9 +1,15 @@
 package network.server.servers.hub;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
+import network.customevents.TimeEvent;
+import network.customevents.player.PlayerLeaveEvent;
+import network.customevents.player.PlayerRankChangeEvent;
+import network.player.account.AccountHandler;
+import network.player.account.AccountHandler.Ranks;
+import network.player.scoreboard.SidebarScoreboardUtil;
+import network.server.DB;
+import network.server.tasks.AsyncDelayedTask;
+import network.server.tasks.DelayedTask;
+import network.server.util.EventUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -21,16 +27,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
-import network.customevents.TimeEvent;
-import network.customevents.player.PlayerLeaveEvent;
-import network.customevents.player.PlayerRankChangeEvent;
-import network.player.account.AccountHandler;
-import network.player.account.AccountHandler.Ranks;
-import network.player.scoreboard.SidebarScoreboardUtil;
-import network.server.DB;
-import network.server.tasks.AsyncDelayedTask;
-import network.server.tasks.DelayedTask;
-import network.server.util.EventUtil;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class Events implements Listener {
 	private static Random random = null;
@@ -56,7 +55,7 @@ public class Events implements Listener {
 	}
 	
 	public static void giveSidebar(Player player) {
-		SidebarScoreboardUtil sidebar = new SidebarScoreboardUtil(" &6&l1v1s.org ") {
+		SidebarScoreboardUtil sidebar = new SidebarScoreboardUtil(" &6&lIP TBA ") {
 			@Override
 			public void update(Player player) {
 				if(oldPlayers != players) {
@@ -71,7 +70,7 @@ public class Events implements Listener {
 				setText(new String [] {
 					" ",
 					"&e&lFollow us!",
-					"&b@1v1sNetwork",
+					"&b/socialMedia",
 					"  ",
 					"&e&lPlayers",
 					"&b" + players,

@@ -22,14 +22,13 @@ import java.util.UUID;
 
 public class GlobalCommands {
 	public GlobalCommands() {
-		new CommandBase("twitter") {
+		new CommandBase("socialMedia") {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
-				MessageHandler.sendMessage(sender, "Server's Twitter:");
-				MessageHandler.sendMessage(sender, "&bhttps://twitter.com/ProMcGames");
-				MessageHandler.sendMessage(sender, "");
-				MessageHandler.sendMessage(sender, "Owner's Twitter:");
-				MessageHandler.sendMessage(sender, "&bhttps://twitter.com/AlexzanderFlors");
+				MessageHandler.sendLine(sender);
+				MessageHandler.sendMessage(sender, "Server's Twitter &bhttps://twitter.com/ProMcGames");
+				MessageHandler.sendMessage(sender, "Owner's Twitter &bhttps://twitter.com/AlexzanderFlors");
+				MessageHandler.sendLine(sender);
 				return true;
 			}
 		};

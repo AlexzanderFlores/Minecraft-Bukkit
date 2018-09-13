@@ -14,12 +14,9 @@ import network.server.servers.hub.items.GameSelector;
 import network.server.servers.hub.items.HubSelector;
 import network.server.servers.hub.items.Profile;
 import network.server.servers.hub.parkours.EndlessParkour;
-import network.server.util.FileHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-
-import java.io.File;
 
 public class HubBase extends ProPlugin {
 	private static int hubNumber = 0;
@@ -60,10 +57,10 @@ public class HubBase extends ProPlugin {
 	
 	@Override
 	public void disable() {
-		String container = Bukkit.getWorldContainer().getPath();
-		Bukkit.unloadWorld(Bukkit.getWorlds().get(0), false);
-		FileHandler.delete(new File(container + "/spawn"));
-		FileHandler.copyFolder(new File("/root/resources/maps/hub"), new File(container + "/spawn"));
+//		String container = Bukkit.getWorldContainer().getPath();
+//		Bukkit.unloadWorld(Bukkit.getWorlds().get(0), false);
+//		FileHandler.delete(new File(container + "/spawn"));
+//		FileHandler.copyFolder(new File("/root/resources/maps/hub"), new File(container + "/spawn"));
 		super.disable();
 	}
 }

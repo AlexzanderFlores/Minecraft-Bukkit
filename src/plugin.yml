@@ -11,8 +11,8 @@ commands:
   viewTeams:
     usage: /viewTeams
 
-  twitter:
-    usage: /twitter
+  socialMedia:
+    usage: /socialMedia
 
   discord:
     usage: /discord

@@ -15,7 +15,7 @@ public class Alerts implements Listener {
 	
 	public Alerts() {
 		alerts = new String [] {
-			"Follow us on Twitter: &b/twitter",
+			"Follow us! &b/socialMedia",
 			"Vote every day for advantages: &b/vote",
 			"Join our discord: &b/discord",
 			"Visit our store: &b/buy"
