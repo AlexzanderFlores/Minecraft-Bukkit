@@ -10,8 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ServerMute implements Listener {
-    private ServerMute instance = null;
-    private boolean muted = false;
+    private ServerMute instance;
 
     public ServerMute() {
         instance = this;
@@ -19,21 +18,21 @@ public class ServerMute implements Listener {
         new CommandBase("serverMute") {
             @Override
             public boolean execute(CommandSender sender, String [] arguments) {
-                muted = !muted;
-                if(muted) {
-                    EventUtil.register(instance);
+                if(EventUtil.isListener(instance)) {
+                    EventUtil.unregister(instance);
+                    MessageHandler.alert("Server Mute has been toggled &coff.");
                 } else {
-                    AsyncPlayerChatEvent.getHandlerList().unregister(instance);
+                    EventUtil.register(instance);
+                    MessageHandler.alert("Server Mute has been toggled &aon.");
                 }
-                MessageHandler.alert("Server Mute has been toggled.");
                 return true;
             }
-        }.setRequiredRank(AccountHandler.Ranks.SENIOR_STAFF);
+        }.enableDelay(5).setRequiredRank(AccountHandler.Ranks.SENIOR_STAFF);
     }
 
     @EventHandler
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        if(muted && !AccountHandler.Ranks.TRIAL.hasRank(event.getPlayer())) {
+        if(!AccountHandler.Ranks.TRIAL.hasRank(event.getPlayer())) {
             MessageHandler.sendMessage(event.getPlayer(), "&cThis server has been temporarily muted by a staff member.");
             event.setCancelled(true);
         }

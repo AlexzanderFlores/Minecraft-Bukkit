@@ -51,7 +51,7 @@ public class KillAuraSpectatorCheck extends AntiCheatBase implements Listener {
 						MessageHandler.sendMessage(sender, "&c" + player.getName() + " is spectating!");
 					} else {
 						final Player viewer = (Player) sender;
-						if(SpectatorHandler.contains(viewer) || StaffMode.contains(player)) {
+						if(SpectatorHandler.contains(viewer) || StaffMode.getInstance().contains(player)) {
 							if(viewer.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
 								if(viewer.getItemInHand() == null || viewer.getItemInHand().getType() == Material.AIR) {
 									if(arguments.length == 1) {

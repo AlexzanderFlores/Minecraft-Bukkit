@@ -229,7 +229,7 @@ commands:
     usage: /staffHere
 
   sm:
-    usage: /sm [tp] [name]
+    usage: /sm [watch] [name]
 
   unban:
     usage: /unban <name>

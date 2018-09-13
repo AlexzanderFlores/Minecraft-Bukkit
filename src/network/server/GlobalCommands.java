@@ -263,7 +263,7 @@ public class GlobalCommands {
 					String players = "";
 					int online = 0;
 					for(Player player : ProPlugin.getPlayers()) {
-						if(!StaffMode.contains(player)) {
+						if(!StaffMode.getInstance().contains(player)) {
 							players += AccountHandler.getRank(player).getColor() + player.getName() + ", ";
 							++online;
 						}

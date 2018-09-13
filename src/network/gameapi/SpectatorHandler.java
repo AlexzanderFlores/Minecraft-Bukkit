@@ -207,8 +207,8 @@ public class SpectatorHandler implements Listener {
 				playerSpectateStartEvent = new PlayerSpectatorEvent(player, SpectatorState.ADDED);
 				Bukkit.getPluginManager().callEvent(playerSpectateStartEvent);
 
-				if(spectatorOnlyEvents == null) {
-					spectatorOnlyEvents = new SpectatorOnlyEvents();
+				if(!EventUtil.isListener(spectatorOnlyEvents)) {
+					new SpectatorOnlyEvents();
 				}
 			}
 		}
@@ -219,8 +219,8 @@ public class SpectatorHandler implements Listener {
 			PlayerSpectatorEvent spectateEndEvent = new PlayerSpectatorEvent(player, SpectatorState.END);
 			Bukkit.getPluginManager().callEvent(spectateEndEvent);
 			if(!spectateEndEvent.isCancelled()) {
-				if(StaffMode.contains(player)) {
-					StaffMode.toggle(player);
+				if(StaffMode.getInstance().contains(player)) {
+					StaffMode.getInstance().toggle(player);
 				}
 				spectators.remove(player.getName());
 				ProPlugin.resetPlayer(player);
@@ -236,9 +236,8 @@ public class SpectatorHandler implements Listener {
 				levels.remove(player.getName());
 				flySpeeds.remove(player.getName());
 
-				if(spectators.isEmpty() && spectatorOnlyEvents != null) {
-					TimeEvent.getHandlerList().unregister(spectatorOnlyEvents);
-					spectatorOnlyEvents = null;
+				if(spectators.isEmpty() && EventUtil.isListener(spectatorOnlyEvents)) {
+					EventUtil.unregister(spectatorOnlyEvents);
 				}
 
 				if(saveItems) {
@@ -321,7 +320,7 @@ public class SpectatorHandler implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler
 	public void onPlayerLeave(PlayerLeaveEvent event) {
 		beenTold.remove(event.getPlayer().getName());
 	}

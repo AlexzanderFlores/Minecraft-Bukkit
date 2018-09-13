@@ -1,29 +1,25 @@
 package network.player.account;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-
 import network.Network;
-import network.ProPlugin;
 import network.customevents.TimeEvent;
 import network.customevents.player.AsyncPlayerLeaveEvent;
 import network.customevents.player.AsyncPostPlayerJoinEvent;
 import network.gameapi.SpectatorHandler;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler.Ranks;
-import network.server.ChatClickHandler;
 import network.server.CommandBase;
-import network.server.DB;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EventUtil;
 import network.staff.StaffMode;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class PlayerTracker implements Listener {
 	private List<String> queue = null;
@@ -93,7 +89,7 @@ public class PlayerTracker implements Listener {
                 List<String> onlineStaff = new ArrayList<String>();
                 for(Player online : Bukkit.getOnlinePlayers()) {
                     if(Ranks.isStaff(online)) {
-                        onlineStaff.add(AccountHandler.getPrefix(online, true, true) + (StaffMode.contains(online) ? " &a(SM)" : ""));
+                        onlineStaff.add(AccountHandler.getPrefix(online, true, true) + (StaffMode.getInstance().contains(online) ? " &a(SM)" : ""));
                     }
                 }
                 if(!onlineStaff.isEmpty()) {
