@@ -182,7 +182,7 @@ public class SkyWarsCrate implements Listener {
 					}, 20 * 2);
 					if(getKeys(player) > 0) {
 						populateFeatures();
-//						new CrateBase(player, Plugins.UHCSW, SkyWarsCrate.getName(), features).setLifetime(DB.HUB_LIFETIME_SKY_WARS_CRATES_OPENED).setMonthly(DB.HUB_MONTHLY_SKY_WARS_CRATES_OPENED).setWeekly(DB.HUB_WEEKLY_SKY_WARS_CRATES_OPENED);
+//						new CrateBase(player, Plugins.UHCSW, SkyWarsCrate.getDisplay(), features).setLifetime(DB.HUB_LIFETIME_SKY_WARS_CRATES_OPENED).setMonthly(DB.HUB_MONTHLY_SKY_WARS_CRATES_OPENED).setWeekly(DB.HUB_WEEKLY_SKY_WARS_CRATES_OPENED);
 					} else {
 						EffectUtil.playSound(player, Sound.NOTE_BASS_GUITAR, 1000.0f);
 					}

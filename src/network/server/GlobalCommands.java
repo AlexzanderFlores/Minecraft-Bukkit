@@ -7,6 +7,7 @@ import network.player.MessageHandler;
 import network.player.account.AccountHandler;
 import network.player.account.AccountHandler.Ranks;
 import network.server.servers.hub.crate.Beacon;
+import network.server.servers.hub.crate.CrateTypes;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.StringUtil;
 import network.server.util.TimeUtil;
@@ -112,17 +113,16 @@ public class GlobalCommands {
 		new CommandBase("giveKey", 3) {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
-				UUID uuid = AccountHandler.getUUID(arguments[0]);
-				int amount = Integer.valueOf(arguments[1]);
-				String type = arguments[2];
-				if(type.equalsIgnoreCase("voting") || type.equalsIgnoreCase("super")) {
-					Beacon.giveKey(uuid, amount, arguments[2]);
-				} else {
+				try {
+					CrateTypes type = CrateTypes.valueOf(arguments[2].toUpperCase());
+					UUID uuid = AccountHandler.getUUID(arguments[0]);
+					int amount = Integer.valueOf(arguments[1]);
+					Beacon.giveKey(uuid, amount, type);
+				} catch(Exception e) {
 					MessageHandler.sendMessage(sender, "Unknown key type, use:");
-					MessageHandler.sendMessage(sender, "voting");
-					MessageHandler.sendMessage(sender, "super");
-					MessageHandler.sendMessage(sender, "sky_wars");
-					MessageHandler.sendMessage(sender, "speed_uhc");
+					for(CrateTypes crateTypes : CrateTypes.values()) {
+						MessageHandler.sendMessage(sender, crateTypes.getName());
+					}
 				}
 				return true;
 			}

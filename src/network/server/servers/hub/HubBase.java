@@ -6,7 +6,7 @@ import network.player.LevelHandler;
 import network.player.TeamScoreboardHandler;
 import network.server.DailyRewards;
 import network.server.ServerLogger;
-import network.server.servers.hub.crate.Crate;
+import network.server.servers.hub.crate.CrateTypes;
 import network.server.servers.hub.crate.KeyFragments;
 import network.server.servers.hub.items.Features;
 import network.server.servers.hub.items.GameSelector;
@@ -16,6 +16,7 @@ import network.server.servers.hub.parkours.EndlessParkour;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 public class HubBase extends ProPlugin {
 	private static int hubNumber = 0;
@@ -30,9 +31,11 @@ public class HubBase extends ProPlugin {
 		hubNumber = Integer.valueOf(Network.getServerName().replaceAll("[^\\d.]", ""));
 		LevelHandler.enable();
 		World world = Bukkit.getWorlds().get(0);
+
+		CrateTypes.VOTING.setBeacon(world.getBlockAt(1651, 6, -1278), new Vector(0.85, 2.5, 0.5));
+		CrateTypes.PREMIUM.setBeacon(world.getBlockAt(1651, 6, -1284), new Vector(0.85, 2.5, 0.5));
+
 		new Events();
-		new Crate();
-//		new KeyExchange();
 		new KeyFragments();
 		new GameSelector();
 		new Features();

@@ -83,7 +83,7 @@ public class AntiCheatBase implements Listener {
 //                    }
 //                });
             } else {
-//                Bukkit.getPluginManager().callEvent(new PlayerBanEvent(player.getUniqueId(), player.getName(), name, queue));
+//                Bukkit.getPluginManager().callEvent(new PlayerBanEvent(player.getUniqueId(), player.getDisplay(), name, queue));
 //                new AsyncDelayedTask(new Runnable() {
 //                    @Override
 //                    public void run() {

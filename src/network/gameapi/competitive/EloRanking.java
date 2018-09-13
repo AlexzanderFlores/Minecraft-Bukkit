@@ -111,7 +111,7 @@ public class EloRanking implements Listener {
 //						Player player = (Player) sender;
 //						if(eloRanks.containsKey(player.getUniqueId())) {
 //							EloRank eloRank = eloRanks.get(player.getUniqueId());
-//							if(lastTweeted.containsKey(player.getName()) && lastTweeted.get(player.getName()) == eloRank) {
+//							if(lastTweeted.containsKey(player.getDisplay()) && lastTweeted.get(player.getDisplay()) == eloRank) {
 //								MessageHandler.sendMessage(sender, "&cYou have recently Tweeted that you have " + eloRank.getPrefix() + ", &crank up before you can Tweet again");
 //							} else {
 //								UUID uuid = player.getUniqueId();
@@ -120,7 +120,7 @@ public class EloRanking implements Listener {
 //									String accessSecret = DB.PLAYERS_TWITTER_API_KEYS.getString("uuid", uuid.toString(), "access_secret");
 //									try {
 //										Tweeter tweeter = new Tweeter(Network.getConsumerKey(), Network.getConsumerSecret(), accessToken, accessSecret);
-//										lastTweeted.put(player.getName(), eloRank);
+//										lastTweeted.put(player.getDisplay(), eloRank);
 //										int elo = EloHandler.getElo(player);
 //										tweeter.tweet("I just ranked up on @1v1sNetwork to " + ChatColor.stripColor(eloRank.toString()) + " (Top " + eloRank.getDisplayPercentage() + "%) with " + elo + " elo", "/root/resources/" + eloRank.toString().toLowerCase() + ".png");
 //									} catch(Exception e) {

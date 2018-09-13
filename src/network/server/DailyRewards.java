@@ -2,6 +2,7 @@ package network.server;
 
 import java.util.UUID;
 
+import network.server.servers.hub.crate.CrateTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -110,16 +111,18 @@ public class DailyRewards implements Listener {
 						"&c(Coming soon)",
 						""
 					}).getItemStack());
+
+					String voting = CrateTypes.VOTING.getDisplay();
 					
 					// Crate keys
-					inventory.setItem(20, Glow.addGlow(new ItemCreator(Material.TRIPWIRE_HOOK).setName("&bVoting Crate Key").setLores(new String [] {
+					inventory.setItem(20, Glow.addGlow(new ItemCreator(Material.TRIPWIRE_HOOK).setName("&b" + voting + " Crate Key").setLores(new String [] {
 						"",
-						"&e+1 &aKey to the Voting crate",
+						"&e+1 &aKey to the " + voting + " crate",
 						""
 					}).getItemStack()));
-					inventory.setItem(22, Glow.addGlow(new ItemCreator(Material.TRIPWIRE_HOOK).setName("&bVoting Crate Key Fragment").setLores(new String [] {
+					inventory.setItem(22, Glow.addGlow(new ItemCreator(Material.TRIPWIRE_HOOK).setName("&b" + voting + " Crate Key Fragment").setLores(new String [] {
 						"",
-						"&e+1 &aKey Fragment to the Voting crate",
+						"&e+1 &aKey Fragment to the " + voting + " crate",
 						"",
 						"&7Collect 3 of these for a full Key",
 						"&7Click the Villager NPC near the crates",

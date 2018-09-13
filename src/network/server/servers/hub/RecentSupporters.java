@@ -105,7 +105,7 @@ public class RecentSupporters implements Listener {
 //				}
 				
 //				for(UUID uuid : uuids) {
-//					names.add(AccountHandler.getName(uuid));
+//					names.add(AccountHandler.getDisplay(uuid));
 //				}
 				for(int a = 0; a < 3; ++a) {
 					new ImageMap(itemFrames.get(a), "Supporter " + a, loadImage(uuids.get(a), a), 3, 4);

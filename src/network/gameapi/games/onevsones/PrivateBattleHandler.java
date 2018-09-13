@@ -93,7 +93,7 @@ public class PrivateBattleHandler implements Listener {
 //                if(QueueHandler._isWaitingForMap(playerOne)) {
 //                    MessageHandler.sendMessage(playerOne, "&cYou are currently waiting for a map, cannot send another request");
 //                } else if(LobbyHandler.isInLobby(playerTwo) && !QueueHandler._isWaitingForMap(playerTwo)) {
-//                    if(battleRequests.containsKey(playerOne.getName())) {
+//                    if(battleRequests.containsKey(playerOne.getDisplay())) {
 //                        if(hasChallengedPlayer(playerOne, playerTwo)) {
 //                            MessageHandler.sendMessage(playerTwo, AccountHandler.getPrefix(playerOne) + " &6has accepted your battle request");
 //                            MessageHandler.sendMessage(playerOne, "&aYou have accepted " + AccountHandler.getPrefix(playerTwo) + "&6's battle request");
@@ -110,11 +110,11 @@ public class PrivateBattleHandler implements Listener {
 //                            removeAllInvitesFromPlayer(playerOne);
 //                            removeAllInvitesFromPlayer(playerTwo);
 //
-//                            battleRequests.remove(playerTwo.getName());
-//                            battleRequests.remove(playerOne.getName());
+//                            battleRequests.remove(playerTwo.getDisplay());
+//                            battleRequests.remove(playerOne.getDisplay());
 //
-//                            String clickedName = playerTwo.getName();
-//                            String clickerName = playerOne.getName();
+//                            String clickedName = playerTwo.getDisplay();
+//                            String clickerName = playerOne.getDisplay();
 //
 //                            new DelayedTask(new Runnable() {
 //                                @Override
@@ -134,8 +134,8 @@ public class PrivateBattleHandler implements Listener {
 //
 //                    QueueHandler._remove(playerOne, true);
 //                    LobbyHandler.openKitSelection(playerOne);
-//                    choosingMatchType.add(playerOne.getName());
-//                    sendingTo.put(playerOne.getName(), playerTwo.getName());
+//                    choosingMatchType.add(playerOne.getDisplay());
+//                    sendingTo.put(playerOne.getDisplay(), playerTwo.getDisplay());
 //                } else {
 //                    MessageHandler.sendMessage(playerOne, "&cThis player is currently in a match please wait");
 //                }

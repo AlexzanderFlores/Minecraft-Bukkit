@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
+import network.server.servers.hub.crate.CrateTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
@@ -97,7 +98,7 @@ public class Voting implements Listener {
 					} else {
 						DB.PLAYERS_WEEKLY_VOTES.insert("'" + uuid + "', '1', '" + week + "'");
 					}
-					Beacon.giveKey(playerUUID, 1 * multiplier, "voting");
+					Beacon.giveKey(playerUUID, multiplier, CrateTypes.VOTING);
 					for(CoinsHandler handler : handlers) {
 						Bukkit.getLogger().info("Giving 20 coins for " + handler.getPluginData());
 						handler.addCoins(playerUUID, 20 * multiplier);

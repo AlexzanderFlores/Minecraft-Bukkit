@@ -5,6 +5,7 @@ import de.inventivegames.hologram.HologramAPI;
 import network.customevents.TimeEvent;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler;
+import network.server.ChatClickHandler;
 import network.server.DB;
 import network.server.servers.hub.items.Features.Rarity;
 import network.server.servers.hub.items.features.FeatureItem;
@@ -41,7 +42,7 @@ public class Beacon implements Listener {
 	private Random random = null;
 	private Block glass = null;
 	private final String originalName;
-	private String type = null;
+	private CrateTypes type = null;
 	private Location hologramLocation = null;
 	private Hologram hologram = null;
 	private NPCEntity npc = null;
@@ -52,9 +53,9 @@ public class Beacon implements Listener {
 	private List<String> delayed = null;
 	private static final int delay = 2;
 	private static String keyFragmentName = null;
-	private static String votingKeyx3Name = null;
+	private static String threeKeys = null;
 	
-	public Beacon(String originalName, String type, Block glass, Vector standOffset) {
+	public Beacon(String originalName, CrateTypes type, Block glass, Vector standOffset) {
 		random = new Random();
 		this.glass = glass;
 		this.originalName = originalName;
@@ -65,13 +66,13 @@ public class Beacon implements Listener {
 		delayed = new ArrayList<String>();
 		setWood();
 		keyFragmentName = "Key Fragment";
-		votingKeyx3Name = "Voting Key x3";
+		threeKeys = CrateTypes.VOTING.getDisplay() + " Key x3";
 		new DelayedTask(new Runnable() {
 			@Override
 			public void run() {
 				items = FeatureItem.getItems(FeatureType.REWARD_CRATE);
 				items.add(new FeatureItem(getKeyFragmentName(), new ItemStack(Material.TRIPWIRE_HOOK), Rarity.UNCOMMON, FeatureType.REWARD_CRATE));
-				items.add(new FeatureItem(getVotingKeyx3(), new ItemStack(Material.TRIPWIRE_HOOK), Rarity.RARE, FeatureType.REWARD_CRATE));
+				items.add(new FeatureItem(getThreeKeys(), new ItemStack(Material.TRIPWIRE_HOOK), Rarity.RARE, FeatureType.REWARD_CRATE));
 			}
 		});
 		EventUtil.register(this);
@@ -81,27 +82,28 @@ public class Beacon implements Listener {
 		return keyFragmentName;
 	}
 	
-	public static String getVotingKeyx3() {
-		return votingKeyx3Name;
+	public static String getThreeKeys() {
+		return threeKeys;
 	}
 	
-	public String getType() {
+	public CrateTypes getType() {
 		return type;
 	}
 	
-	public static void giveKey(final UUID uuid, final int toAdd, final String type) {
+	public static void giveKey(UUID uuid, int toAdd, CrateTypes type) {
 		new AsyncDelayedTask(new Runnable() {
 			@Override
 			public void run() {
-				String [] keys = new String [] {"uuid", "type"};
-				String [] values = new String [] {uuid.toString(), type.toLowerCase()};
+				String [] keys = new String [] { "uuid", "type" };
+				String [] values = new String [] { uuid.toString(), type.getName() };
+
 				if(DB.HUB_CRATE_KEYS.isKeySet(keys, values)) {
 					int amount = DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") + toAdd;
 					DB.HUB_CRATE_KEYS.updateInt("amount", amount, keys, values);
 				} else {
-					DB.HUB_CRATE_KEYS.insert("'" + uuid + "', '" + type.toLowerCase() + "', '" + toAdd + "'");
+					DB.HUB_CRATE_KEYS.insert("'" + uuid + "', '" + type.getName() + "', '" + toAdd + "'");
 				}
-				Bukkit.getLogger().info(type.toLowerCase() + ": give player key");
+				Bukkit.getLogger().info(type.getName() + ": give player key");
 			}
 		});
 	}
@@ -123,13 +125,13 @@ public class Beacon implements Listener {
 				}
 			}, 20 * delay);
 		}
-		final String [] keys = new String [] {"uuid", "type"};
-		final String [] values = new String [] {player.getUniqueId().toString(), type};
+		String [] keys = new String [] { "uuid", "type" };
+		String [] values = new String [] { player.getUniqueId().toString(), type.getName() };
 //		if(DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") <= 0) {
-//			if(type.equals("voting")) {
-//				ChatClickHandler.sendMessageToRunCommand(player, "&aClick here", "Click to vote", "/vote", "&cYou don't have any &bVoting Keys&c! Get some by voting ");
+//			if(type == CrateTypes.VOTING) {
+//				ChatClickHandler.sendMessageToRunCommand(player, "&aClick here", "Click to vote", "/vote", "&cYou don't have any &b" + type.getDisplay() + " Keys&c! Get some by voting ");
 //			} else {
-//				MessageHandler.sendMessage(player, "&cYou do not have any &bSuper Keys&c! Get some on Buycraft: &ahttp://store.1v1s.org/category/767960");
+//				MessageHandler.sendMessage(player, "&cYou do not have any &b" + type.getDisplay() + " Keys&c! Get some on Buycraft: &cComing Soon");
 //			}
 //			return;
 //		}
@@ -152,14 +154,14 @@ public class Beacon implements Listener {
 			public void run() {
 				FeatureItem item = null;
 				int chance = random.nextInt(100) + 1;
-				Rarity rarity = type.equals("super") ? Rarity.RARE : chance <= 10 ? Rarity.RARE : chance <= 35 ? Rarity.UNCOMMON : Rarity.COMMON;
+				Rarity rarity = type == CrateTypes.PREMIUM ? Rarity.RARE : chance <= 10 ? Rarity.RARE : chance <= 35 ? Rarity.UNCOMMON : Rarity.COMMON;
 				do {
 					item = items.get(random.nextInt(items.size()));
 				} while(item.getRarity() != rarity);
 				setItem(item);
 				setWood();
 				displaying = true;
-				if(item != null && player.isOnline()) {
+				if(player.isOnline()) {
 					item.give(player);
 					String log = item.getName();
 					new AsyncDelayedTask(new Runnable() {
@@ -174,7 +176,7 @@ public class Beacon implements Listener {
 								DB.HUB_CRATE_KEYS.updateInt("amount", owned, keys, values);
 							}
 							Bukkit.getLogger().info(type + ": update key amount");
-							MessageHandler.sendMessage(player, "You now have &e" + owned + " &xVoting Crate key" + (owned == 1 ? "" : "s") + " left");
+							MessageHandler.sendMessage(player, "You now have &e" + owned + " &x" + CrateTypes.VOTING.getDisplay() + " Crate key" + (owned == 1 ? "" : "s") + " left");
 							if(DB.HUB_LIFETIME_CRATES_OPENED.isUUIDSet(player.getUniqueId())) {
 								int amount = DB.HUB_LIFETIME_CRATES_OPENED.getInt(keys, values, "amount") + 1;
 								DB.HUB_LIFETIME_CRATES_OPENED.updateInt("amount", amount, keys, values);
@@ -185,7 +187,7 @@ public class Beacon implements Listener {
 							Calendar calendar = Calendar.getInstance();
 							String month = calendar.get(Calendar.MONTH) + "";
 							String [] keys = new String [] {"uuid", "type", "month"};
-							String [] values = new String [] {uuid, type, month};
+							String [] values = new String [] {uuid, type.getName(), month};
 							if(DB.HUB_MONTHLY_CRATES_OPENED.isKeySet(keys, values)) {
 								int amount = DB.HUB_MONTHLY_CRATES_OPENED.getInt(keys, values, "amount") + 1;
 								DB.HUB_MONTHLY_CRATES_OPENED.updateInt("amount", amount, keys, values);

@@ -123,7 +123,7 @@ public class KeyFragments implements Listener {
 					DB.PLAYERS_KEY_FRAGMENTS.updateInt("amount", owned, "uuid", player.getUniqueId().toString());
 				}
 				open(player);
-				Beacon.giveKey(player.getUniqueId(), 1, Crate.getVoting().getType());
+				Beacon.giveKey(player.getUniqueId(), 1, CrateTypes.VOTING);
 				EffectUtil.playSound(player, Sound.LEVEL_UP);
 			} else {
 				EffectUtil.playSound(player, Sound.NOTE_BASS_GUITAR, 1000.0f);

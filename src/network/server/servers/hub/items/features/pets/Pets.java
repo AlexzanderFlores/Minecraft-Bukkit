@@ -380,31 +380,31 @@ public class Pets extends FeatureBase {
 				//String name = ChatColor.stripColor(event.getItemTitle());
 				/*if(item.getType() == Material.BARRIER) {
 					boolean update = false;
-					final PetTypes petType = pets.get(player.getName());
+					final PetTypes petType = pets.get(player.getDisplay());
 					if(petType != null && update) {
 						player.updateInventory();
 						new AsyncDelayedTask(new Runnable() {
 							@Override
 							public void run() {
-								DB.HUB_PETS.updateInt("active", 0, new String [] {"uuid", "name"}, new String [] {uuid.toString(), petType.getName()});
+								DB.HUB_PETS.updateInt("active", 0, new String [] {"uuid", "name"}, new String [] {uuid.toString(), petType.getDisplay()});
 								Bukkit.getLogger().info("pets: set none");
 							}
 						});
-						MessageHandler.sendMessage(player, "You have set " + petType.getName());
+						MessageHandler.sendMessage(player, "You have set " + petType.getDisplay());
 					}
 				} else {
 					boolean update = false;
-					final PetTypes petType = pets.get(player.getName());
+					final PetTypes petType = pets.get(player.getDisplay());
 					if(petType != null && update) {
 						player.updateInventory();
 						new AsyncDelayedTask(new Runnable() {
 							@Override
 							public void run() {
-								DB.HUB_PETS.updateInt("active", 1, new String [] {"uuid", "name"}, new String [] {uuid.toString(), petType.getName()});
+								DB.HUB_PETS.updateInt("active", 1, new String [] {"uuid", "name"}, new String [] {uuid.toString(), petType.getDisplay()});
 								Bukkit.getLogger().info("pets: selected");
 							}
 						});
-						MessageHandler.sendMessage(player, "You have selected &e" + ChatColor.stripColor(petType.getName()));
+						MessageHandler.sendMessage(player, "You have selected &e" + ChatColor.stripColor(petType.getDisplay()));
 					}
 				}*/
 			}

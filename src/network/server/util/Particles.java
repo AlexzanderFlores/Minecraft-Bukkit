@@ -92,7 +92,7 @@ public class Particles implements Listener {
 		}
 		
 		public void displaySpiral(Location location, double height, double radius) {
-//			String particle = effect == null ? particlEffect.getName() : toString().toLowerCase();
+//			String particle = effect == null ? particlEffect.getDisplay() : toString().toLowerCase();
 			EnumParticle particle = EnumParticle.valueOf((effect == null ? particlEffect.getName() : toString()).toUpperCase());
 			for(double y = 0; y < height; y += 0.05) {
 				double x = radius * Math.cos(y);

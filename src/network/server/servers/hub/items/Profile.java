@@ -3,6 +3,7 @@ package network.server.servers.hub.items;
 import java.util.Calendar;
 import java.util.UUID;
 
+import network.server.servers.hub.crate.CrateTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -24,7 +25,6 @@ import network.player.account.AccountHandler.Ranks;
 import network.player.account.PlaytimeTracker.TimeType;
 import network.server.DB;
 import network.server.servers.hub.HubItemBase;
-import network.server.servers.hub.crate.Crate;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EffectUtil;
 import network.server.util.ItemCreator;
@@ -167,15 +167,15 @@ public class Profile extends HubItemBase {
 					""
 				}).getItemStack());
 				String [] keys = new String [] {"uuid", "type"};
-				String [] values = new String [] {player.getUniqueId().toString(), Crate.getVoting().getType()};
+				String [] values = new String [] {player.getUniqueId().toString(), CrateTypes.VOTING.getName()};
 				inventory.setItem(32, new ItemCreator(Material.CHEST).setName("&bCrate Stats").setLores(new String [] {
 					"",
-					"&7Voting Crate Keys owned: &e" + DB.HUB_CRATE_KEYS.getInt(keys, values, "amount"),
+					"&7" + CrateTypes.VOTING.getDisplay() + " Crate Keys owned: &e" + DB.HUB_CRATE_KEYS.getInt(keys, values, "amount"),
 					"&7Key Fragments owned: &e" + DB.PLAYERS_KEY_FRAGMENTS.getInt("uuid", uuid, "amount"),
 					"",
-					"&7Voting Crates opened lifetime: &e" + DB.HUB_LIFETIME_CRATES_OPENED.getInt(keys, values, "amount"),
-					"&7Voting Crates opened this month: &e" + DB.HUB_MONTHLY_CRATES_OPENED.getInt(new String [] {"uuid", "type", "month"}, new String [] {uuid, "voting", month + ""}, "amount"),
-					"&7Voting Crates opened this week: &e" + DB.HUB_WEEKLY_CRATES_OPENED.getInt(new String [] {"uuid", "type", "week"}, new String [] {uuid, "voting", week + ""}, "amount"),
+					"&7" + CrateTypes.VOTING.getDisplay() + " Crates opened lifetime: &e" + DB.HUB_LIFETIME_CRATES_OPENED.getInt(keys, values, "amount"),
+					"&7" + CrateTypes.VOTING.getDisplay() + " Crates opened this month: &e" + DB.HUB_MONTHLY_CRATES_OPENED.getInt(new String [] {"uuid", "type", "month"}, new String [] {uuid, "voting", month + ""}, "amount"),
+					"&7" + CrateTypes.VOTING.getDisplay() + " Crates opened this week: &e" + DB.HUB_WEEKLY_CRATES_OPENED.getInt(new String [] {"uuid", "type", "week"}, new String [] {uuid, "voting", week + ""}, "amount"),
 					"",
 				}).getItemStack());
 				inventory.setItem(34, new ItemCreator(Material.NAME_TAG).setName("&bVote Stats").setLores(new String [] {

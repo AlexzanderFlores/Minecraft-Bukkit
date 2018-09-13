@@ -3,6 +3,7 @@ package network.server.servers.hub.items.features;
 import java.util.ArrayList;
 import java.util.List;
 
+import network.server.servers.hub.crate.CrateTypes;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -79,8 +80,8 @@ public class FeatureItem {
 			KeyFragments.give(player, 1);
 			return;
 		}
-		if(getName().equals(Beacon.getVotingKeyx3())) {
-			Beacon.giveKey(player.getUniqueId(), 3, "voting");
+		if(getName().equals(Beacon.getThreeKeys())) {
+			Beacon.giveKey(player.getUniqueId(), 3, CrateTypes.VOTING);
 			return;
 		}
 		for(HaloParticleTypes halo : HaloParticleTypes.values()) {
@@ -108,13 +109,13 @@ public class FeatureItem {
 			}
 		}
 		/*for(WinEffect effect : WinEffect.values()) {
-			if(effect.getName().equals(getName())) {
+			if(effect.getDisplay().equals(getDisplay())) {
 				effect.give(player);
 				return;
 			}
 		}
 		for(SpinBlock block : SpinBlock.values()) {
-			if(block.getName().equals(getName())) {
+			if(block.getDisplay().equals(getDisplay())) {
 				block.give(player);
 				return;
 			}

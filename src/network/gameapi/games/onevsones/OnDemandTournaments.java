@@ -5,6 +5,7 @@ import network.customevents.player.InventoryItemClickEvent;
 import network.customevents.player.PlayerLeaveEvent;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler;
+import network.server.servers.hub.crate.CrateTypes;
 import network.server.util.CountDownUtil;
 import network.server.util.EventUtil;
 import network.server.util.ItemCreator;
@@ -49,7 +50,7 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
                         .addLore("&b1st Place:")
                         .addLore("   &e30 Ranked Matches")
                         .addLore("   &e2 Key Fragments")
-                        .addLore("   &e1 Voting Key")
+                        .addLore("   &e1 " + CrateTypes.VOTING.getDisplay() + " Key")
                         .addLore("")
                         .addLore("&b2nd Place:")
                         .addLore("   &e15 Ranked Matches")
