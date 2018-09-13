@@ -85,6 +85,7 @@ public class Punishment implements Listener {
 		new AntiCheatBase();
 		new ServerMute();
 		new BadNameHandler();
+		new ClearChat();
 	}
 	
 	public Punishment(String name) {

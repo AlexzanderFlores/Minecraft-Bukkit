@@ -10,19 +10,25 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ServerMute implements Listener {
+    private ServerMute instance = null;
     private boolean muted = false;
 
     public ServerMute() {
+        instance = this;
+
         new CommandBase("serverMute") {
             @Override
             public boolean execute(CommandSender sender, String [] arguments) {
                 muted = !muted;
+                if(muted) {
+                    EventUtil.register(instance);
+                } else {
+                    AsyncPlayerChatEvent.getHandlerList().unregister(instance);
+                }
                 MessageHandler.alert("Server Mute has been toggled.");
                 return true;
             }
         }.setRequiredRank(AccountHandler.Ranks.SENIOR_STAFF);
-
-        EventUtil.register(this);
     }
 
     @EventHandler

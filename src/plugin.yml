@@ -237,6 +237,9 @@ commands:
   unMute:
     usage: /unMute <name> <reason>
 
+  clearChat:
+    usage: /clearChat
+
 # Hub Commands
   rankTransfer:
     usage: /rankTransfer <target>
