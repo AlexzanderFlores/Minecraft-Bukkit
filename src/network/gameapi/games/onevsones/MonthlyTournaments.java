@@ -31,7 +31,7 @@ public class MonthlyTournaments implements Listener {
         name = "Monthly Tournaments";
         players = new ArrayList<>();
 
-        new NPCEntity(EntityType.SQUID, "&e&n" + name + "&c (Coming Soon)", location, Material.DIAMOND) {
+        new NPCEntity(EntityType.SQUID, "&e" + name + "&c (Coming Soon)", location, Material.DIAMOND) {
             @Override
             public void onInteract(Player player) {
                 MessageHandler.sendMessage(player, "&cThese will be released once we have a larger player base.");

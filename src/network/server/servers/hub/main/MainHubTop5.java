@@ -218,7 +218,7 @@ public class MainHubTop5 implements Listener {
 		bar.setVisible(false);*/
 		setNext();
 		name = "Select Top 5 Type";
-		new NPCEntity(EntityType.VILLAGER, "&e&n&k" + name, new Location(world, 1712.5, 5, -1283.5)) {
+		new NPCEntity(EntityType.VILLAGER, "&e&k" + name, new Location(world, 1712.5, 5, -1283.5)) {
 			@Override
 			public void onInteract(Player player) {
 				EffectUtil.playSound(player, Sound.VILLAGER_IDLE);
@@ -277,12 +277,12 @@ public class MainHubTop5 implements Listener {
 				if(counter >= 10) {
 					setNext();
 				}
-				String text = "&4&l";
+				String text = "&4";
 				int size = 0;
 				for(int a = 0; a <= counter; ++a, ++size) {
 					text += "|";
 				}
-				text += "&7&l";
+				text += "&7";
 				for(; size < 10; ++size) {
 					text += "|";
 				}

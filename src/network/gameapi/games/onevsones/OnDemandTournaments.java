@@ -35,7 +35,7 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
         name = "On Demand Tournaments";
         players = new ArrayList<String>();
 
-        new NPCEntity(EntityType.ZOMBIE, "&e&n" + name, location, Material.GOLDEN_APPLE) {
+        new NPCEntity(EntityType.ZOMBIE, "&e" + name, location, Material.GOLDEN_APPLE) {
             @Override
             public void onInteract(Player player) {
                 Inventory inventory = Bukkit.createInventory(player, 9 * 6, name);

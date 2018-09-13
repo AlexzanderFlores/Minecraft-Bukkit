@@ -29,7 +29,7 @@ public class CPSDetector implements Listener {
 	public CPSDetector(Location location, Location target) {
 		clicks = new HashMap<String, Integer>();
 		delayed = new ArrayList<String>();
-		new NPCEntity(EntityType.SKELETON, "&e&nCPS Detector", location, target) {
+		new NPCEntity(EntityType.SKELETON, "&eCPS Detector", location, target) {
 			@Override
 			public void onInteract(Player player) {
 				int click = 0;

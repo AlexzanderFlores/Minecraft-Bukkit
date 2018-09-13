@@ -302,11 +302,11 @@ public class GameSelector extends HubItemBase {
 		item = new ItemCreator(Material.DIAMOND_BOOTS).setName("&bParkour").setLores(new String [] {
 			"&7Our Unique Parkour Course",
 			"",
-			"&a&lEndless Parkour",
+			"&aEndless Parkour",
 			"&eParkour forever, try to",
 			"&ebeat your high score!",
 			"",
-			"&a&lParkour Course",
+			"&aParkour Course",
 			"&eParkour on our custom course",
 			"&eWatch out for obstacles though",
 			""

@@ -141,7 +141,7 @@ public class SpectatorHandler implements Listener {
 	}
 	
 	public void createNPC(Location location, Location target) {
-		new NPCEntity(EntityType.CREEPER, "&e&nSpectate", location, target) {
+		new NPCEntity(EntityType.CREEPER, "&eSpectate", location, target) {
 			@Override
 			public void onInteract(Player player) {
 				if(contains(player)) {

@@ -27,7 +27,7 @@ public class ParkourNPC implements Listener {
 		endlessLocation = new Location(world, 1598.5, 5, -1262.5, -270.0f, 0.0f);
 		courseLocation = new Location(world, 1598.5, 5, -1298.5, -270.0f, 0.0f);
 
-		livingEntity = new NPCEntity(EntityType.SKELETON, "&e&n" + name, new Location(world, 1673.5, 5, -1291.5)) {
+		livingEntity = new NPCEntity(EntityType.SKELETON, "&e" + name, new Location(world, 1673.5, 5, -1291.5)) {
 			@Override
 			public void onInteract(Player player) {
 				Inventory inventory = Bukkit.createInventory(player, 9 * 3, name);
@@ -37,13 +37,13 @@ public class ParkourNPC implements Listener {
 			}
 		}.getLivingEntity();
 		livingEntity.getEquipment().setBoots(new ItemCreator(Material.DIAMOND_BOOTS).setGlow(true).getItemStack());
-		new NPCEntity(EntityType.SKELETON, "&e&nTo Spawn", new Location(world, 1597.5, 5, -1264.5), endlessLocation) {
+		new NPCEntity(EntityType.SKELETON, "&eTo Spawn", new Location(world, 1597.5, 5, -1264.5), endlessLocation) {
 			@Override
 			public void onInteract(Player player) {
 				player.teleport(Events.getSpawn());
 			}
 		};
-		new NPCEntity(EntityType.SKELETON, "&e&nTo Spawn", new Location(world, 1597.5, 5, -1296.5), courseLocation) {
+		new NPCEntity(EntityType.SKELETON, "&eTo Spawn", new Location(world, 1597.5, 5, -1296.5), courseLocation) {
 			@Override
 			public void onInteract(Player player) {
 				player.teleport(Events.getSpawn());

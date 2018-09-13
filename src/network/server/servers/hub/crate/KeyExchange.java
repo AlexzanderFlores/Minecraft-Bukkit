@@ -21,7 +21,7 @@ public class KeyExchange implements Listener {
 	
 	public KeyExchange() {
 		name = "Key Exchange";
-		Villager villager = (Villager) new NPCEntity(EntityType.VILLAGER, "&e&n&k" + name, new Location(Bukkit.getWorlds().get(0), 1658, 5, -1277)) {
+		Villager villager = (Villager) new NPCEntity(EntityType.VILLAGER, "&e&k" + name, new Location(Bukkit.getWorlds().get(0), 1658, 5, -1277)) {
 			@Override
 			public void onInteract(Player player) {
 				EffectUtil.playSound(player, Sound.VILLAGER_IDLE);

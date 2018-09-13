@@ -193,7 +193,7 @@ public class EloRanking implements Listener {
 						EffectUtil.playSound(player, Sound.LEVEL_UP);
 						eloRanks.put(player.getUniqueId(), EloRank.values()[newRank]);
 						MessageHandler.sendMessage(player, "");
-						ChatClickHandler.sendMessageToRunCommand(player, " &6Click here", "Click to Tweet", "/tweetRank", "&a&lView your ELO value by &b&lTweeting &a&lyour new rank");
+						ChatClickHandler.sendMessageToRunCommand(player, " &6Click here", "Click to Tweet", "/tweetRank", "&aView your ELO value by &bTweeting &ayour new rank");
 						MessageHandler.sendMessage(player, "");
 					}
 					break;

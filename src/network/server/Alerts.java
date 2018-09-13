@@ -32,7 +32,7 @@ public class Alerts implements Listener {
 		long ticks = event.getTicks();
 		if(ticks == 20 * 60 * 5) {
 			for(Player player : Bukkit.getOnlinePlayers()) {
-				MessageHandler.sendMessage(player, "&a&l[TIP] &x" + alerts[counter]);
+				MessageHandler.sendMessage(player, "&a[TIP] &x" + alerts[counter]);
 			}
 			if(++counter >= alerts.length) {
 				counter = 0;

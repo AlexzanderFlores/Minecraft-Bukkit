@@ -38,7 +38,7 @@ public class AutoRegenHandler implements Listener {
 		delayed = new ArrayList<String>();
 		World world = Bukkit.getWorlds().get(0);
 		Location location = new Location(world, x, y, z);
-		new NPCEntity(EntityType.ZOMBIE, "&e&nLoad Auto Regen Passes", location, Material.GOLDEN_APPLE) {
+		new NPCEntity(EntityType.ZOMBIE, "&eLoad Auto Regen Passes", location, Material.GOLDEN_APPLE) {
 			@Override
 			public void onInteract(final Player player) {
 				if(delayed.contains(player.getName())) {

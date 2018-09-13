@@ -63,9 +63,9 @@ public class ReportHandler implements Listener {
                                         MessageHandler.sendMessage(player, "&cChecking for more reports in &e" + counter + "&c seconds");
                                     } else {
                                         MessageHandler.sendLine(player, "&b");
-                                        MessageHandler.sendMessage(player, "&aOpen report IDs: &c&l&nCLICK THE ID TO OPEN");
+                                        MessageHandler.sendMessage(player, "&aOpen report IDs: &cCLICK THE ID TO OPEN");
                                         for(int id : openReports.keySet()) {
-                                            ChatClickHandler.sendMessageToRunCommand(player, openReports.get(id) + "&l" + id, "Click to open", "/report view " + id);
+                                            ChatClickHandler.sendMessageToRunCommand(player, openReports.get(id) + id, "Click to open", "/report view " + id);
                                         }
                                         MessageHandler.sendMessage(player, "&cRed &areport IDs are non-ranked players (More likely to hack)");
                                         MessageHandler.sendMessage(player, "&bBlue &areport IDs are possible server advertisement");
@@ -127,18 +127,18 @@ public class ReportHandler implements Listener {
                                     try {
                                         int id = Integer.valueOf(arguments[1]);
                                         MessageHandler.sendLine(player, "&e");
-                                        MessageHandler.sendMessage(player, "&a&lOPTIONS TO KICK");
-                                        ChatClickHandler.sendMessageToRunCommand(player, "&c&lCLICK TO KICK for(SERVER_ADVERTISEMENT)", "Click to kick for SERVER_ADVERTISEMENT", "/report startKicking confirm " + id + " SERVER_ADVERTISEMENT");
+                                        MessageHandler.sendMessage(player, "&aOPTIONS TO KICK");
+                                        ChatClickHandler.sendMessageToRunCommand(player, "&cCLICK TO KICK for(SERVER_ADVERTISEMENT)", "Click to kick for SERVER_ADVERTISEMENT", "/report startKicking confirm " + id + " SERVER_ADVERTISEMENT");
                                         MessageHandler.sendMessage(player, "");
-                                        ChatClickHandler.sendMessageToRunCommand(player, "&c&lCLICK TO KICK for(SOCIAL_MEDIA_ADVERTISEMENT)", "Click to kick for SOCIAL_MEDIA_ADVERTISEMENT", "/report startKicking confirm " + id + " SOCIAL_MEDIA_ADVERTISEMENT");
+                                        ChatClickHandler.sendMessageToRunCommand(player, "&cCLICK TO KICK for(SOCIAL_MEDIA_ADVERTISEMENT)", "Click to kick for SOCIAL_MEDIA_ADVERTISEMENT", "/report startKicking confirm " + id + " SOCIAL_MEDIA_ADVERTISEMENT");
                                         MessageHandler.sendMessage(player, "");
-                                        ChatClickHandler.sendMessageToRunCommand(player, "&c&lCLICK TO KICK for(RACISM)", "Click to kick for RACISM", "/report startKicking confirm " + id + " RACISM");
+                                        ChatClickHandler.sendMessageToRunCommand(player, "&cCLICK TO KICK for(RACISM)", "Click to kick for RACISM", "/report startKicking confirm " + id + " RACISM");
                                         MessageHandler.sendMessage(player, "");
-                                        ChatClickHandler.sendMessageToRunCommand(player, "&c&lCLICK TO KICK for(DISRESPECT)", "Click to kick for DISRESPECT", "/report startKicking confirm " + id + " DISRESPECT");
+                                        ChatClickHandler.sendMessageToRunCommand(player, "&cCLICK TO KICK for(DISRESPECT)", "Click to kick for DISRESPECT", "/report startKicking confirm " + id + " DISRESPECT");
                                         MessageHandler.sendMessage(player, "");
-                                        ChatClickHandler.sendMessageToRunCommand(player, "&c&lCLICK TO KICK for(SUICIDE_COMMENTS)", "Click to kick for SUICIDE_COMMENTS", "/report startKicking confirm " + id + " SUICIDE_COMMENTS");
+                                        ChatClickHandler.sendMessageToRunCommand(player, "&cCLICK TO KICK for(SUICIDE_COMMENTS)", "Click to kick for SUICIDE_COMMENTS", "/report startKicking confirm " + id + " SUICIDE_COMMENTS");
                                         MessageHandler.sendMessage(player, "");
-                                        ChatClickHandler.sendMessageToRunCommand(player, "&c&lCLICK TO KICK for(INAPPROPRIATE_COMMENTS)", "Click to kick for INAPPROPRIATE_COMMENTS", "/report startKicking confirm " + id + " INAPPROPRIATE_COMMENTS");
+                                        ChatClickHandler.sendMessageToRunCommand(player, "&cCLICK TO KICK for(INAPPROPRIATE_COMMENTS)", "Click to kick for INAPPROPRIATE_COMMENTS", "/report startKicking confirm " + id + " INAPPROPRIATE_COMMENTS");
                                         MessageHandler.sendLine(player, "&e");
                                     } catch(NumberFormatException e) {
                                         return;
@@ -153,7 +153,7 @@ public class ReportHandler implements Listener {
                                         } else if(proof == null) {
                                             MessageHandler.sendMessage(sender, "&cCould not load the proof for this report");
                                         } else {
-                                            ChatClickHandler.sendMessageToRunCommand(player, "&a&lCLICK TO KICK FOR " + arguments[3], "Click to kick", "/kick " + name + " " + arguments[3] + " " + proof);
+                                            ChatClickHandler.sendMessageToRunCommand(player, "&aCLICK TO KICK FOR " + arguments[3], "Click to kick", "/kick " + name + " " + arguments[3] + " " + proof);
                                         }
                                     } catch(NumberFormatException e) {
                                         return;
@@ -297,9 +297,9 @@ public class ReportHandler implements Listener {
 
     private void notifyOfOpenReports(Player player) {
         if(openReports.size() == 1) {
-            ChatClickHandler.sendMessageToRunCommand(player, "&c&lCLICK TO VIEW IT", "Click to view the open report", "/report view open", ChatColor.translateAlternateColorCodes('&', "&e&lThere is &c&l1 &e&lopen report! "));
+            ChatClickHandler.sendMessageToRunCommand(player, "&cCLICK TO VIEW IT", "Click to view the open report", "/report view open", ChatColor.translateAlternateColorCodes('&', "&eThere is &c1 &eopen report! "));
         } else {
-            ChatClickHandler.sendMessageToRunCommand(player, "&c&lCLICK TO VIEW THEM", "Click to view the open reports", "/report view open", ChatColor.translateAlternateColorCodes('&', "&e&lThere are &c&l" + openReports.size() + " &e&lopen reports! "));
+            ChatClickHandler.sendMessageToRunCommand(player, "&cCLICK TO VIEW THEM", "Click to view the open reports", "/report view open", ChatColor.translateAlternateColorCodes('&', "&eThere are &c" + openReports.size() + " &eopen reports! "));
         }
         EffectUtil.playSound(player, Sound.CHICKEN_EGG_POP);
     }
@@ -491,15 +491,15 @@ public class ReportHandler implements Listener {
                 MessageHandler.sendLine(player, "&e");
                 MessageHandler.sendMessage(player, "&eReport ID #&b" + id + " &eby &b" + reporting + " &efor &b" + reason.toString().replace("_", " "));
                 MessageHandler.sendMessage(player, "&eReported: &2" + reported + " &eplaytime: &b" + playTime);
-                ChatClickHandler.sendMessageToRunCommand(player, " &c&lCLICK TO JOIN " + server, "Click to teleport to " + server, "/join " + server, "&eCurrent location: &b" + server);
+                ChatClickHandler.sendMessageToRunCommand(player, " &cCLICK TO JOIN " + server, "Click to teleport to " + server, "/join " + server, "&eCurrent location: &b" + server);
                 if(proof != null && !proof.equals("none")) {
                     MessageHandler.sendMessage(player, "&eProof: &b" + proof.replace("_", " "));
                 }
                 if(Ranks.isStaff(player)) {
                     if(reason == ReportReasons.CHAT_FILTER_DETECTION && open) {
-                        ChatClickHandler.sendMessageToRunCommand(player, " &c&lCLICK TO KICK", "Click to kick this player", "/report startKicking " + id, "&eStatus: " + (open ? "&aOPEN" : "&cCLOSED"));
+                        ChatClickHandler.sendMessageToRunCommand(player, " &cCLICK TO KICK", "Click to kick this player", "/report startKicking " + id, "&eStatus: " + (open ? "&aOPEN" : "&cCLOSED"));
                     }
-                    ChatClickHandler.sendMessageToRunCommand(player, open ? " &c&lCLICK TO CLOSE" : " &c&lCLICK TO RE-CLOSE", "Click to close this report", "/report close " + id, "&eStatus: " + (open ? "&aOPEN" : "&cCLOSED"));
+                    ChatClickHandler.sendMessageToRunCommand(player, open ? " &cCLICK TO CLOSE" : " &cCLICK TO RE-CLOSE", "Click to close this report", "/report close " + id, "&eStatus: " + (open ? "&aOPEN" : "&cCLOSED"));
                 }
                 MessageHandler.sendLine(player, "&e");
             }

@@ -97,7 +97,7 @@ public class GlobalCommands {
 						} else {
 							int counter = 0;
 //							for(String url : DB.NETWORK_UHC_URL.getAllStrings("url")) {
-//								ChatClickHandler.sendMessageToRunCommand(player, "&bClick here", "Click to view URL", "/uhc " + url, "&a&lUHC &eGame #" + ++counter + ": ");
+//								ChatClickHandler.sendMessageToRunCommand(player, "&bClick here", "Click to view URL", "/uhc " + url, "&aUHC &eGame #" + ++counter + ": ");
 //							}
 							if(counter == 0) {
 								MessageHandler.sendMessage(player, "&cThere are no UHC games at this time.");

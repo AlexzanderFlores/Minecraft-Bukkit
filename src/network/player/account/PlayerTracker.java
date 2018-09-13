@@ -40,7 +40,7 @@ public class PlayerTracker implements Listener {
                             String location = DB.PLAYERS_LOCATIONS.getString("uuid", uuid.toString(), "location");
                             if(sender instanceof Player) {
                                 Player player = (Player) sender;
-                                ChatClickHandler.sendMessageToRunCommand(player, " &b&lCLICK TO JOIN", "Click to join " + location, "/join " + location, prefix + " &eis on " + location);
+                                ChatClickHandler.sendMessageToRunCommand(player, " &bCLICK TO JOIN", "Click to join " + location, "/join " + location, prefix + " &eis on " + location);
                             } else {
                                 MessageHandler.sendMessage(sender, location);
                             }
@@ -71,7 +71,7 @@ public class PlayerTracker implements Listener {
                                 } else {
                                 	if(sender instanceof Player) {
                                         Player player = (Player) sender;
-                                        ChatClickHandler.sendMessageToRunCommand(player, " &b&lCLICK TO JOIN", "Click to join " + server, "/join " + server, prefix + " &eis on " + server);
+                                        ChatClickHandler.sendMessageToRunCommand(player, " &bCLICK TO JOIN", "Click to join " + server, "/join " + server, prefix + " &eis on " + server);
                                     } else {
                                         MessageHandler.sendMessage(sender, server);
                                     }

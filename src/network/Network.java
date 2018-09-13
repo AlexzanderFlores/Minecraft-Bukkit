@@ -149,7 +149,7 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 		new AutoAlerts();
 		new CommandDispatcher();
 		new DefaultChatColor();
-		new Alerts();
+//		new Alerts();
 		new CommandRepeater();
 		Glow.register();
 	}

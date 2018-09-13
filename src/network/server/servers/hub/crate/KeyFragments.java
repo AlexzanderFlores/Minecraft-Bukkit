@@ -32,7 +32,7 @@ public class KeyFragments implements Listener {
 	public KeyFragments() {
 		name = "Key Fragments";
 		delayed = new ArrayList<String>();
-		Villager villager = (Villager) new NPCEntity(EntityType.VILLAGER, "&e&n" + name, new Location(Bukkit.getWorlds().get(0), 1658, 5, -1284)) {
+		Villager villager = (Villager) new NPCEntity(EntityType.VILLAGER, "&e" + name, new Location(Bukkit.getWorlds().get(0), 1658, 5, -1284)) {
 			@Override
 			public void onInteract(Player player) {
 				if(!delayed.contains(player.getName())) {

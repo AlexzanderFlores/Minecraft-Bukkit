@@ -102,7 +102,7 @@ public abstract class ShopBase implements Listener {
 					hologramClick(player);
 				}
 			});
-			String bottomText = "&b&nClick the Chest";
+			String bottomText = "&bClick the Chest";
 			new Hologram(new Location(lobby, 11, 4.65, 0, 90.0f, 0.0f), bottomText) {
 				@Override
 				public void interact(Player player) {
@@ -206,7 +206,7 @@ public abstract class ShopBase implements Listener {
 			if(holograms != null) {
 				String topText = "Kits / Shop";
 				for(Hologram hologram : holograms) {
-					hologram.setText(colors[counter] + "&n" + topText);
+					hologram.setText(colors[counter] + "" + topText);
 				}
 				if(++counter >= colors.length) {
 					counter = 0;

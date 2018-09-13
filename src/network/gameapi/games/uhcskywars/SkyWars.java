@@ -40,7 +40,7 @@ public class SkyWars extends MiniGame {
 		new GoldenHead();
 		new ScenarioHandler();
 		new CutClean().enable(false);
-		Network.setSidebar(new SidebarScoreboardUtil(" &a&l" + getDisplayName() + " ") {
+		Network.setSidebar(new SidebarScoreboardUtil(" &a" + getDisplayName() + " ") {
 			@Override
 			public void update() {
 				int size = ProPlugin.getPlayers().size();
@@ -58,16 +58,16 @@ public class SkyWars extends MiniGame {
 				}
 				setText(new String [] {
 					" ",
-					"&e&lPlaying",
+					"&ePlaying",
 					"&b" + size + " &7/&b " + Network.getMaxPlayers(),
 					"  ",
-					"&e&l" + getGameState().getDisplay(),
+					"&e" + getGameState().getDisplay(),
 					countDownLine,
 					"   ",
-					"&a&l1v1s.org",
+					"&a1v1s.org",
 					"    ",
-					"&e&lServer",
-					"&b&l" + Network.getPlugin().getServer().toUpperCase() + Network.getServerName().replaceAll("[^\\d.]", ""),
+					"&eServer",
+					"&b" + Network.getPlugin().getServer().toUpperCase() + Network.getServerName().replaceAll("[^\\d.]", ""),
 					"     "
 				});
 				super.update();

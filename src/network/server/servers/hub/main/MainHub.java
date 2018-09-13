@@ -7,7 +7,7 @@ public class MainHub extends HubBase {
 	public MainHub() {
 		super("MainHub");
 		addGroup("mainhub");
-		new MainHubTop5();
+//		new MainHubTop5();
 	}
 	
 	public static int getHubNumber() {

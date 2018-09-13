@@ -235,9 +235,9 @@ public class Beacon implements Listener {
 	
 	private String getName() {
 		if(counter > 0) {
-			return StringUtil.color("&e&n" + originalName.substring(counter, originalName.length() - counter)).replace("&", "");
+			return StringUtil.color("&e" + originalName.substring(counter, originalName.length() - counter)).replace("&", "");
 		}
-		return StringUtil.color("&e&n" + originalName);
+		return StringUtil.color("&e" + originalName);
 	}
 	
 	private void setItem() {
@@ -264,7 +264,7 @@ public class Beacon implements Listener {
 			}
 			item.setItemStack(itemStack);
 		}
-		hologram.setText(StringUtil.color("&b&n" + featureItem.getName()));
+		hologram.setText(StringUtil.color("&b" + featureItem.getName()));
 	}
 	
 	@EventHandler

@@ -47,7 +47,7 @@ public class KitPVP extends ProPlugin {
 		world.setGameRuleValue("keepInventory", "true");
 
 		Location location = new Location(world, 107.5, 33, -8.5, -305.0f, -1.2f);
-		new NPCEntity(EntityType.SKELETON, "&e&nMiner John &7(Click)", location, Material.DIAMOND_PICKAXE) {
+		new NPCEntity(EntityType.SKELETON, "&eMiner John &7(Click)", location, Material.DIAMOND_PICKAXE) {
 			@Override
 			public void onInteract(Player player) {
 				MessageHandler.sendMessage(player, AccountHandler.Ranks.VIP_PLUS.getPrefix() + "MinerJohn: Back in my day this whole cave was filled with emeralds. We sure got all of them over the last few years.");

@@ -156,8 +156,8 @@ public class SkyWarsCrate implements Listener {
 					@Override
 					public void run() {
 						EffectUtil.playSound(player, Sound.LEVEL_UP);
-						MessageHandler.sendMessage(player, "&a&l[TIP] &xYou have enough coins to buy a &bSky Wars Crate");
-						ChatClickHandler.sendMessageToRunCommand(player, " &b&nChest", "Click to Open Shop", "/shop", "&bSky Wars Crates &eare found in the shop, click the");
+						MessageHandler.sendMessage(player, "&a[TIP] &xYou have enough coins to buy a &bSky Wars Crate");
+						ChatClickHandler.sendMessageToRunCommand(player, " &bChest", "Click to Open Shop", "/shop", "&bSky Wars Crates &eare found in the shop, click the");
 					}
 				}, 20 * 2);
 			}

@@ -193,7 +193,7 @@ public class GeneralEvents implements Listener {
 			}
 		}/* else if(ticks == 20 * 60 * 10) {
         	MessageHandler.alert("");
-        	MessageHandler.alert("&c&l25% OFF SALE! &bGet unlimited &6Ranked &bmatches:");
+        	MessageHandler.alert("&c25% OFF SALE! &bGet unlimited &6Ranked &bmatches:");
         	MessageHandler.alert("http://store.1v1s.org/category/759467");
         	MessageHandler.alert("");
         	EffectUtil.playSound(Sound.LEVEL_UP);

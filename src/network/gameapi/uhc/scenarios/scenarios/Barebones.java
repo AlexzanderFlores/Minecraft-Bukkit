@@ -36,7 +36,7 @@ public class Barebones extends Scenario {
         if(event.getWhoClicked() instanceof Player && (type == Material.ENCHANTMENT_TABLE || type == Material.ANVIL || type == Material.GOLDEN_APPLE)) {
             Player player = (Player) event.getWhoClicked();
             player.closeInventory();
-            MessageHandler.sendMessage(player, "&b&l" + getName() + "&e: &cYou may not craft that item");
+            MessageHandler.sendMessage(player, "&b" + getName() + "&e: &cYou may not craft that item");
             event.setCurrentItem(new ItemStack(Material.AIR));
             event.setResult(Result.DENY);
             event.setCancelled(true);
@@ -52,7 +52,7 @@ public class Barebones extends Scenario {
         player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.STRING, 2));
         Player killer = event.getKiller();
         if(killer != null) {
-            MessageHandler.sendMessage(killer, "&b&l" + getName() + "&e: Dropping 1 Diamond, 1 Golden Apple, 32 Arrows & 2 String");
+            MessageHandler.sendMessage(killer, "&b" + getName() + "&e: Dropping 1 Diamond, 1 Golden Apple, 32 Arrows & 2 String");
         }
     }
 
@@ -61,7 +61,7 @@ public class Barebones extends Scenario {
         Material type = event.getBlock().getType();
         if(type == Material.DIAMOND_ORE || type == Material.EMERALD_ORE || type == Material.GOLD_ORE) {
             event.getBlock().setType(Material.IRON_ORE);
-            MessageHandler.sendMessage(event.getPlayer(), "&b&l" + getName() + "&e: Dropping Iron instead");
+            MessageHandler.sendMessage(event.getPlayer(), "&b" + getName() + "&e: Dropping Iron instead");
         }
     }
 }

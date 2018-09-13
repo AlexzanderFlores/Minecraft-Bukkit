@@ -168,7 +168,7 @@ public class KillAuraSpectatorCheck extends AntiCheatBase implements Listener {
 				Player damager = (Player) event.getDamager();
 				if(damager.canSee(player)) {
 					Bukkit.getLogger().info("Damager " + damager.getName() + " can see the spectator");
-					MessageHandler.sendMessage(player, AccountHandler.getPrefix(damager) + " &e&lhas damaged you");
+					MessageHandler.sendMessage(player, AccountHandler.getPrefix(damager) + " &ehas damaged you");
 				}
 			}
 		}

@@ -92,8 +92,8 @@ public class OnevsOnes extends ProPlugin {
 						new Location(world, -14.5, 14, -38.5)
 				};
 				for(int a = 0; a < 3; ++a) {
-					holograms.add(HologramAPI.createHologram(new Location(world, -14.5, 17.25, -38.5), StringUtil.color("&e&nElo ranks are based off of your percentile")));
-					holograms.add(HologramAPI.createHologram(new Location(world, -14.5, 16.75, -38.5), StringUtil.color("&e&nof elo compared to other players.&b /elo")));
+					holograms.add(HologramAPI.createHologram(new Location(world, -14.5, 17.25, -38.5), StringUtil.color("&eElo ranks are based off of your percentile")));
+					holograms.add(HologramAPI.createHologram(new Location(world, -14.5, 16.75, -38.5), StringUtil.color("&eof elo compared to other players.&b /elo")));
 					holograms.add(HologramAPI.createHologram(hologramLocation[0], StringUtil.color(EloRank.DIAMOND.getPrefix() + " &aTop " + EloRank.DIAMOND.getPercentRange() + " of players")));
 					holograms.add(HologramAPI.createHologram(hologramLocation[1], StringUtil.color(EloRank.PLATINUM.getPrefix() + " &aTop " + EloRank.PLATINUM.getPercentRange() + " of players")));
 					holograms.add(HologramAPI.createHologram(hologramLocation[2], StringUtil.color(EloRank.GOLD.getPrefix() + " &aTop " + EloRank.GOLD.getPercentRange() + " of players")));
@@ -108,7 +108,7 @@ public class OnevsOnes extends ProPlugin {
 
         oldPlayerCount = "";
 
-        Network.setSidebar(new SidebarScoreboardUtil(" &a&l" + getDisplayName() + " ") {
+        Network.setSidebar(new SidebarScoreboardUtil(" &a" + getDisplayName() + " ") {
         	@Override
         	public void update(Player player) {
 				int size = ProPlugin.getPlayers().size();

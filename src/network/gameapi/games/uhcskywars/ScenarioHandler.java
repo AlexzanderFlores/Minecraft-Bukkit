@@ -84,7 +84,7 @@ public class ScenarioHandler implements Listener {
 		for(double a = 0, z = -3.5; a < scenarios.size(); ++a, z += 2) {
 			String name = scenarios.get((int) a).getName();
 			voteData.put(name, new VoteData(name));
-			new NPCEntity(EntityType.SKELETON, "&e&n" + name, new Location(world, 13.5, 6, z)) {
+			new NPCEntity(EntityType.SKELETON, "&e" + name, new Location(world, 13.5, 6, z)) {
 				@Override
 				public void onInteract(Player player) {
 					if(Ranks.VIP.hasRank(player)) {

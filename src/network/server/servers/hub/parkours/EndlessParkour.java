@@ -63,7 +63,7 @@ public class EndlessParkour implements Listener {
 		loadTopData();
 		url = "1v1s.org/EPK";
 		World world = Bukkit.getWorlds().get(0);
-		Hologram hologram = HologramAPI.createHologram(new Location(world, 1592.5, 6.5, -1262.5), StringUtil.color("&e&nWalk Forward"));
+		Hologram hologram = HologramAPI.createHologram(new Location(world, 1592.5, 6.5, -1262.5), StringUtil.color("&eWalk Forward"));
 		hologram.spawn();
 		EventUtil.register(this);
 		//TODO: Add 1 respawn into the database when this command is dispatched on the slave server

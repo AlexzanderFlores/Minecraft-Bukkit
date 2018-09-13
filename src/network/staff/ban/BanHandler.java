@@ -205,7 +205,7 @@ public class BanHandler extends Punishment implements Listener {
 								staff = AccountHandler.getName(UUID.fromString(staff));
 							}
 							if(Ranks.STAFF.hasRank(viewer)) {
-								MessageHandler.sendMessage(viewer, "&c&lThis is ONLY shown to Staff and above");
+								MessageHandler.sendMessage(viewer, "&cThis is ONLY shown to Staff and above");
 								MessageHandler.sendMessage(viewer, "Banned by &b" + staff);
 							}
 						}

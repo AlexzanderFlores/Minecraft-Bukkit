@@ -320,7 +320,7 @@ public abstract class MiniGame extends ProPlugin {
 	}
 	
 	public void setToDefaultSidebar() {
-		Network.setSidebar(new SidebarScoreboardUtil(" &a&l" + getDisplayName() + " ") {
+		Network.setSidebar(new SidebarScoreboardUtil(" &a" + getDisplayName() + " ") {
 			@Override
 			public void update() {
 				if(ServerLogger.updatePlayerCount()) {
@@ -337,15 +337,15 @@ public abstract class MiniGame extends ProPlugin {
 				int size = ProPlugin.getPlayers().size();
 				setText(new String [] {
 					" ",
-					"&e&lPlaying",
+					"&ePlaying",
 					"&b" + size + " &7/&b " + Network.getMaxPlayers(),
 					"  ",
-					"&e&l" + getGameState().getDisplay() + (getGameState() == GameStates.STARTED ? "" : " Stage"),
+					"&e" + getGameState().getDisplay() + (getGameState() == GameStates.STARTED ? "" : " Stage"),
 					getGameState() == GameStates.WAITING ? "&b" + size + " &7/&b " + getRequiredPlayers() : CountDownUtil.getCounterAsString(getCounter(), ChatColor.AQUA),
 					"   ",
-					"&a&l1v1s.org",
-					"&e&lServer",
-					"&b&l" + Network.getPlugin().getServer().toUpperCase() + Network.getServerName().replaceAll("[^\\d.]", ""),
+					"&a1v1s.org",
+					"&eServer",
+					"&b" + Network.getPlugin().getServer().toUpperCase() + Network.getServerName().replaceAll("[^\\d.]", ""),
 					"    "
 				});
 				super.update();

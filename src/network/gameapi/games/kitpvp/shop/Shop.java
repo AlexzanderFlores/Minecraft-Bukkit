@@ -11,7 +11,7 @@ import org.bukkit.event.Listener;
 public class Shop implements Listener {
 
 	public Shop(double x, double y, double z) {
-		new NPCEntity(EntityType.ZOMBIE, "&e&nShop", new Location(Bukkit.getWorlds().get(0), x, y, z)) {
+		new NPCEntity(EntityType.ZOMBIE, "&eShop", new Location(Bukkit.getWorlds().get(0), x, y, z)) {
 			@Override
 			public void onInteract(Player player) {
 				KitPVPShop.getInstance().openShop(player);

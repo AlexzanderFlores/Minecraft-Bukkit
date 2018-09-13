@@ -295,7 +295,7 @@ public class OneVsOneKit implements Listener {
                 addToQueue(player, teamSize);
             } else {
                 // Wait 5 seconds to add them to the queue if they're a default player
-                MessageHandler.sendMessage(player, "&a&l[TIP] " + AccountHandler.Ranks.VIP.getPrefix() + "&cPerk: &e5x faster queuing time &b/buy");
+                MessageHandler.sendMessage(player, "&a[TIP] " + AccountHandler.Ranks.VIP.getPrefix() + "&cPerk: &e5x faster queuing time &b/buy");
                 new DelayedTask(new Runnable() {
                     @Override
                     public void run() {

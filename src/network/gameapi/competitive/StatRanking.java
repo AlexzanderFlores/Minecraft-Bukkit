@@ -58,9 +58,9 @@ public class StatRanking implements Listener {
 					DB.close(resultSet);
 				}
 				MessageHandler.sendMessage(player, "");
-				MessageHandler.sendMessage(player, "&a&lRanking: &xYou now have &b" + kills + " &xkill" + (kills == 1 ? "" : "s") + " bringing you to rank &b#" + rank);
-				MessageHandler.sendMessage(player, "&a&lRanking: &xGetting &b1 &xmore kill will bring you to rank &b#" + nextRank);
-				ChatClickHandler.sendMessageToRunCommand(player, " &a&lClick Here", "Click to Play Again", "/autoJoin", "&ePlay again to try and get to rank &b#" + nextRank);
+				MessageHandler.sendMessage(player, "&aRanking: &xYou now have &b" + kills + " &xkill" + (kills == 1 ? "" : "s") + " bringing you to rank &b#" + rank);
+				MessageHandler.sendMessage(player, "&aRanking: &xGetting &b1 &xmore kill will bring you to rank &b#" + nextRank);
+				ChatClickHandler.sendMessageToRunCommand(player, " &aClick Here", "Click to Play Again", "/autoJoin", "&ePlay again to try and get to rank &b#" + nextRank);
 			}
 		}, 20);
 	}
