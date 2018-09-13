@@ -55,7 +55,7 @@ public class Events implements Listener {
 	}
 	
 	public static void giveSidebar(Player player) {
-		SidebarScoreboardUtil sidebar = new SidebarScoreboardUtil(" &6&lIP TBA ") {
+		SidebarScoreboardUtil sidebar = new SidebarScoreboardUtil(" &6IP TBA ") {
 			@Override
 			public void update(Player player) {
 				if(oldPlayers != players) {
@@ -69,16 +69,16 @@ public class Events implements Listener {
 				}
 				setText(new String [] {
 					" ",
-					"&e&lFollow us!",
+					"&eFollow us!",
 					"&b/socialMedia",
 					"  ",
-					"&e&lPlayers",
+					"&ePlayers",
 					"&b" + players,
 					"   ",
-					"&e&lRank",
+					"&eRank",
 					rankString,
 					"    ",
-					"&e&lServer",
+					"&eServer",
 					"&bHUB" +  + HubBase.getHubNumber(),
 					"     ",
 				});

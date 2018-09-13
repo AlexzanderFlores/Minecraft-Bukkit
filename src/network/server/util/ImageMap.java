@@ -35,7 +35,8 @@ public class ImageMap {
 	private ItemFrame itemFrame = null;
 	private List<ItemFrame> itemFrames = null;
 	private String name = null;
-	private String path = null;
+//	private String path = null;
+	private BufferedImage image = null;
 	private int width = 0;
 	private int height = 0;
 	
@@ -67,14 +68,14 @@ public class ImageMap {
 		}
 	}
 	
-	public ImageMap(ItemFrame itemFrame, String name, String path) {
-		this(itemFrame, name, path, 5, 3);
+	public ImageMap(ItemFrame itemFrame, String name, BufferedImage image) {
+		this(itemFrame, name, image, 5, 3);
 	}
 	
-	public ImageMap(ItemFrame itemFrame, String name, String path, int width, int height) {
+	public ImageMap(ItemFrame itemFrame, String name, BufferedImage image, int width, int height) {
 		if(!registeredCommand) {
 			registeredCommand = true;
-			new CommandBase("reloadImageMaps", true) {
+			new CommandBase("reloadImageMaps") {
 				@Override
 				public boolean execute(CommandSender sender, String [] arguments) {
 					for(ImageMap map : imageMaps) {
@@ -90,7 +91,7 @@ public class ImageMap {
 		itemFrames = new ArrayList<ItemFrame>();
 		this.itemFrame = itemFrame;
 		this.name = name;
-		this.path = path;
+		this.image = image;
 		this.width = width;
 		this.height = height;
 		execute();
@@ -108,14 +109,6 @@ public class ImageMap {
 	}
 	
 	public void execute() {
-		Bukkit.getLogger().info("Loading image from \"" + path + "\"");
-		File file = new File(path);
-		BufferedImage image = null;
-		try {
-			image = ImageIO.read(file);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
 		Location location = itemFrame.getLocation();
 		BlockFace face = itemFrame.getFacing();
 		int x1 = location.getBlockX();

@@ -25,6 +25,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class EloRanking implements Listener {
@@ -88,9 +92,14 @@ public class EloRanking implements Listener {
 		frames = new ArrayList<ItemFrame>();
 		EloRanking.eloDB = eloDB;
 		EloRanking.rankDB = rankDB;
-		String path = "/root/resources/Elo.png";
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(new File("/root/resources/Elo.png"));
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 		for(ItemFrame itemFrame : itemFrames) {
-			frames.addAll(new ImageMap(itemFrame, "Elo", path).getItemFrames());
+			frames.addAll(new ImageMap(itemFrame, "Elo", image).getItemFrames());
 		}
 		loadData();
 //		new CommandBase("tweetRank", true) {

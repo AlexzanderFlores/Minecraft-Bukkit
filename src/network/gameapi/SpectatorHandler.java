@@ -343,7 +343,7 @@ public class SpectatorHandler implements Listener {
 		return false;
 	}
 
-	private class SpectatorOnlyEvents implements Listener {
+	class SpectatorOnlyEvents implements Listener {
 		SpectatorOnlyEvents() {
 			spectatorOnlyEvents = this;
 			EventUtil.register(spectatorOnlyEvents);
