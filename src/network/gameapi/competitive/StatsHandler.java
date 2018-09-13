@@ -522,9 +522,9 @@ public class StatsHandler implements Listener {
 		});
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-		if(!event.isCancelled() && event.getEntity() instanceof Player && (event.getDamager() instanceof Player || event.getDamager() instanceof Projectile)) {
+		if(event.getEntity() instanceof Player && (event.getDamager() instanceof Player || event.getDamager() instanceof Projectile)) {
 			Player attacker = null;
 			if(event.getDamager() instanceof Player) {
 				attacker = (Player) event.getDamager();

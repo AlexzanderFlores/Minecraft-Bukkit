@@ -600,7 +600,6 @@ public class SpectatorHandler implements Listener {
 					}
 				}
 			} else if(ticks == 20 * 2) {
-				Bukkit.getLogger().info("2 seconds ran");
 				// Remove spectators in the "spectating" game mode if they're away from entities and blocks
 				for(Player player : getPlayers()) {
 					if(player.getGameMode() == GameMode.SPECTATOR && !isNearEntity.contains(player.getName())) {

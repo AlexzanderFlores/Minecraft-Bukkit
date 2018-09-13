@@ -225,7 +225,6 @@ public class StaffMode implements Listener {
 		public void onTime(TimeEvent event) {
 			long ticks = event.getTicks();
 			if(ticks == 20 * 5) {
-				Bukkit.getLogger().info("Staff Mode 5 seconds ran");
 				if(watching != null) {
 					for(String staffName : watching.keySet()) {
 						Player staff = ProPlugin.getPlayer(staffName);

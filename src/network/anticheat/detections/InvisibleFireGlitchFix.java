@@ -65,9 +65,9 @@ public class InvisibleFireGlitchFix implements Listener {
         EventUtil.register(this);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if(!event.isCancelled() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if(event.getItem() != null && event.getItem().getType() == Material.FLINT_AND_STEEL) {
                 if(blocked.contains(event.getClickedBlock().getType()) || event.getClickedBlock().getTypeId() == 109 || event.getClickedBlock().getTypeId() == 102) {
                     event.setCancelled(true);
@@ -76,14 +76,12 @@ public class InvisibleFireGlitchFix implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if(!event.isCancelled()) {
-            Block above = event.getBlock().getRelative(0, 1, 0);
-            Material material = event.getBlock().getType();
-            if((material == Material.LONG_GRASS || material == Material.DEAD_BUSH) && above.getType() == Material.FIRE) {
-                above.setType(Material.AIR);
-            }
+        Block above = event.getBlock().getRelative(0, 1, 0);
+        Material material = event.getBlock().getType();
+        if((material == Material.LONG_GRASS || material == Material.DEAD_BUSH) && above.getType() == Material.FIRE) {
+            above.setType(Material.AIR);
         }
     }
 }

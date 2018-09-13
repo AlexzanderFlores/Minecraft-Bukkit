@@ -396,9 +396,9 @@ public class ReportHandler implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        if(!event.isCancelled() && !Ranks.isStaff(event.getPlayer())) {
+        if(!Ranks.isStaff(event.getPlayer())) {
             String msg = ChatColor.stripColor(event.getMessage().toLowerCase().replace("!", "").replace(".", "").replace("?", ""));
             String regex = "([h]+[\\W]*[a|4|@|q]+[\\W]*(x|k|ck)+[\\W]*(s)*+(([0|e]+[\\W]*[r]+[\\W]*[s]*)*|([i|1]+[\\W]*[n]+[\\W]*[g]*)))+";
             if(msg.toLowerCase().matches(regex)) {

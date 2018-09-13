@@ -1,13 +1,12 @@
 package network.gameapi.uhc.scenarios.scenarios;
 
+import network.gameapi.uhc.scenarios.Scenario;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-
-import network.gameapi.uhc.scenarios.Scenario;
 
 public class OreMultipliers extends Scenario {
     private static OreMultipliers instance = null;
@@ -38,15 +37,13 @@ public class OreMultipliers extends Scenario {
         OreMultipliers.multiplier = multiplier;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if(!event.isCancelled()) {
-            Block block = event.getBlock();
-            if(multiplier >= 2 && block.getType().toString().endsWith("_ORE")) {
-                for(int a = 0; a < multiplier - 1; ++a) {
-                    for(ItemStack drop : block.getDrops()) {
-                        block.getWorld().dropItem(block.getLocation(), drop);
-                    }
+        Block block = event.getBlock();
+        if(multiplier >= 2 && block.getType().toString().endsWith("_ORE")) {
+            for(int a = 0; a < multiplier - 1; ++a) {
+                for(ItemStack drop : block.getDrops()) {
+                    block.getWorld().dropItem(block.getLocation(), drop);
                 }
             }
         }

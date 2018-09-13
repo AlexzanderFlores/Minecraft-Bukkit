@@ -921,12 +921,12 @@ public class ProPlugin extends CountDownUtil implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onHighEntityDamage(EntityDamageEvent event) {
 		if(DEBUG) {
 			Bukkit.getLogger().info(event.toString());
 		}
-		if(!event.isCancelled() && event.getCause() == DamageCause.VOID && event.getEntity() instanceof Player) {
+		if(event.getCause() == DamageCause.VOID && event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
 			Player killer = player.getKiller();
 			if(killer == null || !killer.isOnline() || (SpectatorHandler.isEnabled() && SpectatorHandler.contains(killer))) {
@@ -1151,33 +1151,31 @@ public class ProPlugin extends CountDownUtil implements Listener {
 		event.setCancelled(true);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onServerRestart(ServerRestartEvent event) {
 		if(DEBUG) {
 			Bukkit.getLogger().info(event.toString());
 		}
-		if(!event.isCancelled()) {
-			for(World world : Bukkit.getWorlds()) {
-				DeleteImportedWorldEvent deleteImportedWorldEvent = new DeleteImportedWorldEvent(world);
-				Bukkit.getPluginManager().callEvent(deleteImportedWorldEvent);
-				if(deleteImportedWorldEvent.isCancelled()) {
-					continue;
-				}
-				String path = Bukkit.getWorldContainer().getPath();
+		for(World world : Bukkit.getWorlds()) {
+			DeleteImportedWorldEvent deleteImportedWorldEvent = new DeleteImportedWorldEvent(world);
+			Bukkit.getPluginManager().callEvent(deleteImportedWorldEvent);
+			if(deleteImportedWorldEvent.isCancelled()) {
+				continue;
+			}
+			String path = Bukkit.getWorldContainer().getPath();
+			path = path.substring(0, path.length() - 2);
+			path += "/" + world.getName() + "/";
+			Bukkit.unloadWorld(world, false);
+			try {
+				FileHandler.delete(new File(path + "playerdata"));
+				FileHandler.delete(new File(path + "stats"));
+			} catch(Exception e) {
+
+			}
+			if(importedWorlds != null && importedWorlds.contains(world.getName())) {
+				path = Bukkit.getWorldContainer().getPath();
 				path = path.substring(0, path.length() - 2);
-				path += "/" + world.getName() + "/";
-				Bukkit.unloadWorld(world, false);
-				try {
-					FileHandler.delete(new File(path + "playerdata"));
-					FileHandler.delete(new File(path + "stats"));
-				} catch(Exception e) {
-					
-				}
-				if(importedWorlds != null && importedWorlds.contains(world.getName())) {
-					path = Bukkit.getWorldContainer().getPath();
-					path = path.substring(0, path.length() - 2);
-					FileHandler.delete(new File(path + "/" + world));
-				}
+				FileHandler.delete(new File(path + "/" + world));
 			}
 		}
 	}

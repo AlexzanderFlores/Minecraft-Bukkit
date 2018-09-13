@@ -1,10 +1,9 @@
 package network.gameapi;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import network.customevents.game.GameDeathEvent;
+import network.customevents.player.PlayerAssistEvent;
+import network.customevents.player.PlayerLeaveEvent;
+import network.server.util.EventUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -13,10 +12,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import network.customevents.game.GameDeathEvent;
-import network.customevents.player.PlayerAssistEvent;
-import network.customevents.player.PlayerLeaveEvent;
-import network.server.util.EventUtil;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AssistTracker implements Listener {
 	public Map<String, List<String>> allDamagers = null;
@@ -26,9 +25,9 @@ public class AssistTracker implements Listener {
 		EventUtil.register(this);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-		if(!event.isCancelled() && event.getEntity() instanceof Player) {
+		if(event.getEntity() instanceof Player) {
 			Player damager = null;
 			if(event.getDamager() instanceof Player) {
 				damager = (Player) event.getDamager();
