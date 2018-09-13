@@ -1,18 +1,21 @@
 package network.server.servers.hub;
 
 import network.customevents.TimeEvent;
+import network.player.account.AccountHandler;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EventUtil;
 import network.server.util.FileHandler;
 import network.server.util.ImageMap;
 import network.server.util.StringUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.util.Vector;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -25,53 +28,54 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
-public class RecentSupporters implements Listener {
+public abstract class RecentSupporters implements Listener {
 	private List<ItemFrame> itemFrames = null;
 	private List<ArmorStand> nameStands = null;
 	private List<ArmorStand> packageStands = null;
 	private List<String> packageNames = null;
+	private Color color = null;
+	private int updateDelayInMinutes = 5;
 
-	RecentSupporters() {
+	public RecentSupporters(Location [] locations, Vector[] nameDistances, String [] titles, Color color, int updateDelayInMinutes) {
 		itemFrames = new ArrayList<ItemFrame>();
 		nameStands = new ArrayList<ArmorStand>();
 		packageStands = new ArrayList<ArmorStand>();
-		packageNames = Arrays.asList("Recent Customer &a/buy", "Recent Voter &a/vote", "Recently Joined Discord &a/discord");
+		packageNames = Arrays.asList(titles);
+		this.color = color;
+		this.updateDelayInMinutes = updateDelayInMinutes;
 		
 		World world = Bukkit.getWorlds().get(0);
-		
-		itemFrames.add(ImageMap.getItemFrame(world, 1689, 8, -1260));
-		itemFrames.add(ImageMap.getItemFrame(world, 1685, 8, -1260));
-		itemFrames.add(ImageMap.getItemFrame(world, 1681, 8, -1260));
-		
-		try {
-			packageStands.add((ArmorStand) world.spawnEntity(itemFrames.get(0).getLocation().clone().add(-1, -2, -2.5), EntityType.ARMOR_STAND));
-			packageStands.add((ArmorStand) world.spawnEntity(itemFrames.get(1).getLocation().clone().add(-1, -2, -2.5), EntityType.ARMOR_STAND));
-			packageStands.add((ArmorStand) world.spawnEntity(itemFrames.get(2).getLocation().clone().add(-1, -2, -2.5), EntityType.ARMOR_STAND));
-			for(ArmorStand armorStand : packageStands) {
-				setUpArmorStand(armorStand);
-			}
 
-			nameStands.add((ArmorStand) world.spawnEntity(packageStands.get(0).getLocation().clone().add(0, .3, 0), EntityType.ARMOR_STAND));
-			nameStands.add((ArmorStand) world.spawnEntity(packageStands.get(1).getLocation().clone().add(0, .3, 0), EntityType.ARMOR_STAND));
-			nameStands.add((ArmorStand) world.spawnEntity(packageStands.get(2).getLocation().clone().add(0, .3, 0), EntityType.ARMOR_STAND));
-			for(ArmorStand armorStand : nameStands) {
+		for(Location location : locations) {
+			itemFrames.add(ImageMap.getItemFrame(location));
+		}
+
+		try {
+			for(int a = 0; a < 3; ++a) {
+				Location location = itemFrames.get(a).getLocation();
+
+				ArmorStand armorStand = (ArmorStand) world.spawnEntity(location.clone().add(nameDistances[a]), EntityType.ARMOR_STAND);
 				setUpArmorStand(armorStand);
+				packageStands.add(armorStand);
+
+				armorStand = (ArmorStand) world.spawnEntity(location.clone().add(nameDistances[a + 3]), EntityType.ARMOR_STAND);
+				setUpArmorStand(armorStand);
+				nameStands.add(armorStand);
 			}
 
 			update();
 			EventUtil.register(this);
 		} catch(Exception e) {
 			e.printStackTrace();
-			Bukkit.getLogger().info("ARE THE RECENT SUPPORTER BLOCKS ARE MISSING?");
+			Bukkit.getLogger().info("ARE ITEM FRAMES MISSING?");
 		}
 	}
 	
 	@EventHandler
 	public void onTime(TimeEvent event) {
 		long ticks = event.getTicks();
-		if(ticks == 20 * 60 * 5) {
+		if(ticks == 20 * 60 * updateDelayInMinutes) {
 			update();
 		}
 	}
@@ -80,16 +84,13 @@ public class RecentSupporters implements Listener {
 		new AsyncDelayedTask(new Runnable() {
 			@Override
 			public void run() {
-				List<UUID> uuids = new ArrayList<UUID>();
+				List<UUID> uuids = getUUIDs();
 				List<String> names = new ArrayList<String>();
 
-				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
-				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
-				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
-
-				names.add("AlexzanderFlores");
-				names.add("AlexzanderFlores");
-				names.add("AlexzanderFlores");
+				for(UUID uuid : uuids) {
+					String name = AccountHandler.getName(uuid);
+					names.add(name == null || name.equals("") ? "AlexzanderFlores" : name);
+				}
 				
 //				ResultSet resultSet = null;
 //				try {
@@ -145,7 +146,7 @@ public class RecentSupporters implements Listener {
 
 		String path = Bukkit.getWorldContainer().getPath() + "/plugins/" + index + ".png";
 
-		// Download as a file so other hubs on the same box can access it without an additional API call
+		// Download as a file so other servers on the same box can access it without an additional API call
 		FileHandler.downloadImage(url, path);
 
 		try {
@@ -180,8 +181,8 @@ public class RecentSupporters implements Listener {
 			for(int x = 0; x < image.getWidth(); ++x) {
 				int argb = image.getRGB(x, y);
 
-				if(((argb >> 24) & 0xff) == 0) {
-					image.setRGB(x, y, new Color(0x312117).getRGB());
+				if(this.color != null && ((argb >> 24) & 0xff) == 0) {
+					image.setRGB(x, y, this.color.getRGB());
 				} else {
 					image.setRGB(x, y, argb);
 				}
@@ -190,4 +191,6 @@ public class RecentSupporters implements Listener {
 
 		return image;
 	}
+
+	public abstract List<UUID> getUUIDs();
 }

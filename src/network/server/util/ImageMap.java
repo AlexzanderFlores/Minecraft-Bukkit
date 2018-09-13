@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.function.Predicate;
 
 @SuppressWarnings("deprecation")
 public class ImageMap {
@@ -98,13 +99,14 @@ public class ImageMap {
 		if(imageMaps == null) {
 			imageMaps = new ArrayList<ImageMap>();
 		}
-		Iterator<ImageMap> iterator = imageMaps.iterator();
-		while(iterator.hasNext()) {
-			ImageMap map = iterator.next();
-			if(map.getName().equals(this.name)) {
-				iterator.remove();
+
+		imageMaps.removeIf(new Predicate<ImageMap>() {
+			@Override
+			public boolean test(ImageMap map) {
+				return map.getName().equals(name);
 			}
-		}
+		});
+
 		imageMaps.add(this);
 	}
 	
@@ -118,7 +120,7 @@ public class ImageMap {
 			for(int b = 0; b < width; ++b) {
 				int x = b * MAP_WIDTH;
 				int y = a * MAP_HEIGHT;
-				ItemFrame frame = getItemFrame(itemFrame.getWorld(), x1, y1, z1);
+				ItemFrame frame = getItemFrame(new Location(location.getWorld(), x1, y1, z1));
 				int id = -1;
 				if(itemFrameMaps.containsKey(frame)) {
 					id = itemFrameMaps.get(frame);
@@ -182,13 +184,12 @@ public class ImageMap {
 		return itemFrames;
 	}
 	
-	public static ItemFrame getItemFrame(World world, int x1, int y1, int z1) {
-		for(Entity entity : world.getEntities()) {
+	public static ItemFrame getItemFrame(Location location) {
+		for(Entity entity : location.getWorld().getEntities()) {
 			if(entity instanceof ItemFrame) {
 				Location loc = entity.getLocation();
-				if(loc.getBlockX() == x1 && loc.getBlockY() == y1 && loc.getBlockZ() == z1) {
-					ItemFrame itemFrame = (ItemFrame) entity;
-					return itemFrame;
+				if(loc.getBlockX() == location.getBlockX() && loc.getBlockY() == location.getBlockY() && loc.getBlockZ() == location.getBlockZ()) {
+					return (ItemFrame) entity;
 				}
 			}
 		}

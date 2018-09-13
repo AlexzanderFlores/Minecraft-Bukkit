@@ -18,6 +18,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class HubBase extends ProPlugin {
 	private static int hubNumber = 0;
 	
@@ -46,8 +51,39 @@ public class HubBase extends ProPlugin {
 		new TeamScoreboardHandler();
 		new ParkourNPC();
 		new EndlessParkour();
-		new RecentSupporters();
 		new Flag();
+
+		Location [] locations = new Location [] {
+				new Location(world, 1689, 8, -1260),
+				new Location(world, 1685, 8, -1260),
+				new Location(world, 1681, 8, -1260)
+		};
+
+		Vector [] nameDistances = new Vector [] {
+				new Vector(-1, -2, -2.5),
+				new Vector(-1, -2, -2.5),
+				new Vector(-1, -2, -2.5),
+
+				new Vector(-1, -2.3, -2.5),
+				new Vector(-1, -2.3, -2.5),
+				new Vector(-1, -2.3, -2.5)
+		};
+
+		new RecentSupporters(locations, nameDistances, new String [] {
+				"Recent Customer &a/buy",
+				"Recent Voter &a/vote",
+				"Recently Joined Discord &a/discord"
+		}, new Color(0x312117), 5) {
+			@Override
+			public List<UUID> getUUIDs() {
+				List<UUID> uuids = new ArrayList<UUID>();
+				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
+				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
+				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
+				return uuids;
+			}
+		};
+
 		if(hubNumber == 1) {
 			new Server();
 		}
