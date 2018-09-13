@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,11 +31,13 @@ public class RecentSupporters implements Listener {
 	private List<ItemFrame> itemFrames = null;
 	private List<ArmorStand> nameStands = null;
 	private List<ArmorStand> packageStands = null;
-	
+	private List<String> packageNames = null;
+
 	RecentSupporters() {
 		itemFrames = new ArrayList<ItemFrame>();
 		nameStands = new ArrayList<ArmorStand>();
 		packageStands = new ArrayList<ArmorStand>();
+		packageNames = Arrays.asList("Recent Customer &a/buy", "Recent Voter &a/vote", "Recently Joined Discord &a/discord");
 		
 		World world = Bukkit.getWorlds().get(0);
 		
@@ -78,15 +81,12 @@ public class RecentSupporters implements Listener {
 			@Override
 			public void run() {
 				List<UUID> uuids = new ArrayList<UUID>();
-				List<String> packageNames = new ArrayList<String>();
 				List<String> names = new ArrayList<String>();
 
 				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
 				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
 				uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
-				packageNames.add("Recent Customer &a/buy");
-				packageNames.add("Recent Voter &a/vote");
-				packageNames.add("Recently Joined Discord &a/discord");
+
 				names.add("AlexzanderFlores");
 				names.add("AlexzanderFlores");
 				names.add("AlexzanderFlores");
@@ -114,7 +114,6 @@ public class RecentSupporters implements Listener {
 				}
 				
 				uuids.clear();
-				packageNames.clear();
 				names.clear();
 			}
 		}, 20 * 3);
@@ -152,18 +151,7 @@ public class RecentSupporters implements Listener {
 		try {
 			BufferedImage image = ImageIO.read(new File(path));
 			image = resizeImage(image);
-
-			for(int y = 0; y < image.getHeight(); ++y) {
-				for(int x = 0; x < image.getWidth(); ++x) {
-					int argb = image.getRGB(x, y);
-
-					if(((argb >> 24) & 0xff) == 0) {
-						image.setRGB(x, y, new Color(0x312117).getRGB());
-					} else {
-						image.setRGB(x, y, argb);
-					}
-				}
-			}
+			image = removeTransparency(image);
 
 			return image;
 		} catch(IOException e) {
@@ -185,5 +173,21 @@ public class RecentSupporters implements Listener {
 		g.drawImage(originalImage, (width - originalWidth) / 2, (height - originalHeight) / 2, originalWidth, originalHeight, null);
 		g.dispose();
 		return scaledBI;
+	}
+
+	private BufferedImage removeTransparency(BufferedImage image) {
+		for(int y = 0; y < image.getHeight(); ++y) {
+			for(int x = 0; x < image.getWidth(); ++x) {
+				int argb = image.getRGB(x, y);
+
+				if(((argb >> 24) & 0xff) == 0) {
+					image.setRGB(x, y, new Color(0x312117).getRGB());
+				} else {
+					image.setRGB(x, y, argb);
+				}
+			}
+		}
+
+		return image;
 	}
 }
