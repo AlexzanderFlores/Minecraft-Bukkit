@@ -1,40 +1,46 @@
 package network.server.effects.images;
 
+import network.customevents.player.AsyncPlayerJoinEvent;
+import network.customevents.player.PlayerLeaveEvent;
 import network.server.tasks.AsyncDelayedTask;
-import network.server.util.FileHandler;
+import network.server.tasks.DelayedTask;
+import network.server.util.EventUtil;
 import network.server.util.ImageMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.inventivetalent.animatedframes.AnimatedFrame;
 import org.inventivetalent.animatedframes.AnimatedFramesPlugin;
 import org.inventivetalent.animatedframes.Callback;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
-import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
-
-public class DisplayImage {
+public class DisplayImage implements Listener {
+    private String name;
     private Location bottomLeft;
     private Location topRight;
     private String url;
-    private UUID name;
+    private UUID uuid;
+    private AnimatedFramesPlugin plugin;
+    private AnimatedFrame frame;
 
-    public DisplayImage(Location bottomLeft, Location topRight) {
-        this(bottomLeft, topRight, null);
+    public DisplayImage(String name, Location bottomLeft, Location topRight) {
+        this(name, bottomLeft, topRight, null);
     }
 
-    public DisplayImage(Location bottomLeft, Location topRight, String url) {
+    public DisplayImage(String name, Location bottomLeft, Location topRight, String url) {
+        this.name = name;
         this.bottomLeft = bottomLeft;
         this.topRight = topRight;
         this.url = url;
-        this.name = UUID.randomUUID();
+        this.uuid = UUID.randomUUID();
+
+        plugin = (AnimatedFramesPlugin) Bukkit.getPluginManager().getPlugin("AnimatedFrames");
+
+        EventUtil.register(this);
     }
 
     protected String getUrl() {
@@ -46,15 +52,15 @@ public class DisplayImage {
         return this;
     }
 
-    protected String getName() {
-        return this.name.toString();
+    protected String getUuid() {
+        return this.uuid.toString();
     }
 
     public void display() {
         new AsyncDelayedTask(new Runnable() {
             @Override
             public void run() {
-                AnimatedFramesPlugin plugin = (AnimatedFramesPlugin) Bukkit.getPluginManager().getPlugin("AnimatedFrames");
+                removeFrame();
 
                 ItemFrame firstFrame = ImageMap.getItemFrame(bottomLeft);
                 ItemFrame secondFrame = ImageMap.getItemFrame(topRight);
@@ -62,21 +68,14 @@ public class DisplayImage {
                 if(firstFrame == null || secondFrame == null) {
                     return;
                 }
-
-                AnimatedFrame animatedFrame = null;
+                
+                frame = null;
                 do {
                     try {
-                        animatedFrame = plugin.frameManager.createFrame(UUID.randomUUID().toString(), url, firstFrame, secondFrame);
+                        frame = plugin.frameManager.createFrame(name, url, firstFrame, secondFrame);
                     } catch(Exception e) {}
-                } while(animatedFrame == null);
+                } while(frame == null);
 
-                AnimatedFrame frame = animatedFrame;
-                Bukkit.getLogger().info("");
-                Bukkit.getLogger().info(frame.getHeight() + " x " + frame.getWidth());
-                Bukkit.getLogger().info("");
-//                frame.creator = player.getUniqueId();
-
-                // Save frame & index
                 plugin.frameManager.writeToFile(frame);
                 plugin.frameManager.writeIndexToFile();
 
@@ -86,30 +85,48 @@ public class DisplayImage {
                 frame.startCallback = new Callback<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
+                        new AsyncDelayedTask(new Runnable() {
                             @Override
                             public void run() {
-//                                frame.addViewer(player);
-
-                                // Add players in the world
-                                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        for(Player player : bottomLeft.getWorld().getPlayers()) {
-//                                            if(player.getUniqueId().equals(player.getUniqueId())) {
-//                                                continue; // Skip the creator
-//                                            }
-                                            frame.addViewer(player);
-                                        }
-                                    }
-                                }, 20);
+                                for(Player player : bottomLeft.getWorld().getPlayers()) {
+                                    frame.addViewer(player);
+                                }
                             }
-                        }, 40);
+                        });
                     }
                 };
 
                 frame.setPlaying(true);
             }
-        });
+        }, 20);
+    }
+
+    private void removeFrame() {
+        if(plugin.frameManager.doesFrameExist(name)) {
+            AnimatedFrame frame = this.plugin.frameManager.getFrame(name);
+            plugin.frameManager.stopFrame(frame);
+
+            new DelayedTask(new Runnable() {
+                @Override
+                public void run() {
+                    frame.clearFrames();
+                    plugin.frameManager.removeFrame(frame);
+                }
+            });
+        }
+    }
+
+    @EventHandler
+    public void onAsyncPlayerJoin(AsyncPlayerJoinEvent event) {
+        if(frame != null) {
+            frame.addViewer(event.getPlayer());
+        }
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerLeaveEvent event) {
+        if(frame != null) {
+            frame.removeViewer(event.getPlayer());
+        }
     }
 }

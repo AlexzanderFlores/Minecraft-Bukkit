@@ -9,19 +9,20 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
 public class DisplaySkin extends DisplayImage {
-    public DisplaySkin(Location bottomLeft, Location topRight, UUID uuid, Color color) {
-        super(bottomLeft, topRight);
+    public DisplaySkin(String name, Map<String, Location []> locations, UUID uuid, Color color) {
+        super(name, locations.get(name)[0], locations.get(name)[1]);
         setUrl(loadImage(uuid, color));
     }
 
     protected String loadImage(UUID uuid, Color color) {
         String skinUrl = "https://crafatar.com/renders/body/" + uuid + "?scale=10";
-        String path = Bukkit.getWorldContainer().getPath() + "/plugins/Core/" + getName() + ".png";
+        String path = Bukkit.getWorldContainer().getPath() + "/plugins/Core/" + getUuid() + ".png";
 
         // Download as a file so other servers on the same box can access it without an additional API call
         FileHandler.downloadImage(skinUrl, path);
