@@ -11,6 +11,7 @@ import network.server.tasks.AsyncDelayedTask;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
 import network.server.util.TimeUtil;
+import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -20,7 +21,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
+import java.io.IOException;
+import java.net.URL;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -230,7 +236,7 @@ public class AccountHandler implements Listener {
 				return player.getUniqueId();
 			}
 			return UUID.fromString(DB.PLAYERS_ACCOUNTS.getString("name", name, "uuid"));
-		} catch(NullPointerException e) {
+		} catch(Exception e) {
 			return null;
 		}
 	}

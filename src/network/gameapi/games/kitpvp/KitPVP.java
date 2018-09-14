@@ -96,6 +96,7 @@ public class KitPVP extends ProPlugin {
 					uuids.add(UUID.fromString(lifetime));
 					uuids.add(UUID.fromString(weekly));
 				} catch(Exception e) {
+					e.printStackTrace();
 					uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
 					uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));
 					uuids.add(UUID.fromString("ec286bfe-04ef-40d5-ab4c-e8d50148a499"));

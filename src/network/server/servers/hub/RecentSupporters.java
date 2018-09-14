@@ -109,7 +109,7 @@ public abstract class RecentSupporters implements Listener {
 //					names.add(AccountHandler.getDisplay(uuid));
 //				}
 				for(int a = 0; a < 3; ++a) {
-					new ImageMap(itemFrames.get(a), "Supporter " + a, loadImage(uuids.get(a), a), 3, 4);
+//					new ImageMap(itemFrames.get(a), "Supporter " + a, loadImage(uuids.get(a), a, color), 3, 4);
 					nameStands.get(a).setCustomName(StringUtil.color("&a" + names.get(a)));
 					packageStands.get(a).setCustomName(StringUtil.color("&b" + packageNames.get(a)));
 				}
@@ -126,7 +126,7 @@ public abstract class RecentSupporters implements Listener {
 		armorStand.setCustomNameVisible(true);
 	}
 	
-	private BufferedImage loadImage(UUID uuid, int index) {
+	public static String loadImage(UUID uuid, int index, Color color) {
 		String url;
 		int scale = 10;
 
@@ -150,18 +150,21 @@ public abstract class RecentSupporters implements Listener {
 		FileHandler.downloadImage(url, path);
 
 		try {
-			BufferedImage image = ImageIO.read(new File(path));
+			File file = new File(path);
+			BufferedImage image = ImageIO.read(file);
 			image = resizeImage(image);
-			image = removeTransparency(image);
+			image = removeTransparency(image, color);
 
-			return image;
+			ImageIO.write(image, "png", file);
+
+			return file.getPath();
 		} catch(IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	private BufferedImage resizeImage(Image originalImage) {
+	private static BufferedImage resizeImage(Image originalImage) {
 		int originalHeight = originalImage.getHeight(null);
 		int originalWidth = originalImage.getWidth(null);
 
@@ -176,13 +179,13 @@ public abstract class RecentSupporters implements Listener {
 		return scaledBI;
 	}
 
-	private BufferedImage removeTransparency(BufferedImage image) {
+	private static BufferedImage removeTransparency(BufferedImage image, Color color) {
 		for(int y = 0; y < image.getHeight(); ++y) {
 			for(int x = 0; x < image.getWidth(); ++x) {
 				int argb = image.getRGB(x, y);
 
-				if(this.color != null && ((argb >> 24) & 0xff) == 0) {
-					image.setRGB(x, y, this.color.getRGB());
+				if(color != null && ((argb >> 24) & 0xff) == 0) {
+					image.setRGB(x, y, color.getRGB());
 				} else {
 					image.setRGB(x, y, argb);
 				}

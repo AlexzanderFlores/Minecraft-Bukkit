@@ -124,6 +124,9 @@ commands:
     usage: /versions
 
 # Hub Commands
+  setSkin:
+    usage: /setSkin <uuid> <index>
+
   giveKey:
     usage: /giveKey <name> <amount> <type>
 

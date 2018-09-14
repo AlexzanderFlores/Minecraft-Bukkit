@@ -97,6 +97,7 @@ public class ProPlugin extends CountDownUtil implements Listener {
 	}
 	
 	public void disable() {
+		FileHandler.delete(new File(Bukkit.getWorldContainer().getPath() + "/plugins/AnimatedFrames"));
 		/*try {
 			for(NPCs npc : NPCs.values()) {
 				npc.unregister();

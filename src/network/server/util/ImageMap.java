@@ -121,17 +121,21 @@ public class ImageMap {
 				int x = b * MAP_WIDTH;
 				int y = a * MAP_HEIGHT;
 				ItemFrame frame = getItemFrame(new Location(location.getWorld(), x1, y1, z1));
-				int id = -1;
+				int id;
 				if(itemFrameMaps.containsKey(frame)) {
 					id = itemFrameMaps.get(frame);
-				} else if(!DB.NETWORK_MAP_IDS.isKeySet("name", name)) {
-//					id = DB.NETWORK_MAP_IDS.getInt("name", name, "map_id");
+				} else {
+					id = itemFrameMaps.size() + 1;
+					itemFrameMaps.put(frame, id);
+				}
+				/* else if(DB.NETWORK_MAP_IDS.isKeySet("name", name)) {
+					id = DB.NETWORK_MAP_IDS.getInt("name", name, "map_id");
 					itemFrameMaps.put(frame, id);
 				} else {
-					Bukkit.getLogger().info("Unknown map id logged for \"" + name + "\"");
-					return;
-				}
-				id += counter++;
+					id = DB.NETWORK_MAP_IDS.getSize() + 1;
+					id += counter++;
+					DB.NETWORK_MAP_IDS.insert("'" + name + "', '" + id + "'");
+				}*/
 				MapView mapView = Bukkit.getMap((short) id);
 				while(mapView == null || mapView.getId() < id) {
 					mapView = Bukkit.createMap(frame.getWorld());
