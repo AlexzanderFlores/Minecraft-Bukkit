@@ -5,10 +5,7 @@ import network.gameapi.MiniGame;
 import network.gameapi.games.kitpvp.KitPVP;
 import network.gameapi.games.onevsones.OnevsOnes;
 import network.gameapi.games.uhcskywars.SkyWars;
-import network.player.ChatLogger;
-import network.player.DefaultChatColor;
-import network.player.LevelHandler;
-import network.player.PrivateMessaging;
+import network.player.*;
 import network.player.account.AccountHandler;
 import network.player.account.PlayerTracker;
 import network.player.account.PlaytimeTracker;
@@ -151,6 +148,7 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 		new DefaultChatColor();
 //		new Alerts();
 		new CommandRepeater();
+		new DiscordHandler();
 		Glow.register();
 	}
 	

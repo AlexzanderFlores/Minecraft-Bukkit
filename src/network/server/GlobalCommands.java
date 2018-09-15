@@ -143,14 +143,6 @@ public class GlobalCommands {
 				return true;
 			}
 		};
-
-		new CommandBase("discord") {
-			@Override
-			public boolean execute(CommandSender sender, String [] arguments) {
-				MessageHandler.sendMessage(sender, "&chttps://discord.gg/cXB5Q8k");
-				return true;
-			}
-		};
 		
 		new CommandBase("sysTime") {
 			@Override

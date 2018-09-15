@@ -124,6 +124,9 @@ commands:
     usage: /versions
 
 # Hub Commands
+  confirmDiscord:
+    usage: /confirmDiscord
+
   giveKey:
     usage: /giveKey <name> <amount> <type>
 
