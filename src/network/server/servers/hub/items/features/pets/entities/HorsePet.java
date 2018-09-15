@@ -87,13 +87,13 @@ public class HorsePet extends EntityHorse implements EntityPet {
 
     @Override
     public void clickedOnCustomOption(Player player, ItemStack clicked) {
-        if(Ranks.VIP_PLUS.hasRank(player)) {
+        if(Ranks.PRO_PLUS.hasRank(player)) {
             Horse horse = (Horse) getBukkitEntity();
             if(clicked.getType() == Material.SADDLE) {
                 horse.removePotionEffect(PotionEffectType.SLOW);
                 getBukkitEntity().setPassenger(player);
             } else if(clicked.getType() == Material.SKULL_ITEM) {
-                if(Ranks.VIP_PLUS.hasRank(player)) {
+                if(Ranks.PRO_PLUS.hasRank(player)) {
                     if(clicked.getData().getData() == (byte) 3) {
                         horse.setVariant(Variant.HORSE);
                         setTame(true);
@@ -108,7 +108,7 @@ public class HorsePet extends EntityHorse implements EntityPet {
                         MessageHandler.sendMessage(player, "&aYou have changed your horse into a Zombie Horse");
                     }
                 } else {
-                    MessageHandler.sendMessage(player, Ranks.VIP_PLUS.getNoPermission());
+                    MessageHandler.sendMessage(player, Ranks.PRO_PLUS.getNoPermission());
                 }
             } else {
                 String name = ChatColor.stripColor(clicked.getItemMeta().getDisplayName());
@@ -125,7 +125,7 @@ public class HorsePet extends EntityHorse implements EntityPet {
                 }
             }
         } else {
-            MessageHandler.sendMessage(player, Ranks.VIP_PLUS.getNoPermission());
+            MessageHandler.sendMessage(player, Ranks.PRO_PLUS.getNoPermission());
         }
     }
 

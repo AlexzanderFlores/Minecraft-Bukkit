@@ -64,11 +64,11 @@ public class OcelotPet extends EntityOcelot implements EntityPet {
 
     @Override
     public void clickedOnCustomOption(Player player, ItemStack clicked) {
-        if(Ranks.VIP_PLUS.hasRank(player)) {
+        if(Ranks.PRO_PLUS.hasRank(player)) {
             Ocelot ocelot = (Ocelot) getBukkitEntity();
             ocelot.setCatType(Type.valueOf(ChatColor.stripColor(clicked.getItemMeta().getDisplayName().split(" type")[0].toUpperCase().replace(" ", "_"))));
         } else {
-            MessageHandler.sendMessage(player, Ranks.VIP_PLUS.getNoPermission());
+            MessageHandler.sendMessage(player, Ranks.PRO_PLUS.getNoPermission());
         }
     }
 

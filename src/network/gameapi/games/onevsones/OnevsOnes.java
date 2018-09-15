@@ -125,7 +125,7 @@ public class OnevsOnes extends ProPlugin {
 					"  ",
 					"&eQueue Times",
 					Ranks.PLAYER.getColor() + "Default: &b5s",
-					Ranks.VIP.getColor() + "VIP: &b1s /buy",
+					Ranks.PRO.getColor() + "PRO: &b1s /buy",
 					"     ",
 					"&aIP TBA",
 					"      ",

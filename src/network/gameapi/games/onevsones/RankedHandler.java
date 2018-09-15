@@ -83,11 +83,11 @@ public class RankedHandler implements Listener {
 	public void onBattleStart(BattleStartEvent event) {
 		if(event.getBattle().isRanked()) {
 			for(Player player : event.getBattle().getPlayers()) {
-				if(!Ranks.VIP.hasRank(player)) {
+				if(!Ranks.PRO.hasRank(player)) {
 					int amount = getMatches(player);
 					matches.put(player.getName(), --amount);
 					MessageHandler.sendMessage(player, "You now have &e" + amount + " &xranked matches left");
-					MessageHandler.sendMessage(player, "Get more with " + Ranks.VIP.getPrefix() + "&xor voting &b/vote");
+					MessageHandler.sendMessage(player, "Get more with " + Ranks.PRO.getPrefix() + "&xor voting &b/vote");
 				}
 			}
 		}

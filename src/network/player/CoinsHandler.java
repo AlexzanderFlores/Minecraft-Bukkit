@@ -89,14 +89,14 @@ public class CoinsHandler implements Listener {
 								return true;
 							}
 						} else if(arguments.length == 1) {
-							if(Ranks.VIP.hasRank(sender)) {
+							if(Ranks.PRO.hasRank(sender)) {
 								target = ProPlugin.getPlayer(arguments[0]);
 								if(target == null) {
 									MessageHandler.sendMessage(sender, "&c" + arguments[0] + " is not online");
 									return true;
 								}
 							} else {
-								MessageHandler.sendMessage(sender, Ranks.VIP.getNoPermission());
+								MessageHandler.sendMessage(sender, Ranks.PRO.getNoPermission());
 								return true;
 							}
 						}
@@ -161,9 +161,9 @@ public class CoinsHandler implements Listener {
 		Bukkit.getPluginManager().callEvent(event);
 		amount = event.getAmount();
 		if(amount > 0) {
-			if(Ranks.VIP_PLUS.hasRank(player)) {
+			if(Ranks.PRO_PLUS.hasRank(player)) {
 				amount *= 3;
-			} else if(Ranks.VIP.hasRank(player)) {
+			} else if(Ranks.PRO.hasRank(player)) {
 				amount *= 2;
 			}
 		}
@@ -172,7 +172,7 @@ public class CoinsHandler implements Listener {
 			msg += " " + message;
 		}
 		MessageHandler.sendMessage(player, msg);
-		/*if(!Ranks.VIP.hasRank(player)) {
+		/*if(!Ranks.PRO.hasRank(player)) {
 			MessageHandler.sendMessage(player, RankAds.getAlerts()[0]);
 		}*/
 		if(coins.containsKey(player.getName())) {

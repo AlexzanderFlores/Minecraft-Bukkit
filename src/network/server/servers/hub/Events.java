@@ -100,7 +100,7 @@ public class Events implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
-		if(Ranks.VIP.hasRank(player)) {
+		if(Ranks.PRO.hasRank(player)) {
 			player.setAllowFlight(true);
 		}
 		player.getInventory().clear();

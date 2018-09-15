@@ -121,15 +121,15 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
 
                     // Is the tournament full?
                     if(players.size() >= max) {
-                        if(AccountHandler.Ranks.VIP.hasRank(player)) {
+                        if(AccountHandler.Ranks.PRO.hasRank(player)) {
                             boolean kickedPlayer = false;
                             for(String name : players) {
                                 Player tournamentPlayer = ProPlugin.getPlayer(name);
-                                if(tournamentPlayer == null || !AccountHandler.Ranks.VIP.hasRank(tournamentPlayer)) {
+                                if(tournamentPlayer == null || !AccountHandler.Ranks.PRO.hasRank(tournamentPlayer)) {
                                     kickedPlayer = true;
                                     if(removePlayer(name) && tournamentPlayer != null) {
-                                        MessageHandler.sendMessage(tournamentPlayer, "A " + AccountHandler.Ranks.VIP.getPrefix() + "&xplayer has joined a full tournament.");
-                                        MessageHandler.sendMessage(tournamentPlayer, "Don't get kicked again by getting " + AccountHandler.Ranks.VIP.getPrefix() + "&b/buy");
+                                        MessageHandler.sendMessage(tournamentPlayer, "A " + AccountHandler.Ranks.PRO.getPrefix() + "&xplayer has joined a full tournament.");
+                                        MessageHandler.sendMessage(tournamentPlayer, "Don't get kicked again by getting " + AccountHandler.Ranks.PRO.getPrefix() + "&b/buy");
                                     }
                                     break;
                                 }
@@ -140,7 +140,7 @@ public class OnDemandTournaments extends CountDownUtil implements Listener {
                                 return;
                             }
                         } else {
-                            MessageHandler.sendMessage(player, "&cThis tournament is full. Join full tournaments with " + AccountHandler.Ranks.VIP.getPrefix() + "&b/buy");
+                            MessageHandler.sendMessage(player, "&cThis tournament is full. Join full tournaments with " + AccountHandler.Ranks.PRO.getPrefix() + "&b/buy");
                             event.setCancelled(true);
                             return;
                         }

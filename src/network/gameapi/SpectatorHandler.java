@@ -126,7 +126,7 @@ public class SpectatorHandler implements Listener {
 				}
 				return true;
 			}
-		}.setRequiredRank(Ranks.VIP);
+		}.setRequiredRank(Ranks.PRO);
 
 		instance = this;
 		EventUtil.register(instance);
@@ -449,20 +449,20 @@ public class SpectatorHandler implements Listener {
 							}
 						} else if(event.getInventory().getTitle().equals(settingsName)) {
 							if(item.getType() == Material.FEATHER) {
-								if(Ranks.VIP.hasRank(player)) {
+								if(Ranks.PRO.hasRank(player)) {
 									player.setFlySpeed((float) (item.getAmount() * 0.10));
 								} else {
-									MessageHandler.sendMessage(player, Ranks.VIP.getNoPermission());
+									MessageHandler.sendMessage(player, Ranks.PRO.getNoPermission());
 								}
 							} else if(item.getType() == Material.TORCH) {
-								if(Ranks.VIP.hasRank(player)) {
+								if(Ranks.PRO.hasRank(player)) {
 									if(player.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
 										player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 									} else {
 										player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 999999999, 100));
 									}
 								} else {
-									MessageHandler.sendMessage(player, Ranks.VIP.getNoPermission());
+									MessageHandler.sendMessage(player, Ranks.PRO.getNoPermission());
 								}
 							}
 							player.closeInventory();

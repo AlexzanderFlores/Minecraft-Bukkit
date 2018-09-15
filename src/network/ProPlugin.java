@@ -769,9 +769,9 @@ public class ProPlugin extends CountDownUtil implements Listener {
 		if(restarting) {
 			event.setKickMessage("This server is currently restarting");
 			event.setResult(Result.KICK_OTHER);
-		} else if(ProPlugin.isServerFull() && Ranks.VIP.hasRank(player) && Network.getMiniGame().getJoiningPreGame()) {
+		} else if(ProPlugin.isServerFull() && Ranks.PRO.hasRank(player) && Network.getMiniGame().getJoiningPreGame()) {
 			for(Player online : Bukkit.getOnlinePlayers()) {
-				if(!Ranks.VIP.hasRank(online)) {
+				if(!Ranks.PRO.hasRank(online)) {
 					MessageHandler.sendMessage(online, "You were moved to the hub to make room for a " + AccountHandler.getRank(player).getPrefix());
 					MessageHandler.sendMessage(online, "Avoid this with a rank: &b/buy");
 					ProPlugin.sendPlayerToServer(online, "hub");
@@ -795,7 +795,7 @@ public class ProPlugin extends CountDownUtil implements Listener {
 			} else {
 				event.setKickMessage(ChatColor.YELLOW + "Server is full, ranks allow you to join full servers; " + ChatColor.AQUA + "/buy");
 			}
-		} else if(getBeta() && !Ranks.VIP.hasRank(player)) {
+		} else if(getBeta() && !Ranks.PRO.hasRank(player)) {
 			event.setKickMessage(ChatColor.YELLOW + "Server is currently in BETA mode, ranks allow you to join beta servers; " + ChatColor.AQUA + "/buy");
 			event.setResult(Result.KICK_OTHER);
 		}

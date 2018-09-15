@@ -57,7 +57,7 @@ public class ChickenPet extends EntityChicken implements EntityPet {
     @Override
     public void clickedOnCustomOption(Player player, ItemStack clicked) {
         if(clicked.getType() == Material.FEATHER) {
-            if(Ranks.VIP_PLUS.hasRank(player)) {
+            if(Ranks.PRO_PLUS.hasRank(player)) {
                 if(flyingChickens == null) {
                     flyingChickens = new ArrayList<Chicken>();
                 }
@@ -70,7 +70,7 @@ public class ChickenPet extends EntityChicken implements EntityPet {
                     chicken.setPassenger(player);
                 }
             } else {
-                MessageHandler.sendMessage(player, Ranks.VIP_PLUS.getNoPermission());
+                MessageHandler.sendMessage(player, Ranks.PRO_PLUS.getNoPermission());
             }
         }
     }

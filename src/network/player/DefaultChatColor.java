@@ -50,7 +50,7 @@ public class DefaultChatColor implements Listener {
 				player.openInventory(inventory);
 				return true;
 			}
-		}.setRequiredRank(Ranks.VIP_PLUS);
+		}.setRequiredRank(Ranks.PRO_PLUS);
 		EventUtil.register(this);
 	}
 	
@@ -104,7 +104,7 @@ public class DefaultChatColor implements Listener {
 	@EventHandler
 	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		if(Ranks.VIP_PLUS.hasRank(player)) {
+		if(Ranks.PRO_PLUS.hasRank(player)) {
 			if(!colors.containsKey(player.getName())) {
 				if(DB.PLAYERS_CHAT_COLOR.isUUIDSet(player.getUniqueId())) {
 					colors.put(player.getName(), DB.PLAYERS_CHAT_COLOR.getString("uuid", player.getUniqueId().toString(), "color"));

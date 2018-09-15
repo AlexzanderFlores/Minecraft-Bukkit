@@ -290,12 +290,12 @@ public class OneVsOneKit implements Listener {
             // Give them the kit items
             give(player);
 
-            if(AccountHandler.Ranks.VIP.hasRank(player)) {
+            if(AccountHandler.Ranks.PRO.hasRank(player)) {
                 // Add them to the queue instantly if they're a ranked player
                 addToQueue(player, teamSize);
             } else {
                 // Wait 5 seconds to add them to the queue if they're a default player
-                MessageHandler.sendMessage(player, "&a[TIP] " + AccountHandler.Ranks.VIP.getPrefix() + "&cPerk: &e5x faster queuing time &b/buy");
+                MessageHandler.sendMessage(player, "&a[TIP] " + AccountHandler.Ranks.PRO.getPrefix() + "&cPerk: &e5x faster queuing time &b/buy");
                 new DelayedTask(new Runnable() {
                     @Override
                     public void run() {

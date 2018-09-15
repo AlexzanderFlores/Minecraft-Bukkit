@@ -58,7 +58,7 @@ public class KitPVP extends ProPlugin {
 		new NPCEntity(EntityType.SKELETON, "&eMiner John &7(Click)", location, Material.DIAMOND_PICKAXE) {
 			@Override
 			public void onInteract(Player player) {
-				MessageHandler.sendMessage(player, AccountHandler.Ranks.VIP_PLUS.getPrefix() + "MinerJohn: Back in my day this whole cave was filled with emeralds. We sure got all of them over the last few years.");
+				MessageHandler.sendMessage(player, AccountHandler.Ranks.PRO_PLUS.getPrefix() + "MinerJohn: Back in my day this whole cave was filled with emeralds. We sure got all of them over the last few years.");
 			}
 		};
 

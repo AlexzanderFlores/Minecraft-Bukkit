@@ -35,7 +35,7 @@ public class RankAds implements Listener {
 		long ticks = event.getTicks();
 		if(ticks == 20 * 60) {
 			for(Player player : Bukkit.getOnlinePlayers()) {
-				if(!Ranks.VIP.hasRank(player)) {
+				if(!Ranks.PRO.hasRank(player)) {
 					MessageHandler.sendMessage(player, "&a[TIP] &x" + alerts[counter]);
 				}
 			}

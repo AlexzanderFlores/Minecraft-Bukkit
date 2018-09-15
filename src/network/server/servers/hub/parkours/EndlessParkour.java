@@ -229,7 +229,7 @@ public class EndlessParkour implements Listener {
 					remove(block);
 				}
 			}, 20);
-			if(Ranks.VIP.hasRank(player)) {
+			if(Ranks.PRO.hasRank(player)) {
 				player.setAllowFlight(true);
 			}
 			if(teleport) {

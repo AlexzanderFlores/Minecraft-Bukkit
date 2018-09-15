@@ -87,10 +87,10 @@ public class ScenarioHandler implements Listener {
 			new NPCEntity(EntityType.SKELETON, "&e" + name, new Location(world, 13.5, 6, z)) {
 				@Override
 				public void onInteract(Player player) {
-					if(Ranks.VIP.hasRank(player)) {
+					if(Ranks.PRO.hasRank(player)) {
 						voteData.get(ChatColor.stripColor(getName())).vote(player);
 					} else {
-						MessageHandler.sendMessage(player, Ranks.VIP.getNoPermission());
+						MessageHandler.sendMessage(player, Ranks.PRO.getNoPermission());
 					}
 				}
 			};
@@ -113,10 +113,10 @@ public class ScenarioHandler implements Listener {
 			return;
 		}
 		MessageHandler.alert("");
-		MessageHandler.alert(Ranks.VIP.getPrefix() + "&amodifier selected: " + winner.getName());
+		MessageHandler.alert(Ranks.PRO.getPrefix() + "&amodifier selected: " + winner.getName());
 		for(Player player : Bukkit.getOnlinePlayers()) {
-			if(!Ranks.VIP.hasRank(player)) {
-				MessageHandler.sendMessage(player, "Vote for " + Ranks.VIP.getPrefix() + "&xmodifiers: &b/buy");
+			if(!Ranks.PRO.hasRank(player)) {
+				MessageHandler.sendMessage(player, "Vote for " + Ranks.PRO.getPrefix() + "&xmodifiers: &b/buy");
 			}
 		}
 		MessageHandler.alert("");

@@ -11,7 +11,6 @@ import network.server.tasks.AsyncDelayedTask;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
 import network.server.util.TimeUtil;
-import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -21,12 +20,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
-import java.io.IOException;
-import java.net.URL;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -34,8 +28,8 @@ import java.util.UUID;
 public class AccountHandler implements Listener {
 	public enum Ranks {
 		PLAYER(ChatColor.GRAY, ""),
-		VIP(ChatColor.YELLOW, "[VIP]"),
-		VIP_PLUS(ChatColor.GREEN, "[VIP&b+&a]"),
+		PRO(ChatColor.YELLOW, "[Pro]"),
+		PRO_PLUS(ChatColor.GREEN, "[Pro&b+&a]"),
 		YOUTUBER(ChatColor.LIGHT_PURPLE, "[YT]"),
 		TRIAL(ChatColor.DARK_AQUA, "[Trial]"),
 		STAFF(ChatColor.DARK_GREEN, "[Staff]"),
@@ -276,7 +270,7 @@ public class AccountHandler implements Listener {
 			}
 		} else if(Network.getPlugin() == Network.Plugins.HUB) {
 			// TODO: Change this to player
-			Ranks startingRank = Ranks.VIP_PLUS;
+			Ranks startingRank = Ranks.PRO_PLUS;
 			setRank(player, startingRank);
 			new DelayedTask(new Runnable() {
 				@Override

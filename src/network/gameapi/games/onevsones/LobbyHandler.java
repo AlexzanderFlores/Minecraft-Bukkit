@@ -72,7 +72,7 @@ public class LobbyHandler implements Listener {
         location.setZ(location.getBlockZ() + (random.nextInt(range) * (random.nextBoolean() ? 1 : -1)));
         player.teleport(location);
         if(!SpectatorHandler.contains(player)) {
-            if(Ranks.VIP.hasRank(player)) {
+            if(Ranks.PRO.hasRank(player)) {
                 player.setAllowFlight(true);
             }
             if(giveItems) {
@@ -244,12 +244,12 @@ public class LobbyHandler implements Listener {
         if(isInLobby(player)) {
             ItemStack item = player.getItemInHand();
             if(item.equals(rankedQueue)) {
-            	if(RankedHandler.getMatches(player) > 0 || Ranks.VIP.hasRank(player)) {
+            	if(RankedHandler.getMatches(player) > 0 || Ranks.PRO.hasRank(player)) {
             		openKitSelection(player);
             	} else {
             		MessageHandler.sendMessage(player, "&cYou are out of ranked matches!");
             		MessageHandler.sendMessage(player, "&cGet more by voting: &b/vote");
-            		MessageHandler.sendMessage(player, "&cGet unlimited ranked matches with " + Ranks.VIP.getPrefix() + "&b/buy");
+            		MessageHandler.sendMessage(player, "&cGet unlimited ranked matches with " + Ranks.PRO.getPrefix() + "&b/buy");
             	}
             }
         }

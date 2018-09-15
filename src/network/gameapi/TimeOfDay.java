@@ -47,7 +47,7 @@ public class TimeOfDay implements Listener {
 				inventory.setItem(15, new ItemCreator(Material.WOOL, 15).setName("&bNight").setLores(new String [] {"", "&7Ticks: &a18000", ""}).getItemStack());
 				player.openInventory(inventory);
 			} else {
-				MessageHandler.sendMessage(player, Ranks.VIP.getNoPermission());
+				MessageHandler.sendMessage(player, Ranks.PRO.getNoPermission());
 			}
 		}
 	}

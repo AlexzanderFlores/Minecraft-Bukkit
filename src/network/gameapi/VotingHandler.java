@@ -65,7 +65,7 @@ public class VotingHandler implements Listener {
 			int votes = Ranks.getVotes(player);
 			this.votes += votes;
 			MessageHandler.sendMessage(player, "+" + votes + " &avotes for &e" + getName());
-			if(!Ranks.VIP.hasRank(player)) {
+			if(!Ranks.PRO.hasRank(player)) {
 				MessageHandler.sendMessage(player, "&eRanks give you more map votes! &b/buy");
 			}
 		}
@@ -133,7 +133,7 @@ public class VotingHandler implements Listener {
 				}
 			}, 30);
 		}
-		if(!recentlyClicked.contains(player.getName()) && Ranks.VIP_PLUS.hasRank(player)) {
+		if(!recentlyClicked.contains(player.getName()) && Ranks.PRO_PLUS.hasRank(player)) {
 			recentlyClicked.add(player.getName());
 			MessageHandler.alert(AccountHandler.getPrefix(player) + "&e has voted for &c" + map);
 			new DelayedTask(new Runnable() {

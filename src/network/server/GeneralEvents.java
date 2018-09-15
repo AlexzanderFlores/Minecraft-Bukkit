@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,7 +30,6 @@ import network.player.account.AccountHandler;
 import network.player.account.AccountHandler.Ranks;
 import network.server.DB.Databases;
 import network.server.tasks.DelayedTask;
-import network.server.util.EffectUtil;
 import network.server.util.EventUtil;
 import network.server.util.StringUtil;
 import network.server.util.UnicodeUtil;
@@ -139,7 +137,7 @@ public class GeneralEvents implements Listener {
 		
 		// Chat delay for non premium players
 		if(delayed.contains(player.getName())) {
-			MessageHandler.sendMessage(player, "&cSlow down! Non " + Ranks.VIP.getPrefix() + "&cchat delay of &e" + delay + " &cseconds");
+			MessageHandler.sendMessage(player, "&cSlow down! Non " + Ranks.PRO.getPrefix() + "&cchat delay of &e" + delay + " &cseconds");
 			event.setCancelled(true);
 			return;
 		} else if(AccountHandler.getRank(player) == Ranks.PLAYER) {
@@ -154,7 +152,7 @@ public class GeneralEvents implements Listener {
 		}
 		
 		// Color codes for premium and above
-		if(Ranks.VIP.hasRank(player)) {
+		if(Ranks.PRO.hasRank(player)) {
 			event.setMessage(StringUtil.color(event.getMessage()));
 			event.setMessage(event.getMessage().replace("<3", UnicodeUtil.getHeart()) + ChatColor.WHITE);
 			

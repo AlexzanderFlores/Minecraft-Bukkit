@@ -43,15 +43,15 @@ public class SaveYourItems extends InventoryViewer {
 				}
 				values[1] = "2";
 				if(DB.PLAYERS_KITPVP_CHESTS.isKeySet(keys, values)) {
-					inventory.setItem(13, new ItemCreator(Material.ENDER_CHEST).setAmount(2).setName("&bEnder Chest #2").setLores(new String [] {"", "&7Price: &a100", "&7Requires " + Ranks.VIP.getPrefix(), ""}).getItemStack());
+					inventory.setItem(13, new ItemCreator(Material.ENDER_CHEST).setAmount(2).setName("&bEnder Chest #2").setLores(new String [] {"", "&7Price: &a100", "&7Requires " + Ranks.PRO.getPrefix(), ""}).getItemStack());
 				} else {
-					inventory.setItem(13, new ItemCreator(Material.INK_SACK, 8).setAmount(2).setName("&bEnder Chest #2").setLores(new String [] {"", "&7Price: &a100", "&7Requires " + Ranks.VIP.getPrefix(), ""}).getItemStack());
+					inventory.setItem(13, new ItemCreator(Material.INK_SACK, 8).setAmount(2).setName("&bEnder Chest #2").setLores(new String [] {"", "&7Price: &a100", "&7Requires " + Ranks.PRO.getPrefix(), ""}).getItemStack());
 				}
 				values[1] = "3";
 				if(DB.PLAYERS_KITPVP_CHESTS.isKeySet(keys, values)) {
-					inventory.setItem(15, new ItemCreator(Material.ENDER_CHEST).setAmount(3).setName("&bEnder Chest #3").setLores(new String [] {"", "&7Price: &a150", "&7Requires " + Ranks.VIP_PLUS.getPrefix(), ""}).getItemStack());
+					inventory.setItem(15, new ItemCreator(Material.ENDER_CHEST).setAmount(3).setName("&bEnder Chest #3").setLores(new String [] {"", "&7Price: &a150", "&7Requires " + Ranks.PRO_PLUS.getPrefix(), ""}).getItemStack());
 				} else {
-					inventory.setItem(15, new ItemCreator(Material.INK_SACK, 8).setAmount(3).setName("&bEnder Chest #3").setLores(new String [] {"", "&7Price: &a150", "&7Requires " + Ranks.VIP_PLUS.getPrefix(), ""}).getItemStack());
+					inventory.setItem(15, new ItemCreator(Material.INK_SACK, 8).setAmount(3).setName("&bEnder Chest #3").setLores(new String [] {"", "&7Price: &a150", "&7Requires " + Ranks.PRO_PLUS.getPrefix(), ""}).getItemStack());
 				}
 			}
 		});
@@ -162,17 +162,17 @@ public class SaveYourItems extends InventoryViewer {
 			if(slot == 11) {
 				openChest(player, 1);
 			} else if(slot == 12) {
-				if(Ranks.VIP.hasRank(player)) {
+				if(Ranks.PRO.hasRank(player)) {
 					openChest(player, 2);
 				} else {
-					MessageHandler.sendMessage(player, Ranks.VIP.getNoPermission());
+					MessageHandler.sendMessage(player, Ranks.PRO.getNoPermission());
 					EffectUtil.playSound(player, Sound.NOTE_BASS_GUITAR, 1000.0f);
 				}
 			} else if(slot == 13) {
-				if(Ranks.VIP_PLUS.hasRank(player)) {
+				if(Ranks.PRO_PLUS.hasRank(player)) {
 					openChest(player, 3);
 				} else {
-					MessageHandler.sendMessage(player, Ranks.VIP_PLUS.getNoPermission());
+					MessageHandler.sendMessage(player, Ranks.PRO_PLUS.getNoPermission());
 					EffectUtil.playSound(player, Sound.NOTE_BASS_GUITAR, 1000.0f);
 				}
 			}

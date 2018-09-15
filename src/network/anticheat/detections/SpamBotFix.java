@@ -15,7 +15,7 @@ public class SpamBotFix implements Listener {
 
     @EventHandler
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        if(PerformanceHandler.getPing(event.getPlayer()) == 0 && !AccountHandler.Ranks.VIP.hasRank(event.getPlayer())) {
+        if(PerformanceHandler.getPing(event.getPlayer()) == 0 && !AccountHandler.Ranks.PRO.hasRank(event.getPlayer())) {
             MessageHandler.sendMessage(event.getPlayer(), "&cYou cannot talk in chat without a rank when you have a ping of 0. This is to prevent spam bots.");
             event.setCancelled(true);
         }

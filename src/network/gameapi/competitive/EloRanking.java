@@ -208,10 +208,10 @@ public class EloRanking implements Listener {
 			Player player = event.getPlayer();
 			EloRank rank = getRank(player);
 			MessageHandler.sendMessage(player, "You are within the percent range for " + rank.getPrefix() + " &x(Top &c" + rank.getPercentRange() + "&x of players)");
-			if(Ranks.VIP.hasRank(player)) {
+			if(Ranks.PRO.hasRank(player)) {
 				MessageHandler.sendMessage(player, "Your exact Elo value is &e" + EloHandler.getElo(player));
 			} else {
-				MessageHandler.sendMessage(player, "&cTo view your exact Elo value you must have " + Ranks.VIP.getPrefix());
+				MessageHandler.sendMessage(player, "&cTo view your exact Elo value you must have " + Ranks.PRO.getPrefix());
 			}
 		}
 	}
