@@ -138,9 +138,7 @@ public class Events implements Listener {
 					sidebars.get(player.getName()).update(player);
 				}
 			}
-		} else if(ticks == 20 * 10) {
-			MessageHandler.alert("Updating player skins...");
-
+		} else if(ticks == 20 * 60 * 5) {
 			World world = Bukkit.getWorlds().get(0);
 
 			Map<String, Location []> locations = new HashMap<String, Location []>();
