@@ -59,50 +59,6 @@ public class HubBase extends ProPlugin {
 		if(hubNumber == 1) {
 			new Server();
 		}
-
-		Map<String, Location []> locations = new HashMap<String, Location []>();
-
-		locations.put("RecentCustomer", new Location [] {
-				new Location(world, 1689, 5, -1260),
-				new Location(world, 1687, 8, -1260)
-		});
-
-		locations.put("RecentVoter", new Location [] {
-				new Location(world, 1685, 5, -1260),
-				new Location(world, 1683, 8, -1260)
-		});
-
-		locations.put("RecentlyJoinedDiscord", new Location [] {
-				new Location(world, 1681, 5, -1260),
-				new Location(world, 1679, 8, -1260),
-		});
-
-		List<UUID> uuids = Arrays.asList(
-				UUID.fromString("11603007-81b5-45fe-b17e-91ea8972143d"),
-				UUID.fromString("6330b959-8daa-4cb0-9112-cf28f5185384"),
-				UUID.fromString("10924f26-1c86-4025-8f9d-8b3a86b83810")
-		);
-
-		new DisplaySkin(
-				"RecentCustomer",
-				locations,
-				uuids.get(new Random().nextInt(uuids.size())),
-				new Color(0x312117)
-		).display();
-
-		new DisplaySkin(
-				"RecentVoter",
-				locations,
-				uuids.get(new Random().nextInt(uuids.size())),
-				new Color(0x312117)
-		).display();
-
-		new DisplaySkin(
-				"RecentlyJoinedDiscord",
-				locations,
-				uuids.get(new Random().nextInt(uuids.size())),
-				new Color(0x312117)
-		).display();
 	}
 	
 	public static int getHubNumber() {

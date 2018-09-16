@@ -3,17 +3,16 @@ package network.server.servers.hub;
 import network.customevents.TimeEvent;
 import network.customevents.player.PlayerLeaveEvent;
 import network.customevents.player.PlayerRankChangeEvent;
+import network.player.MessageHandler;
 import network.player.account.AccountHandler;
 import network.player.account.AccountHandler.Ranks;
 import network.player.scoreboard.SidebarScoreboardUtil;
 import network.server.DB;
+import network.server.effects.images.DisplaySkin;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,9 +26,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.awt.*;
+import java.awt.Color;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 public class Events implements Listener {
 	private static Random random = null;
@@ -118,7 +121,7 @@ public class Events implements Listener {
 	@EventHandler
 	public void onTime(TimeEvent event) {
 		long ticks = event.getTicks();
-		if(ticks == (20 * 5)) {
+		if(ticks == 20 * 5) {
 			new AsyncDelayedTask(new Runnable() {
 				@Override
 				public void run() {
@@ -134,6 +137,58 @@ public class Events implements Listener {
 				if(sidebars.containsKey(player.getName())) {
 					sidebars.get(player.getName()).update(player);
 				}
+			}
+		} else if(ticks == 20 * 10) {
+			MessageHandler.alert("Updating player skins...");
+
+			World world = Bukkit.getWorlds().get(0);
+
+			Map<String, Location []> locations = new HashMap<String, Location []>();
+
+			locations.put("RecentCustomer", new Location [] {
+					new Location(world, 1689, 5, -1260),
+					new Location(world, 1687, 8, -1260)
+			});
+
+			locations.put("RecentVoter", new Location [] {
+					new Location(world, 1685, 5, -1260),
+					new Location(world, 1683, 8, -1260)
+			});
+
+			locations.put("RecentlyJoinedDiscord", new Location [] {
+					new Location(world, 1681, 5, -1260),
+					new Location(world, 1679, 8, -1260),
+			});
+
+			List<String> recentCustomer = DB.PLAYERS_CUSTOMERS.getOrdered("id", "uuid", 1, true);
+			List<String> recentVoter = DB.PLAYERS_RECENT_VOTER.getOrdered("id", "uuid", 1, true);
+			List<String> recentDiscord = DB.PLAYERS_DISCORD.getOrdered("id", "uuid", 1, true);
+
+			if(recentCustomer != null && !recentCustomer.isEmpty()) {
+				new DisplaySkin(
+						"RecentCustomer",
+						locations,
+						UUID.fromString(recentCustomer.get(0)),
+						new Color(0x312117)
+				).display();
+			}
+
+			if(recentVoter != null && !recentVoter.isEmpty()) {
+				new DisplaySkin(
+						"RecentVoter",
+						locations,
+						UUID.fromString(recentVoter.get(0)),
+						new Color(0x312117)
+				).display();
+			}
+
+			if(recentDiscord != null && !recentDiscord.isEmpty()) {
+				new DisplaySkin(
+						"RecentlyJoinedDiscord",
+						locations,
+						UUID.fromString(recentDiscord.get(0)),
+						new Color(0x312117)
+				).display();
 			}
 		}
 	}

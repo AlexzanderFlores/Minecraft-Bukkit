@@ -269,8 +269,7 @@ public class AccountHandler implements Listener {
 				});
 			}
 		} else if(Network.getPlugin() == Network.Plugins.HUB) {
-			// TODO: Change this to player
-			Ranks startingRank = Ranks.PRO_PLUS;
+			Ranks startingRank = Ranks.PLAYER;
 			setRank(player, startingRank);
 			new DelayedTask(new Runnable() {
 				@Override

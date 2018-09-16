@@ -127,14 +127,14 @@ public class Beacon implements Listener {
 		}
 		String [] keys = new String [] { "uuid", "type" };
 		String [] values = new String [] { player.getUniqueId().toString(), type.getName() };
-//		if(DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") <= 0) {
-//			if(type == CrateTypes.VOTING) {
-//				ChatClickHandler.sendMessageToRunCommand(player, "&aClick here", "Click to vote", "/vote", "&cYou don't have any &b" + type.getDisplay() + " Keys&c! Get some by voting ");
-//			} else {
-//				MessageHandler.sendMessage(player, "&cYou do not have any &b" + type.getDisplay() + " Keys&c! Get some on Buycraft: &cComing Soon");
-//			}
-//			return;
-//		}
+		if(DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") <= 0) {
+			if(type == CrateTypes.VOTING) {
+				ChatClickHandler.sendMessageToRunCommand(player, "&aClick here", "Click to vote", "/vote", "&cYou don't have any &b" + type.getDisplay() + " Keys&c! Get some by voting ");
+			} else {
+				MessageHandler.sendMessage(player, "&cYou do not have any &b" + type.getDisplay() + " Keys&c! Get some on Buycraft: &cComing Soon");
+			}
+			return;
+		}
 		if(npc != null) {
 			npc.remove();
 		}

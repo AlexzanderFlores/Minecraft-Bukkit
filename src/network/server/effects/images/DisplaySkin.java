@@ -22,7 +22,7 @@ public class DisplaySkin extends DisplayImage {
 
     protected String loadImage(UUID uuid, Color color) {
         String skinUrl = "https://crafatar.com/renders/body/" + uuid + "?scale=10";
-        String path = Bukkit.getWorldContainer().getPath() + "/plugins/Core/" + getUuid() + ".png";
+        String path = Bukkit.getWorldContainer().getPath() + "/plugins/Core/skins/" + getUuid() + ".png";
 
         // Download as a file so other servers on the same box can access it without an additional API call
         FileHandler.downloadImage(skinUrl, path);

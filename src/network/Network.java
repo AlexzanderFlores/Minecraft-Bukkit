@@ -16,7 +16,6 @@ import network.server.servers.building.Building;
 import network.server.servers.hub.items.features.particles.Particles;
 import network.server.servers.hub.main.MainHub;
 import network.server.servers.slave.Slave;
-import network.server.servers.worker.Worker;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.CommandRepeater;
 import network.server.util.ConfigurationUtil;
@@ -40,8 +39,7 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 		ONEVSONE("1v1s", "1v1", "1v1s"),
 		UHCSW("UHCSW", "sky_wars", "UHC Sky Wars"),
 		BUILDING("Building", "building"),
-		SLAVE("Slave", "slave"),
-		WORKER("Worker", "worker");
+		SLAVE("Slave", "slave");
 		
 		private String server = null;
 		private String data = null;
@@ -115,9 +113,6 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 				break;
 			case SLAVE:
 				proPlugin = new Slave();
-				break;
-			case WORKER:
-				proPlugin = new Worker();
 				break;
 			}
 		} catch(Exception e) {
