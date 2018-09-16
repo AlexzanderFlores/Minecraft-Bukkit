@@ -44,6 +44,7 @@ public class Events implements Listener {
 		random = new Random();
 		Bukkit.getWorlds().get(0).setSpawnLocation(1684, 6, -1280);
 		sidebars = new HashMap<String, SidebarScoreboardUtil>();
+		updateSkins();
 		EventUtil.register(this);
 	}
 	
@@ -99,6 +100,58 @@ public class Events implements Listener {
 			sidebars.remove(name);
 		}
 	}
+
+	private void updateSkins() {
+		World world = Bukkit.getWorlds().get(0);
+
+		Map<String, Location []> locations = new HashMap<String, Location []>();
+
+		locations.put("RecentCustomer", new Location [] {
+				new Location(world, 1689, 5, -1260),
+				new Location(world, 1687, 8, -1260)
+		});
+
+		locations.put("RecentVoter", new Location [] {
+				new Location(world, 1685, 5, -1260),
+				new Location(world, 1683, 8, -1260)
+		});
+
+		locations.put("RecentlyJoinedDiscord", new Location [] {
+				new Location(world, 1681, 5, -1260),
+				new Location(world, 1679, 8, -1260),
+		});
+
+		List<String> recentCustomer = DB.PLAYERS_CUSTOMERS.getOrdered("id", "uuid", 1, true);
+		List<String> recentVoter = DB.PLAYERS_RECENT_VOTER.getOrdered("id", "uuid", 1, true);
+		List<String> recentDiscord = DB.PLAYERS_DISCORD.getOrdered("id", "uuid", 1, true);
+
+		if(recentCustomer != null && !recentCustomer.isEmpty()) {
+			new DisplaySkin(
+					"RecentCustomer",
+					locations,
+					UUID.fromString(recentCustomer.get(0)),
+					new Color(0x312117)
+			).display();
+		}
+
+		if(recentVoter != null && !recentVoter.isEmpty()) {
+			new DisplaySkin(
+					"RecentVoter",
+					locations,
+					UUID.fromString(recentVoter.get(0)),
+					new Color(0x312117)
+			).display();
+		}
+
+		if(recentDiscord != null && !recentDiscord.isEmpty()) {
+			new DisplaySkin(
+					"RecentlyJoinedDiscord",
+					locations,
+					UUID.fromString(recentDiscord.get(0)),
+					new Color(0x312117)
+			).display();
+		}
+	}
 	
 	@EventHandler(priority = EventPriority.LOW)
 	public void onPlayerJoin(PlayerJoinEvent event) {
@@ -139,55 +192,7 @@ public class Events implements Listener {
 				}
 			}
 		} else if(ticks == 20 * 60 * 5) {
-			World world = Bukkit.getWorlds().get(0);
-
-			Map<String, Location []> locations = new HashMap<String, Location []>();
-
-			locations.put("RecentCustomer", new Location [] {
-					new Location(world, 1689, 5, -1260),
-					new Location(world, 1687, 8, -1260)
-			});
-
-			locations.put("RecentVoter", new Location [] {
-					new Location(world, 1685, 5, -1260),
-					new Location(world, 1683, 8, -1260)
-			});
-
-			locations.put("RecentlyJoinedDiscord", new Location [] {
-					new Location(world, 1681, 5, -1260),
-					new Location(world, 1679, 8, -1260),
-			});
-
-			List<String> recentCustomer = DB.PLAYERS_CUSTOMERS.getOrdered("id", "uuid", 1, true);
-			List<String> recentVoter = DB.PLAYERS_RECENT_VOTER.getOrdered("id", "uuid", 1, true);
-			List<String> recentDiscord = DB.PLAYERS_DISCORD.getOrdered("id", "uuid", 1, true);
-
-			if(recentCustomer != null && !recentCustomer.isEmpty()) {
-				new DisplaySkin(
-						"RecentCustomer",
-						locations,
-						UUID.fromString(recentCustomer.get(0)),
-						new Color(0x312117)
-				).display();
-			}
-
-			if(recentVoter != null && !recentVoter.isEmpty()) {
-				new DisplaySkin(
-						"RecentVoter",
-						locations,
-						UUID.fromString(recentVoter.get(0)),
-						new Color(0x312117)
-				).display();
-			}
-
-			if(recentDiscord != null && !recentDiscord.isEmpty()) {
-				new DisplaySkin(
-						"RecentlyJoinedDiscord",
-						locations,
-						UUID.fromString(recentDiscord.get(0)),
-						new Color(0x312117)
-				).display();
-			}
+			updateSkins();
 		}
 	}
 	
