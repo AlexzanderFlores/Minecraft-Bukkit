@@ -83,7 +83,7 @@ public class DiscordHandler implements HttpHandler, Listener {
                 if(DB.PLAYERS_DISCORD.isUUIDSet(uuid)) {
                     String discordId = DB.PLAYERS_DISCORD.getString("uuid", uuid.toString(), "discord");
                     if(discordId != null) {
-                        Server.post("http://localhost:8081/change-rank?d=" + discordId + "&r=" + event.getRank().toString());
+                        Server.post("http://167.114.98.199:8081/change-rank?d=" + discordId + "&r=" + event.getRank().toString());
                     }
                 }
             }

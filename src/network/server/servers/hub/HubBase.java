@@ -4,6 +4,7 @@ import network.Network;
 import network.ProPlugin;
 import network.player.LevelHandler;
 import network.player.TeamScoreboardHandler;
+import network.player.account.AccountHandler;
 import network.server.CommandBase;
 import network.server.DailyRewards;
 import network.server.ServerLogger;
@@ -57,6 +58,17 @@ public class HubBase extends ProPlugin {
 		new Flag();
 
 		if(hubNumber == 1) {
+			new CommandBase("purchase", 2, false) {
+				@Override
+				public boolean execute(CommandSender sender, String [] arguments) {
+					String name = arguments[0];
+					String product = arguments[1];
+
+					Server.post("http://167.114.98.199:8081/recent-customer?n=" + name + "&p=" + product);
+					return true;
+				}
+			}.setRequiredRank(AccountHandler.Ranks.OWNER);
+
 			new Server();
 		}
 	}

@@ -131,6 +131,9 @@ commands:
     usage: /giveKey <name> <amount> <type>
 
 # Op Only Global Commands
+  purchase:
+    usage: /purchase <name> <product name>
+
   addRankedMatches:
     usage: /addRankedMatches <name> <amount>
 
@@ -286,10 +289,6 @@ commands:
 
   editSkyWarsMap:
     usage: /editSkyWarsMap <Y> <N> <S> <E> <W> <Start Radius>
-
-# Worker commands
-  purchase:
-    usage: /purchase <name> <package name>
 
 # UHC commands
   health:
