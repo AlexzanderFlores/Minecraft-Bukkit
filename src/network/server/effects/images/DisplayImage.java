@@ -62,41 +62,46 @@ public class DisplayImage implements Listener {
             public void run() {
                 removeFrame();
 
-                ItemFrame firstFrame = ImageMap.getItemFrame(bottomLeft);
-                ItemFrame secondFrame = ImageMap.getItemFrame(topRight);
-
-                if(firstFrame == null || secondFrame == null) {
-                    return;
-                }
-                
-                frame = null;
-                do {
-                    try {
-                        frame = plugin.frameManager.createFrame(name, url, firstFrame, secondFrame);
-                    } catch(Exception e) {}
-                } while(frame == null);
-
-                plugin.frameManager.writeToFile(frame);
-                plugin.frameManager.writeIndexToFile();
-
-                frame.refresh();
-                plugin.frameManager.startFrame(frame);
-
-                frame.startCallback = new Callback<Void>() {
+                new AsyncDelayedTask(new Runnable() {
                     @Override
-                    public void call(Void aVoid) {
-                        new AsyncDelayedTask(new Runnable() {
-                            @Override
-                            public void run() {
-                                for(Player player : bottomLeft.getWorld().getPlayers()) {
-                                    frame.addViewer(player);
-                                }
-                            }
-                        });
-                    }
-                };
+                    public void run() {
+                        ItemFrame firstFrame = ImageMap.getItemFrame(bottomLeft);
+                        ItemFrame secondFrame = ImageMap.getItemFrame(topRight);
 
-                frame.setPlaying(true);
+                        if(firstFrame == null || secondFrame == null) {
+                            return;
+                        }
+
+                        frame = null;
+                        do {
+                            try {
+                                frame = plugin.frameManager.createFrame(name, url, firstFrame, secondFrame);
+                            } catch(Exception e) {}
+                        } while(frame == null);
+
+                        plugin.frameManager.writeToFile(frame);
+                        plugin.frameManager.writeIndexToFile();
+
+                        frame.refresh();
+                        plugin.frameManager.startFrame(frame);
+
+                        frame.startCallback = new Callback<Void>() {
+                            @Override
+                            public void call(Void aVoid) {
+                                new AsyncDelayedTask(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        for(Player player : bottomLeft.getWorld().getPlayers()) {
+                                            frame.addViewer(player);
+                                        }
+                                    }
+                                });
+                            }
+                        };
+
+                        frame.setPlaying(true);
+                    }
+                }, 20);
             }
         }, 20);
     }
@@ -109,6 +114,10 @@ public class DisplayImage implements Listener {
             new DelayedTask(new Runnable() {
                 @Override
                 public void run() {
+                    for(Player player : Bukkit.getOnlinePlayers()) {
+                        frame.removeViewer(player);
+                    }
+
                     frame.clearFrames();
                     plugin.frameManager.removeFrame(frame);
                 }
