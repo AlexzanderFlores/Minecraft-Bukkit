@@ -16,10 +16,14 @@ import network.server.servers.hub.items.GameSelector;
 import network.server.servers.hub.items.HubSelector;
 import network.server.servers.hub.items.Profile;
 import network.server.servers.hub.parkours.EndlessParkour;
+import network.server.tasks.DelayedTask;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.util.Vector;
 
 import java.awt.*;
@@ -28,7 +32,7 @@ import java.util.List;
 
 public class HubBase extends ProPlugin {
 	private static int hubNumber = 0;
-	private boolean hasPlayerJoined = false;
+	private boolean setup = false;
 	
 	public HubBase(String name) {
 		super(name);
@@ -56,6 +60,14 @@ public class HubBase extends ProPlugin {
 		new ParkourNPC();
 		new EndlessParkour();
 		new Flag();
+		new WhitelistHandler();
+
+		new DelayedTask(new Runnable() {
+			@Override
+			public void run() {
+				setup = true;
+			}
+		}, 20 * 5);
 
 		if(hubNumber == 1) {
 			new CommandBase("purchase", 2, false) {
@@ -86,4 +98,12 @@ public class HubBase extends ProPlugin {
 //		FileHandler.copyFolder(new File("/root/resources/maps/hub"), new File(container + "/spawn"));
 //		super.disable();
 //	}
+
+	@EventHandler
+	public void onPlayerLogin(PlayerLoginEvent event) {
+		if(!setup) {
+			event.setKickMessage(ChatColor.RED + "This server is still starting up");
+			event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
+		}
+	}
 }
