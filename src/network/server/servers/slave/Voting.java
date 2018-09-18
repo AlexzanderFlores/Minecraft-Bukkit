@@ -77,6 +77,7 @@ public class Voting implements Listener {
 					} else {
 						DB.PLAYERS_LIFETIME_VOTES.insert("'" + uuid + "', '1', '" + currentDay + "', '1', '1'");
 					}
+
 					Bukkit.getLogger().info("voting: update monthly votes");
 					Calendar calendar = Calendar.getInstance();
 					String month = calendar.get(Calendar.MONTH) + "";
@@ -88,6 +89,7 @@ public class Voting implements Listener {
 					} else {
 						DB.PLAYERS_MONTHLY_VOTES.insert("'" + uuid + "', '1', '" + month + "'");
 					}
+
 					Bukkit.getLogger().info("voting: update weekly votes");
 					String week = calendar.get(Calendar.WEEK_OF_YEAR) + "";
 					keys[1] = "week";
@@ -98,6 +100,7 @@ public class Voting implements Listener {
 					} else {
 						DB.PLAYERS_WEEKLY_VOTES.insert("'" + uuid + "', '1', '" + week + "'");
 					}
+
 					Beacon.giveKey(playerUUID, multiplier, CrateTypes.VOTING);
 					for(CoinsHandler handler : handlers) {
 						Bukkit.getLogger().info("Giving 20 coins for " + handler.getPluginData());

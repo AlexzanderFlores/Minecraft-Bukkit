@@ -29,6 +29,7 @@ public class CommandDispatcher implements Listener {
 				return true;
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		new CommandBase("hubCommand", 1, -1) {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
@@ -40,6 +41,7 @@ public class CommandDispatcher implements Listener {
 				return true;
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		new CommandBase("globalAlert", -1) {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
@@ -51,10 +53,11 @@ public class CommandDispatcher implements Listener {
 				return true;
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		EventUtil.register(this);
 	}
 	
-	public static void sendToAll(final String command) {
+	public static void sendToAll(String command) {
 		new AsyncDelayedTask(new Runnable() {
 			@Override
 			public void run() {
@@ -78,32 +81,31 @@ public class CommandDispatcher implements Listener {
 					}
 				}
 				for(String server : servers) {
-//					DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.insert("'" + server + "', '" + command + "'");
+					DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.insert("'" + server + "', '" + command + "'");
 				}
 				servers.clear();
-				servers = null;
 			}
 		});
 	}
 	
-	public static void sendToGame(final String game, final String command) {
+	public static void sendToGame(String game, String command) {
 		new AsyncDelayedTask(new Runnable() {
 			@Override
 			public void run() {
 				Bukkit.getLogger().info("Sending \"" + command + "\" to all \"" + game + "\" servers");
-//				for(String serverNumber : DB.NETWORK_SERVER_STATUS.getAllStrings("server_number", "game_name", game)) {
-//					DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.insert("'" + game + serverNumber + "', '" + command + "'");
-//				}
+				for(String serverNumber : DB.NETWORK_SERVER_STATUS.getAllStrings("server_number", "game_name", game)) {
+					DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.insert("'" + game + serverNumber + "', '" + command + "'");
+				}
 			}
 		});
 	}
 	
-	public static void sendToServer(final String server, final String command) {
+	public static void sendToServer(String server, String command) {
 		new AsyncDelayedTask(new Runnable() {
 			@Override
 			public void run() {
 				Bukkit.getLogger().info("Sending \"" + command + "\" to \"" + server + "\"");
-//				DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.insert("'" + server + "', '" + command + "'");
+				DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.insert("'" + server + "', '" + command + "'");
 			}
 		});
 	}
@@ -117,14 +119,14 @@ public class CommandDispatcher implements Listener {
 				public void run() {
 					String server = Network.getServerName();
 					try {
-//						for(String command : DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.getAllStrings("command", "server", server)) {
-//							Bukkit.getLogger().info("Command Dispatcher: Running \"" + command + "\" for \"" + server + "\"");
-//							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-//						}
+						for(String command : DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.getAllStrings("command", "server", server)) {
+							Bukkit.getLogger().info("Command Dispatcher: Running \"" + command + "\" for \"" + server + "\"");
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+						}
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
-//					DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.delete("server", server);
+					DB.NETWORK_BUKKIT_COMMAND_DISPATCHER.delete("server", server);
 				}
 			});
 		}

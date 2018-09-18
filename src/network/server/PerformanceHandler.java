@@ -22,6 +22,7 @@ import java.util.List;
 public class PerformanceHandler implements Listener {
 	private int counter = 0;
 	private static double ticksPerSecond = 0;
+	private static double memory = 0;
 	private long seconds = 0;
 	private long currentSecond = 0;
 	private int tickCounter = 0;
@@ -39,7 +40,6 @@ public class PerformanceHandler implements Listener {
 					player.chat("/tps");
 					permission.unsetPermission(perm);
 					permission.remove();
-					permission = null;
 					MessageHandler.sendMessage(sender, "&bPing: &c" + getPing(player));
 				} else {
 					Bukkit.dispatchCommand(sender, "tps");
@@ -54,12 +54,13 @@ public class PerformanceHandler implements Listener {
 				//MessageHandler.sendMessage(sender, "&bTicks per second: &c" + ticksPerSecond);
 				MessageHandler.sendMessage(sender, "&bAverage ping: &c" + averagePing);
 				MessageHandler.sendMessage(sender, "&bConnected clients: &c" + Bukkit.getOnlinePlayers().size());
-				MessageHandler.sendMessage(sender, "&bUsed memory: &c" + getMemory(!Ranks.OWNER.hasRank(sender)) + "%");
+				MessageHandler.sendMessage(sender, "&bUsed memory: &c" + getMemory() + "%");
 				MessageHandler.sendMessage(sender, "&bUptime: &c" + getUptimeString());
 				MessageHandler.sendMessage(sender, "&eFor more server performance info run /networkPerformance");
 				return true;
 			}
 		};
+
 		new CommandBase("ping", 0, 1) {
 			@Override
 			public boolean execute(CommandSender sender, String[] arguments) {
@@ -81,16 +82,19 @@ public class PerformanceHandler implements Listener {
 				return true;
 			}
 		};
-		final List<Integer> counters = new ArrayList<Integer>();
+
+		List<Integer> counters = new ArrayList<Integer>();
 		for(int a = 1; a <= 20; ++a) {
 			counters.add(a);
 		}
+
 		counters.add(20 * 2);
 		counters.add(20 * 5);
 		counters.add(20 * 10);
 		counters.add(20 * 60);
 		counters.add(20 * 60 * 5);
 		counters.add(20 * 60 * 10);
+
 		Bukkit.getScheduler().runTaskTimer(Network.getInstance(), new Runnable() {
 			@Override
 			public void run() {
@@ -102,6 +106,7 @@ public class PerformanceHandler implements Listener {
 				}
 			}
 		}, 1, 1);
+
 		EventUtil.register(this);
 	}
 	
@@ -115,13 +120,7 @@ public class PerformanceHandler implements Listener {
 	}
 	
 	public static double getMemory() {
-		return getMemory(true);
-	}
-	
-	public static double getMemory(boolean round) {
-		double total = Runtime.getRuntime().totalMemory() / (1024 * 1024);
-		double allocated = Runtime.getRuntime().maxMemory() / (1024 * 1024);
-		return (int) (total * 100.0d / allocated + 0.5);
+		return memory;
 	}
 	
 	public static String getUptimeString() {
@@ -131,12 +130,12 @@ public class PerformanceHandler implements Listener {
 		} else if(uptimeCounter < (60 * 60)) {
 			int minutes = getAbsoluteValue((uptimeCounter / 60));
 			int seconds = getAbsoluteValue((uptimeCounter % 60));
-			uptime = minutes + " minute(s) and " + seconds + " second(s)";
+			uptime = minutes + "m " + seconds + "s";
 		} else {
 			int hours = getAbsoluteValue((uptimeCounter / 60 / 60));
 			int minutes = getAbsoluteValue((hours * 60) - (uptimeCounter / 60));
 			int seconds = getAbsoluteValue((uptimeCounter % 60));
-			uptime = hours + " hour(s) and " + minutes + " minute(s) and " + seconds + " second(s)";
+			uptime = hours + "h " + minutes + "m " + seconds + "s";
 		}
 		return uptime;
 	}
@@ -173,6 +172,13 @@ public class PerformanceHandler implements Listener {
 			}
 		} else if(ticks == 20) {
 			++uptimeCounter;
+		} else if(ticks == 20 * 5) {
+			Runtime r = Runtime.getRuntime();
+
+			double max = r.maxMemory() / (1024 * 1024);
+			double free = max - r.freeMemory() / (1024 * 1024);
+
+			memory = (int) (free * 100.0d / max + 0.5);
 		}
 	}
 }

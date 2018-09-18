@@ -70,6 +70,7 @@ public class HubBase extends ProPlugin {
 			}.setRequiredRank(AccountHandler.Ranks.OWNER);
 
 			new Server();
+			new Voting();
 		}
 	}
 	

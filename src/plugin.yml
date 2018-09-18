@@ -131,6 +131,9 @@ commands:
     usage: /giveKey <name> <amount> <type>
 
 # Op Only Global Commands
+  testVote:
+    usage: /testVote <name>
+
   purchase:
     usage: /purchase <name> <product name>
 

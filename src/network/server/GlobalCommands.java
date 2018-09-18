@@ -9,13 +9,11 @@ import network.player.account.AccountHandler.Ranks;
 import network.server.servers.hub.crate.Beacon;
 import network.server.servers.hub.crate.CrateTypes;
 import network.server.tasks.AsyncDelayedTask;
+import network.server.util.EffectUtil;
 import network.server.util.StringUtil;
 import network.server.util.TimeUtil;
 import network.staff.StaffMode;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -131,15 +129,13 @@ public class GlobalCommands {
 		new CommandBase("vote") {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
-				MessageHandler.sendMessage(sender, "&cVoting is coming soon.");
-//				MessageHandler.sendLine(sender, "&6");
-//				MessageHandler.sendMessage(sender, "http://minecraftservers.org/server/387074");
-//				MessageHandler.sendMessage(sender, "http://minecraft-mp.com/server/134839/vote/");
-//				MessageHandler.sendLine(sender, "&6");
-//				if(sender instanceof Player) {
-//					Player player = (Player) sender;
-//					EffectUtil.playSound(player, Sound.LEVEL_UP);
-//				}
+				MessageHandler.sendLine(sender, "&6");
+				MessageHandler.sendMessage(sender, "https://minecraftservers.org/server/514731");
+				MessageHandler.sendLine(sender, "&6");
+				if(sender instanceof Player) {
+					Player player = (Player) sender;
+					EffectUtil.playSound(player, Sound.LEVEL_UP);
+				}
 				return true;
 			}
 		};
