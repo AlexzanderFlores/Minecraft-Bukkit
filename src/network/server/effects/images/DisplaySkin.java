@@ -3,6 +3,7 @@ package network.server.effects.images;
 import network.server.util.FileHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
-public class DisplaySkin extends DisplayImage {
+public abstract class DisplaySkin extends DisplayImage {
     public DisplaySkin(String name, Map<String, Location []> locations, UUID uuid, Color color) {
         super(name, locations.get(name)[0], locations.get(name)[1]);
         setUrl(loadImage(uuid, color));
@@ -73,4 +74,6 @@ public class DisplaySkin extends DisplayImage {
 
         return image;
     }
+
+    public abstract void interact(Player player);
 }

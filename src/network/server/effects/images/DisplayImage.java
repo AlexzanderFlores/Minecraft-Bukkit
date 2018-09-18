@@ -1,6 +1,7 @@
 package network.server.effects.images;
 
 import network.customevents.player.AsyncPlayerJoinEvent;
+import network.customevents.player.PlayerItemFrameInteractEvent;
 import network.customevents.player.PlayerLeaveEvent;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.tasks.DelayedTask;
@@ -12,13 +13,15 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.inventivetalent.animatedframes.AnimatedFrame;
 import org.inventivetalent.animatedframes.AnimatedFramesPlugin;
 import org.inventivetalent.animatedframes.Callback;
+import org.inventivetalent.mapmanager.event.MapInteractEvent;
 
 import java.util.UUID;
 
-public class DisplayImage implements Listener {
+public abstract class DisplayImage implements Listener {
     private String name;
     private Location bottomLeft;
     private Location topRight;
@@ -138,4 +141,18 @@ public class DisplayImage implements Listener {
             frame.removeViewer(event.getPlayer());
         }
     }
+
+    @EventHandler
+    public void onMapInteract(MapInteractEvent event) {
+        for(UUID [] uuidArray : frame.getItemFrameUUIDs()) {
+            for(UUID uuid : uuidArray) {
+                if(uuid.equals(event.getItemFrame().getUniqueId())) {
+                    interact(event.getPlayer());
+                    return;
+                }
+            }
+        }
+    }
+
+    public abstract void interact(Player player);
 }

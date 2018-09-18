@@ -23,6 +23,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.util.Vector;
@@ -90,13 +91,23 @@ public class HubBase extends ProPlugin {
 				"HubLeft",
 				new Location(world, 1679, 5, -1302),
 				new Location(world, 1683, 8, -1302),
-				Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/discord.png").display();
+				Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/discord.png") {
+			@Override
+			public void interact(Player player) {
+				player.chat("/discord");
+			}
+		}.display();
 
 		new DisplayImage(
 				"HubRight",
 				new Location(world, 1685, 5, -1302),
 				new Location(world, 1689, 8, -1302),
-				Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/store.png").display();
+				Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/store.png") {
+			@Override
+			public void interact(Player player) {
+				player.chat("/buy");
+			}
+		}.display();
 	}
 	
 	public static int getHubNumber() {

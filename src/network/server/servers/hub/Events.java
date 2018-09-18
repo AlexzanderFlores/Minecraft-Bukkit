@@ -131,7 +131,12 @@ public class Events implements Listener {
 					locations,
 					UUID.fromString(recentCustomer.get(0)),
 					new Color(0x312117)
-			).display();
+			) {
+				@Override
+				public void interact(Player player) {
+					player.chat("/buy");
+				}
+			}.display();
 		}
 
 		if(recentVoter != null && !recentVoter.isEmpty()) {
@@ -140,7 +145,12 @@ public class Events implements Listener {
 					locations,
 					UUID.fromString(recentVoter.get(0)),
 					new Color(0x312117)
-			).display();
+			) {
+				@Override
+				public void interact(Player player) {
+					player.chat("/vote");
+				}
+			}.display();
 		}
 
 		if(recentDiscord != null && !recentDiscord.isEmpty()) {
@@ -149,7 +159,12 @@ public class Events implements Listener {
 					locations,
 					UUID.fromString(recentDiscord.get(0)),
 					new Color(0x312117)
-			).display();
+			) {
+				@Override
+				public void interact(Player player) {
+					player.chat("/discord");
+				}
+			}.display();
 		}
 	}
 	

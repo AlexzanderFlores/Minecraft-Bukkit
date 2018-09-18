@@ -1039,9 +1039,23 @@ public class ProPlugin extends CountDownUtil implements Listener {
 			event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+		if(DEBUG) {
+			Bukkit.getLogger().info(event.toString());
+		}
+		if(event.getRightClicked() instanceof ItemFrame) {
+			ItemFrame itemFrame = (ItemFrame) event.getRightClicked();
+			Bukkit.getPluginManager().callEvent(new PlayerItemFrameInteractEvent(event.getPlayer(), itemFrame));
+			if(!getAllowHangingBreakByEntity()) {
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler
+	public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
 		if(DEBUG) {
 			Bukkit.getLogger().info(event.toString());
 		}
