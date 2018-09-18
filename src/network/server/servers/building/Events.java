@@ -108,10 +108,4 @@ public class Events implements Listener {
 	public void onDeleteImportedWorld(DeleteImportedWorldEvent event) {
 		event.setCancelled(true);
 	}
-	
-	@EventHandler
-	public void onPlayerItemFrameInteract(PlayerItemFrameInteractEvent event) {
-		Location location = event.getItemFrame().getLocation();
-		MessageHandler.sendMessage(event.getPlayer(), location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ());
-	}
 }

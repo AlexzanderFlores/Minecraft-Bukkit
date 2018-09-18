@@ -1,6 +1,6 @@
 package network.customevents.player;
 
-import org.bukkit.entity.ItemFrame;
+import network.server.effects.images.DisplayImage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -8,19 +8,25 @@ import org.bukkit.event.HandlerList;
 public class PlayerItemFrameInteractEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private Player player = null;
-    private ItemFrame itemFrame = null;
+    private DisplayImage.ImageID id = null;
+    private String name = null;
     
-    public PlayerItemFrameInteractEvent(Player player, ItemFrame itemFrame) {
+    public PlayerItemFrameInteractEvent(Player player, DisplayImage.ImageID id, String name) {
     	this.player = player;
-    	this.itemFrame = itemFrame;
+    	this.id = id;
+    	this.name = name;
     }
     
     public Player getPlayer() {
     	return this.player;
     }
     
-    public ItemFrame getItemFrame() {
-    	return this.itemFrame;
+    public DisplayImage.ImageID getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
     }
  
     @Override

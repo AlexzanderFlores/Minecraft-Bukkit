@@ -946,11 +946,6 @@ public class ProPlugin extends CountDownUtil implements Listener {
 			if(!getAllowHangingBreakByEntity()) {
 				event.setCancelled(true);
 			}
-			if(event.getDamager() instanceof Player) {
-				Player player = (Player) event.getDamager();
-				ItemFrame itemFrame = (ItemFrame) event.getEntity();
-				Bukkit.getPluginManager().callEvent(new PlayerItemFrameInteractEvent(player, itemFrame));
-			}
 		} else if(!getAllowEntityDamageByEntities()) {
 			event.setCancelled(true);
 		}
@@ -1046,8 +1041,6 @@ public class ProPlugin extends CountDownUtil implements Listener {
 			Bukkit.getLogger().info(event.toString());
 		}
 		if(event.getRightClicked() instanceof ItemFrame) {
-			ItemFrame itemFrame = (ItemFrame) event.getRightClicked();
-			Bukkit.getPluginManager().callEvent(new PlayerItemFrameInteractEvent(event.getPlayer(), itemFrame));
 			if(!getAllowHangingBreakByEntity()) {
 				event.setCancelled(true);
 			}
@@ -1060,8 +1053,6 @@ public class ProPlugin extends CountDownUtil implements Listener {
 			Bukkit.getLogger().info(event.toString());
 		}
 		if(event.getRightClicked() instanceof ItemFrame) {
-			ItemFrame itemFrame = (ItemFrame) event.getRightClicked();
-			Bukkit.getPluginManager().callEvent(new PlayerItemFrameInteractEvent(event.getPlayer(), itemFrame));
 			if(!getAllowHangingBreakByEntity()) {
 				event.setCancelled(true);
 			}

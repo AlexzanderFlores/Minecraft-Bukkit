@@ -1,6 +1,7 @@
 package network.server.servers.hub;
 
 import network.customevents.TimeEvent;
+import network.customevents.player.PlayerItemFrameInteractEvent;
 import network.customevents.player.PlayerLeaveEvent;
 import network.customevents.player.PlayerRankChangeEvent;
 import network.player.MessageHandler;
@@ -8,6 +9,7 @@ import network.player.account.AccountHandler;
 import network.player.account.AccountHandler.Ranks;
 import network.player.scoreboard.SidebarScoreboardUtil;
 import network.server.DB;
+import network.server.effects.images.DisplayImage;
 import network.server.effects.images.DisplaySkin;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.tasks.DelayedTask;
@@ -28,11 +30,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.awt.*;
 import java.awt.Color;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
 
 public class Events implements Listener {
 	private static Random random = null;
@@ -104,19 +103,19 @@ public class Events implements Listener {
 	private void updateSkins() {
 		World world = Bukkit.getWorlds().get(0);
 
-		Map<String, Location []> locations = new HashMap<String, Location []>();
+		Map<DisplayImage.ImageID, Location []> locations = new HashMap<DisplayImage.ImageID, Location []>();
 
-		locations.put("RecentCustomer", new Location [] {
+		locations.put(DisplayImage.ImageID.RECENT_CUSTOMER, new Location [] {
 				new Location(world, 1689, 5, -1260),
 				new Location(world, 1687, 8, -1260)
 		});
 
-		locations.put("RecentVoter", new Location [] {
+		locations.put(DisplayImage.ImageID.RECENT_VOTER, new Location [] {
 				new Location(world, 1685, 5, -1260),
 				new Location(world, 1683, 8, -1260)
 		});
 
-		locations.put("RecentlyJoinedDiscord", new Location [] {
+		locations.put(DisplayImage.ImageID.RECENT_DISCORD, new Location [] {
 				new Location(world, 1681, 5, -1260),
 				new Location(world, 1679, 8, -1260),
 		});
@@ -127,44 +126,70 @@ public class Events implements Listener {
 
 		if(recentCustomer != null && !recentCustomer.isEmpty()) {
 			new DisplaySkin(
-					"RecentCustomer",
+					DisplayImage.ImageID.RECENT_CUSTOMER,
 					locations,
 					UUID.fromString(recentCustomer.get(0)),
 					new Color(0x312117)
-			) {
-				@Override
-				public void interact(Player player) {
-					player.chat("/buy");
-				}
-			}.display();
+			).display();
 		}
 
 		if(recentVoter != null && !recentVoter.isEmpty()) {
 			new DisplaySkin(
-					"RecentVoter",
+					DisplayImage.ImageID.RECENT_VOTER,
 					locations,
 					UUID.fromString(recentVoter.get(0)),
 					new Color(0x312117)
-			) {
-				@Override
-				public void interact(Player player) {
-					player.chat("/vote");
-				}
-			}.display();
+			).display();
 		}
 
 		if(recentDiscord != null && !recentDiscord.isEmpty()) {
 			new DisplaySkin(
-					"RecentlyJoinedDiscord",
+					DisplayImage.ImageID.RECENT_DISCORD,
 					locations,
 					UUID.fromString(recentDiscord.get(0)),
 					new Color(0x312117)
-			) {
-				@Override
-				public void interact(Player player) {
-					player.chat("/discord");
-				}
-			}.display();
+			).display();
+		}
+	}
+
+	private void setAds() {
+		World world = Bukkit.getWorlds().get(0);
+
+		List<String> paths = new ArrayList<String>();
+		paths.add("discord");
+		paths.add("store");
+		paths.add("goat");
+
+		int random = new Random().nextInt(paths.size());
+
+		new DisplayImage(
+				DisplayImage.ImageID.HUB_LEFT,
+				new Location(world, 1679, 5, -1302),
+				new Location(world, 1683, 8, -1302),
+				paths.get(random)).display();
+
+		paths.remove(random);
+		random = new Random().nextInt(paths.size());
+
+		new DisplayImage(
+				DisplayImage.ImageID.HUB_RIGHT,
+				new Location(world, 1685, 5, -1302),
+				new Location(world, 1689, 8, -1302),
+				paths.get(random)).display();
+	}
+
+	@EventHandler
+	public void onPlayerItemFrameInteract(PlayerItemFrameInteractEvent event) {
+		Player player = event.getPlayer();
+
+		if(event.getName().equals("discord") || event.getId() == DisplayImage.ImageID.RECENT_DISCORD) {
+			player.chat("/discord");
+		} else if(event.getName().equals("store") || event.getId() == DisplayImage.ImageID.RECENT_CUSTOMER) {
+			player.chat("/buy");
+		} else if(event.getId() == DisplayImage.ImageID.RECENT_VOTER) {
+			player.chat("/vote");
+		} else if(event.getName().equals("goat")) {
+			MessageHandler.sendMessage(player, "&cComing Soon");
 		}
 	}
 	
@@ -208,6 +233,7 @@ public class Events implements Listener {
 			}
 		} else if(ticks == 20 * 60 * 5) {
 			updateSkins();
+			setAds();
 		}
 	}
 	

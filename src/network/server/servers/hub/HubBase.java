@@ -86,28 +86,6 @@ public class HubBase extends ProPlugin {
 			new Server();
 			new Voting();
 		}
-
-		new DisplayImage(
-				"HubLeft",
-				new Location(world, 1679, 5, -1302),
-				new Location(world, 1683, 8, -1302),
-				Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/discord.png") {
-			@Override
-			public void interact(Player player) {
-				player.chat("/discord");
-			}
-		}.display();
-
-		new DisplayImage(
-				"HubRight",
-				new Location(world, 1685, 5, -1302),
-				new Location(world, 1689, 8, -1302),
-				Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/store.png") {
-			@Override
-			public void interact(Player player) {
-				player.chat("/buy");
-			}
-		}.display();
 	}
 	
 	public static int getHubNumber() {

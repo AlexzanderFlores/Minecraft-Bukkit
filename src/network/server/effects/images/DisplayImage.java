@@ -13,7 +13,6 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.inventivetalent.animatedframes.AnimatedFrame;
 import org.inventivetalent.animatedframes.AnimatedFramesPlugin;
 import org.inventivetalent.animatedframes.Callback;
@@ -21,38 +20,48 @@ import org.inventivetalent.mapmanager.event.MapInteractEvent;
 
 import java.util.UUID;
 
-public abstract class DisplayImage implements Listener {
-    private String name;
+public class DisplayImage implements Listener {
+    public enum ImageID {
+        HUB_LEFT,
+        HUB_RIGHT,
+        RECENT_CUSTOMER,
+        RECENT_VOTER,
+        RECENT_DISCORD
+    }
+
+    private ImageID id;
     private Location bottomLeft;
     private Location topRight;
+    private String name;
     private String url;
     private UUID uuid;
     private AnimatedFramesPlugin plugin;
     private AnimatedFrame frame;
 
-    public DisplayImage(String name, Location bottomLeft, Location topRight) {
-        this(name, bottomLeft, topRight, null);
+    DisplayImage(ImageID id, Location bottomLeft, Location topRight) {
+        this(id, bottomLeft, topRight, null);
     }
 
-    public DisplayImage(String name, Location bottomLeft, Location topRight, String url) {
-        this.name = name;
+    public DisplayImage(ImageID id, Location bottomLeft, Location topRight, String url) {
+        this.id = id;
         this.bottomLeft = bottomLeft;
         this.topRight = topRight;
-        this.url = url;
         this.uuid = UUID.randomUUID();
+
+        setUrl(url);
 
         plugin = (AnimatedFramesPlugin) Bukkit.getPluginManager().getPlugin("AnimatedFrames");
 
         EventUtil.register(this);
     }
 
-    protected String getUrl() {
+    String getUrl() {
         return this.url;
     }
 
-    protected DisplayImage setUrl(String url) {
-        this.url = url;
-        return this;
+    void setUrl(String url) {
+        this.name = url;
+        this.url = Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/" + url + ".png";
     }
 
     protected String getUuid() {
@@ -78,7 +87,7 @@ public abstract class DisplayImage implements Listener {
                         frame = null;
                         do {
                             try {
-                                frame = plugin.frameManager.createFrame(name, url, firstFrame, secondFrame);
+                                frame = plugin.frameManager.createFrame(id.toString(), url, firstFrame, secondFrame);
                             } catch(Exception e) {}
                         } while(frame == null);
 
@@ -110,8 +119,8 @@ public abstract class DisplayImage implements Listener {
     }
 
     private void removeFrame() {
-        if(plugin.frameManager.doesFrameExist(name)) {
-            AnimatedFrame frame = this.plugin.frameManager.getFrame(name);
+        if(plugin.frameManager.doesFrameExist(id.toString())) {
+            AnimatedFrame frame = this.plugin.frameManager.getFrame(id.toString());
             plugin.frameManager.stopFrame(frame);
 
             new DelayedTask(new Runnable() {
@@ -144,15 +153,16 @@ public abstract class DisplayImage implements Listener {
 
     @EventHandler
     public void onMapInteract(MapInteractEvent event) {
-        for(UUID [] uuidArray : frame.getItemFrameUUIDs()) {
-            for(UUID uuid : uuidArray) {
-                if(uuid.equals(event.getItemFrame().getUniqueId())) {
-                    interact(event.getPlayer());
-                    return;
+        if(frame != null) {
+            for(UUID [] uuidArray : frame.getItemFrameUUIDs()) {
+                for(UUID uuid : uuidArray) {
+                    if(uuid.equals(event.getItemFrame().getUniqueId())) {
+                        PlayerItemFrameInteractEvent playerItemFrameInteractEvent = new PlayerItemFrameInteractEvent(event.getPlayer(), id, name);
+                        Bukkit.getPluginManager().callEvent(playerItemFrameInteractEvent);
+                        return;
+                    }
                 }
             }
         }
     }
-
-    public abstract void interact(Player player);
 }

@@ -202,19 +202,19 @@ public class EloRanking implements Listener {
 		}
 	}
 	
-	@EventHandler
-	public void onPlayerItemFrameInteract(PlayerItemFrameInteractEvent event) {
-		if(frames.contains(event.getItemFrame())) {
-			Player player = event.getPlayer();
-			EloRank rank = getRank(player);
-			MessageHandler.sendMessage(player, "You are within the percent range for " + rank.getPrefix() + " &x(Top &c" + rank.getPercentRange() + "&x of players)");
-			if(Ranks.PRO.hasRank(player)) {
-				MessageHandler.sendMessage(player, "Your exact Elo value is &e" + EloHandler.getElo(player));
-			} else {
-				MessageHandler.sendMessage(player, "&cTo view your exact Elo value you must have " + Ranks.PRO.getPrefix());
-			}
-		}
-	}
+//	@EventHandler
+//	public void onPlayerItemFrameInteract(PlayerItemFrameInteractEvent event) {
+//		if(frames.contains(event.getItemFrame())) {
+//			Player player = event.getPlayer();
+//			EloRank rank = getRank(player);
+//			MessageHandler.sendMessage(player, "You are within the percent range for " + rank.getPrefix() + " &x(Top &c" + rank.getPercentRange() + "&x of players)");
+//			if(Ranks.PRO.hasRank(player)) {
+//				MessageHandler.sendMessage(player, "Your exact Elo value is &e" + EloHandler.getElo(player));
+//			} else {
+//				MessageHandler.sendMessage(player, "&cTo view your exact Elo value you must have " + Ranks.PRO.getPrefix());
+//			}
+//		}
+//	}
 	
 	@EventHandler
 	public void onGameEnding(GameEndingEvent event) {

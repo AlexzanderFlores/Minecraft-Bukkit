@@ -15,15 +15,16 @@ import java.util.UUID;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
-public abstract class DisplaySkin extends DisplayImage {
-    public DisplaySkin(String name, Map<String, Location []> locations, UUID uuid, Color color) {
-        super(name, locations.get(name)[0], locations.get(name)[1]);
-        setUrl(loadImage(uuid, color));
+public class DisplaySkin extends DisplayImage {
+    public DisplaySkin(ImageID id, Map<ImageID, Location []> locations, UUID uuid, Color color) {
+        super(id, locations.get(id)[0], locations.get(id)[1]);
+        loadImage(uuid, color);
     }
 
-    private String loadImage(UUID uuid, Color color) {
+    private void loadImage(UUID uuid, Color color) {
         String skinUrl = "https://crafatar.com/renders/body/" + uuid + "?scale=10";
-        String path = Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/" + uuid.toString() + ".png";
+        setUrl(uuid.toString());
+        String path = getUrl();
 
         // Download as a file so other servers on the same box can access it without an additional API call
         FileHandler.downloadImage(skinUrl, path);
@@ -36,11 +37,8 @@ public abstract class DisplaySkin extends DisplayImage {
             image = removeTransparency(image, color);
 
             ImageIO.write(image, "png", file);
-
-            return file.getPath();
         } catch(IOException e) {
             e.printStackTrace();
-            return null;
         }
     }
 
@@ -74,6 +72,4 @@ public abstract class DisplaySkin extends DisplayImage {
 
         return image;
     }
-
-    public abstract void interact(Player player);
 }
