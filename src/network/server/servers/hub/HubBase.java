@@ -8,6 +8,7 @@ import network.player.account.AccountHandler;
 import network.server.CommandBase;
 import network.server.DailyRewards;
 import network.server.ServerLogger;
+import network.server.effects.images.DisplayImage;
 import network.server.effects.images.DisplaySkin;
 import network.server.servers.hub.crate.CrateTypes;
 import network.server.servers.hub.crate.KeyFragments;
@@ -84,6 +85,18 @@ public class HubBase extends ProPlugin {
 			new Server();
 			new Voting();
 		}
+
+		new DisplayImage(
+				"HubLeft",
+				new Location(world, 1679, 5, -1302),
+				new Location(world, 1683, 8, -1302),
+				Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/discord.png").display();
+
+		new DisplayImage(
+				"HubRight",
+				new Location(world, 1685, 5, -1302),
+				new Location(world, 1689, 8, -1302),
+				Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/store.png").display();
 	}
 	
 	public static int getHubNumber() {

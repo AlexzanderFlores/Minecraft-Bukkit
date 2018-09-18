@@ -20,9 +20,9 @@ public class DisplaySkin extends DisplayImage {
         setUrl(loadImage(uuid, color));
     }
 
-    protected String loadImage(UUID uuid, Color color) {
+    private String loadImage(UUID uuid, Color color) {
         String skinUrl = "https://crafatar.com/renders/body/" + uuid + "?scale=10";
-        String path = Bukkit.getWorldContainer().getPath() + "/plugins/Core/skins/" + getUuid() + ".png";
+        String path = Bukkit.getWorldContainer().getPath() + "/plugins/Core/media/" + uuid.toString() + ".png";
 
         // Download as a file so other servers on the same box can access it without an additional API call
         FileHandler.downloadImage(skinUrl, path);
@@ -43,7 +43,7 @@ public class DisplaySkin extends DisplayImage {
         }
     }
 
-    protected BufferedImage resizeImage(Image originalImage) {
+    private BufferedImage resizeImage(Image originalImage) {
         int originalHeight = originalImage.getHeight(null);
         int originalWidth = originalImage.getWidth(null);
 
@@ -58,7 +58,7 @@ public class DisplaySkin extends DisplayImage {
         return scaledBI;
     }
 
-    protected BufferedImage removeTransparency(BufferedImage image, Color color) {
+    private BufferedImage removeTransparency(BufferedImage image, Color color) {
         for(int y = 0; y < image.getHeight(); ++y) {
             for(int x = 0; x < image.getWidth(); ++x) {
                 int argb = image.getRGB(x, y);
