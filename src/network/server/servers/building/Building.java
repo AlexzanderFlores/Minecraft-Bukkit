@@ -11,8 +11,6 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.Region;
 
-import de.inventivegames.hologram.Hologram;
-import de.inventivegames.hologram.HologramAPI;
 import network.Network;
 import network.Network.Plugins;
 import network.ProPlugin;

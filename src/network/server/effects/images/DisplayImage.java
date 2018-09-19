@@ -13,21 +13,36 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.util.Vector;
 import org.inventivetalent.animatedframes.AnimatedFrame;
 import org.inventivetalent.animatedframes.AnimatedFramesPlugin;
 import org.inventivetalent.animatedframes.Callback;
 import org.inventivetalent.mapmanager.event.MapInteractEvent;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class DisplayImage implements Listener {
     public enum ImageID {
-        HUB_LEFT,
-        HUB_RIGHT,
-        RECENT_CUSTOMER,
-        RECENT_VOTER,
-        RECENT_DISCORD
+        HUB_LEFT(new Vector(1679, 5, -1302), new Vector(1683, 8, -1302)),
+        HUB_RIGHT(new Vector(1685, 5, -1302), new Vector(1689, 8, -1302)),
+        PARKOUR(new Vector(1612, 5, -1306), new Vector(1616, 8, -1306)),
+        ENDLESS_PARKOUR(new Vector(1616, 5, -1256), new Vector(1612, 8, -1256)),
+        RECENT_CUSTOMER(new Vector(1689, 5, -1260), new Vector(1687, 8, -1260)),
+        RECENT_VOTER(new Vector(1685, 5, -1260), new Vector(1683, 8, -1260)),
+        RECENT_DISCORD(new Vector(1681, 5, -1260), new Vector(1679, 8, -1260));
+
+        private Location bottomLeft;
+        private Location topRight;
+
+        ImageID(Vector bottomLeft, Vector topRight) {
+            this.bottomLeft = bottomLeft.toLocation(Bukkit.getWorlds().get(0));
+            this.topRight = topRight.toLocation(Bukkit.getWorlds().get(0));
+        }
     }
+
+    private static Map<ImageID, DisplayImage> images = null;
 
     private ImageID id;
     private Location bottomLeft;
@@ -38,14 +53,14 @@ public class DisplayImage implements Listener {
     private AnimatedFramesPlugin plugin;
     private AnimatedFrame frame;
 
-    DisplayImage(ImageID id, Location bottomLeft, Location topRight) {
-        this(id, bottomLeft, topRight, null);
+    DisplayImage(ImageID id) {
+        this(id, null);
     }
 
-    public DisplayImage(ImageID id, Location bottomLeft, Location topRight, String url) {
+    public DisplayImage(ImageID id, String url) {
         this.id = id;
-        this.bottomLeft = bottomLeft;
-        this.topRight = topRight;
+        this.bottomLeft = id.bottomLeft;
+        this.topRight = id.topRight;
         this.uuid = UUID.randomUUID();
 
         setUrl(url);
@@ -53,6 +68,16 @@ public class DisplayImage implements Listener {
         plugin = (AnimatedFramesPlugin) Bukkit.getPluginManager().getPlugin("AnimatedFrames");
 
         EventUtil.register(this);
+
+        if(images == null) {
+            images = new HashMap<ImageID, DisplayImage>();
+        }
+
+        if(images.containsKey(id)) {
+            images.get(id).remove();
+        }
+
+        images.put(id, this);
     }
 
     String getUrl() {
@@ -123,18 +148,29 @@ public class DisplayImage implements Listener {
             AnimatedFrame frame = this.plugin.frameManager.getFrame(id.toString());
             plugin.frameManager.stopFrame(frame);
 
-            new DelayedTask(new Runnable() {
-                @Override
-                public void run() {
-                    for(Player player : Bukkit.getOnlinePlayers()) {
-                        frame.removeViewer(player);
-                    }
+            for(Player player : Bukkit.getOnlinePlayers()) {
+                frame.removeViewer(player);
+            }
 
-                    frame.clearFrames();
-                    plugin.frameManager.removeFrame(frame);
-                }
-            });
+            frame.clearFrames();
+            plugin.frameManager.removeFrame(frame);
+
+            frame = null;
+            plugin = null;
         }
+    }
+
+    private void remove() {
+        removeFrame();
+
+        id = null;
+        bottomLeft = null;
+        topRight = null;
+        name = null;
+        url = null;
+        uuid = null;
+
+        EventUtil.unregister(this);
     }
 
     @EventHandler

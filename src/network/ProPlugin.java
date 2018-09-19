@@ -943,6 +943,13 @@ public class ProPlugin extends CountDownUtil implements Listener {
 			Bukkit.getLogger().info(event.toString());
 		}
 		if(event.getEntity() instanceof ItemFrame) {
+			if(event.getDamager() instanceof Player) {
+				Player player = (Player) event.getDamager();
+				if(Ranks.OWNER.hasRank(player)) {
+					Location l = event.getEntity().getLocation();
+					MessageHandler.sendMessage(player, l.getBlockX() + ", " + l.getBlockY() + ", " + l.getBlockZ());
+				}
+			}
 			if(!getAllowHangingBreakByEntity()) {
 				event.setCancelled(true);
 			}
@@ -1041,6 +1048,11 @@ public class ProPlugin extends CountDownUtil implements Listener {
 			Bukkit.getLogger().info(event.toString());
 		}
 		if(event.getRightClicked() instanceof ItemFrame) {
+			Player player = event.getPlayer();
+			if(Ranks.OWNER.hasRank(player)) {
+				Location l = event.getRightClicked().getLocation();
+				MessageHandler.sendMessage(player, l.getBlockX() + ", " + l.getBlockY() + ", " + l.getBlockZ());
+			}
 			if(!getAllowHangingBreakByEntity()) {
 				event.setCancelled(true);
 			}

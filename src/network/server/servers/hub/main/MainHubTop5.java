@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import de.inventivegames.hologram.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -14,10 +15,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import de.inventivegames.hologram.Hologram;
 import network.customevents.TimeEvent;
 import network.customevents.player.InventoryItemClickEvent;
 import network.player.MessageHandler;

@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import de.inventivegames.hologram.Hologram;
+import de.inventivegames.hologram.HologramAPI;
+import network.Network;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,8 +21,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
-import de.inventivegames.hologram.Hologram;
-import de.inventivegames.hologram.HologramAPI;
 import network.ProPlugin;
 import network.customevents.TimeEvent;
 import network.customevents.player.PlayerLeaveEvent;
@@ -64,7 +65,6 @@ public class EndlessParkour implements Listener {
 		url = "1v1s.org/EPK";
 		World world = Bukkit.getWorlds().get(0);
 		Hologram hologram = HologramAPI.createHologram(new Location(world, 1592.5, 6.5, -1262.5), StringUtil.color("&eWalk Forward"));
-		hologram.spawn();
 		EventUtil.register(this);
 		//TODO: Add 1 respawn into the database when this command is dispatched on the slave server
 		new CommandBase("endlessParkourRespawn", 0, 1) {

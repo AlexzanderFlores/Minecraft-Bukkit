@@ -2,6 +2,7 @@ package network.server.servers.hub.crate;
 
 import de.inventivegames.hologram.Hologram;
 import de.inventivegames.hologram.HologramAPI;
+import network.Network;
 import network.customevents.TimeEvent;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler;
@@ -62,7 +63,6 @@ public class Beacon implements Listener {
 		this.type = type;
 		this.hologramLocation = glass.getLocation().add(standOffset);
 		hologram = HologramAPI.createHologram(hologramLocation, getName());
-		hologram.spawn();
 		delayed = new ArrayList<String>();
 		setWood();
 		keyFragmentName = "Key Fragment";

@@ -16,8 +16,8 @@ import java.util.UUID;
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
 public class DisplaySkin extends DisplayImage {
-    public DisplaySkin(ImageID id, Map<ImageID, Location []> locations, UUID uuid, Color color) {
-        super(id, locations.get(id)[0], locations.get(id)[1]);
+    public DisplaySkin(ImageID id, UUID uuid, Color color) {
+        super(id);
         loadImage(uuid, color);
     }
 
