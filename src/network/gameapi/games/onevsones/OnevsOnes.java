@@ -1,7 +1,7 @@
 package network.gameapi.games.onevsones;
 
-import de.inventivegames.hologram.Hologram;
-import de.inventivegames.hologram.HologramAPI;
+import com.sainttx.holograms.api.Hologram;
+import com.sainttx.holograms.api.line.TextLine;
 import network.Network;
 import network.ProPlugin;
 import network.gameapi.competitive.*;
@@ -71,30 +71,21 @@ public class OnevsOnes extends ProPlugin {
 
         new DelayedTask(() -> {
 			List<Location> locations = Arrays.asList(
-				new Location(world, 13.5, 18.5, -25),
-				new Location(world, 13.5, 18.5, -31),
-				new Location(world, 13.5, 18.5, -37)
+				new Location(world, 13.5, 15, -25),
+				new Location(world, 13.5, 15, -31),
+				new Location(world, 13.5, 15, -37)
 			);
 			new StatDisplayer(locations);
-			List<Hologram> holograms = new ArrayList<Hologram>();
-			Location [] hologramLocation = new Location [] {
-					new Location(world, -14.5, 16, -38.5),
-					new Location(world, -14.5, 15.5, -38.5),
-					new Location(world, -14.5, 15, -38.5),
-					new Location(world, -14.5, 14.5, -38.5),
-					new Location(world, -14.5, 14, -38.5)
-			};
+
 			for(int a = 0; a < 3; ++a) {
-				holograms.add(HologramAPI.createHologram(new Location(world, -14.5, 17.25, -38.5), StringUtil.color("&eElo ranks are based off of your percentile")));
-				holograms.add(HologramAPI.createHologram(new Location(world, -14.5, 16.75, -38.5), StringUtil.color("&eof elo compared to other players.&b /elo")));
-				holograms.add(HologramAPI.createHologram(hologramLocation[0], StringUtil.color(EloRank.DIAMOND.getPrefix() + " &aTop " + EloRank.DIAMOND.getPercentRange() + " of players")));
-				holograms.add(HologramAPI.createHologram(hologramLocation[1], StringUtil.color(EloRank.PLATINUM.getPrefix() + " &aTop " + EloRank.PLATINUM.getPercentRange() + " of players")));
-				holograms.add(HologramAPI.createHologram(hologramLocation[2], StringUtil.color(EloRank.GOLD.getPrefix() + " &aTop " + EloRank.GOLD.getPercentRange() + " of players")));
-				holograms.add(HologramAPI.createHologram(hologramLocation[3], StringUtil.color(EloRank.SILVER.getPrefix() + " &aTop " + EloRank.SILVER.getPercentRange() + " of players")));
-				holograms.add(HologramAPI.createHologram(hologramLocation[4], StringUtil.color(EloRank.BRONZE.getPrefix() + " &aTop " + EloRank.BRONZE.getPercentRange() + " of players")));
-			}
-			for(Hologram hologram : holograms) {
-				hologram.spawn();
+				Hologram hologram = new Hologram("elo_ranks_" + a, new Location(world, -14.5, 15, -38.5));
+				hologram.addLine(new TextLine(hologram, StringUtil.color("&eElo ranks are based off of your percentile")));
+				hologram.addLine(new TextLine(hologram, StringUtil.color("&eof elo compared to other players.&b /elo")));
+				hologram.addLine(new TextLine(hologram, EloRank.DIAMOND.getPrefix() + " &aTop " + EloRank.DIAMOND.getPercentRange() + " of players"));
+				hologram.addLine(new TextLine(hologram, EloRank.PLATINUM.getPrefix() + " &aTop " + EloRank.PLATINUM.getPercentRange() + " of players"));
+				hologram.addLine(new TextLine(hologram, EloRank.GOLD.getPrefix() + " &aTop " + EloRank.GOLD.getPercentRange() + " of players"));
+				hologram.addLine(new TextLine(hologram, EloRank.SILVER.getPrefix() + " &aTop " + EloRank.SILVER.getPercentRange() + " of players"));
+				hologram.addLine(new TextLine(hologram, EloRank.BRONZE.getPrefix() + " &aTop " + EloRank.BRONZE.getPercentRange() + " of players"));
 			}
 		}, 20);
 

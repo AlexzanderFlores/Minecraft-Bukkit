@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import de.inventivegames.hologram.Hologram;
+import com.sainttx.holograms.api.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -100,7 +100,6 @@ public class MainHubTop5 implements Listener {
 						}
 						setNames(names);
 						names.clear();
-						names = null;
 						setDisplay("Lifetime Votes");
 						counter = 0;
 						last = Information.LIFETIME_VOTES;
@@ -121,7 +120,6 @@ public class MainHubTop5 implements Listener {
 						}
 						setNames(names);
 						names.clear();
-						names = null;
 						setDisplay("Monthly Votes");
 						counter = 0;
 						last = Information.MONTHLY_VOTES;
@@ -141,7 +139,6 @@ public class MainHubTop5 implements Listener {
 						}
 						setNames(names);
 						names.clear();
-						names = null;
 						setDisplay("Weekly Votes");
 						counter = 0;
 						last = Information.WEEKLY_VOTES;

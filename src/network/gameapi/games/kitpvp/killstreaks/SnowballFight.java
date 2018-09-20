@@ -19,6 +19,7 @@ import network.server.util.ItemCreator;
 
 public class SnowballFight extends Killstreak implements Listener {
 	private static SnowballFight instance = null;
+	private static int amount = 3;
 	
 	public SnowballFight() {
 		super(new ItemCreator(Material.SNOW_BALL).setName("Snowball Fight").getItemStack());
@@ -35,9 +36,9 @@ public class SnowballFight extends Killstreak implements Listener {
 	
 	@Override
 	public void execute(Player player) {
-		player.getInventory().addItem(new ItemStack(Material.SNOW_BALL, 5));
+		player.getInventory().addItem(new ItemStack(Material.SNOW_BALL, amount));
 		MessageHandler.alert(AccountHandler.getPrefix(player) + " &6opened \"&e" + getName() + "&6\" from the killstreak selector");
-		MessageHandler.sendMessage(player, "&b" + getName() + ": &aGet 3 snowballs that give players slowness");
+		MessageHandler.sendMessage(player, "&b" + getName() + ": &aGet " + amount + " snowballs that give players slowness");
 	}
 	
 	@EventHandler

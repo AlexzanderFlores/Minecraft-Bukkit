@@ -1,7 +1,7 @@
 name: Core
 main: network.Network
 version: 1.0
-softdepend: [NPC, Votifier, EffectLib, Citizens]
+softdepend: [NPC, Votifier, EffectLib, Citizens, Holograms]
 authors: [AlexzanderFlores]
 commands:
 # Global Commands

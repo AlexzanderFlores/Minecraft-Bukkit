@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import de.inventivegames.hologram.Hologram;
-import de.inventivegames.hologram.HologramAPI;
+import com.sainttx.holograms.api.Hologram;
+import com.sainttx.holograms.api.line.HologramLine;
+import com.sainttx.holograms.api.line.TextLine;
 import network.Network;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -64,7 +65,8 @@ public class EndlessParkour implements Listener {
 		loadTopData();
 		url = "1v1s.org/EPK";
 		World world = Bukkit.getWorlds().get(0);
-		Hologram hologram = HologramAPI.createHologram(new Location(world, 1592.5, 6.5, -1262.5), StringUtil.color("&eWalk Forward"));
+		Hologram hologram = new Hologram("endless_parkour", new Location(world, 1592.5, 6.5, -1262.5));
+		hologram.addLine(new TextLine(hologram, StringUtil.color("&eWalk Forward")));
 		EventUtil.register(this);
 		//TODO: Add 1 respawn into the database when this command is dispatched on the slave server
 		new CommandBase("endlessParkourRespawn", 0, 1) {
@@ -72,8 +74,8 @@ public class EndlessParkour implements Listener {
 			public boolean execute(CommandSender sender, String [] arguments) {
 				if(arguments.length == 0) {
 					if(sender instanceof Player) {
-						final Player player = (Player) sender;
-						final String name = player.getName();
+						Player player = (Player) sender;
+						String name = player.getName();
 						if(scores.containsKey(name)) {
 							MessageHandler.sendMessage(player, "&cYou cannot run this command while playing");
 							return true;

@@ -1,8 +1,8 @@
 package network.server.servers.hub.crate;
 
-import de.inventivegames.hologram.Hologram;
-import de.inventivegames.hologram.HologramAPI;
-import network.Network;
+import com.sainttx.holograms.api.Hologram;
+import com.sainttx.holograms.api.line.ItemLine;
+import com.sainttx.holograms.api.line.TextLine;
 import network.customevents.TimeEvent;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler;
@@ -25,7 +25,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,7 +45,6 @@ public class Beacon implements Listener {
 	private CrateTypes type = null;
 	private Location hologramLocation = null;
 	private Hologram hologram = null;
-	private NPCEntity npc = null;
 	private int counter = 0;
 	private boolean running = false;
 	private boolean displaying = false;
@@ -62,18 +60,16 @@ public class Beacon implements Listener {
 		this.originalName = originalName;
 		this.type = type;
 		this.hologramLocation = glass.getLocation().add(standOffset);
-		hologram = HologramAPI.createHologram(hologramLocation, getName());
+		hologram = new Hologram("crate_" + type.getName(), hologramLocation);
+		hologram.addLine(new TextLine(hologram, getName()));
 		delayed = new ArrayList<String>();
 		setWood();
 		keyFragmentName = "Key Fragment";
 		threeKeys = CrateTypes.VOTING.getDisplay() + " Key x3";
-		new DelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				items = FeatureItem.getItems(FeatureType.REWARD_CRATE);
-				items.add(new FeatureItem(getKeyFragmentName(), new ItemStack(Material.TRIPWIRE_HOOK), Rarity.UNCOMMON, FeatureType.REWARD_CRATE));
-				items.add(new FeatureItem(getThreeKeys(), new ItemStack(Material.TRIPWIRE_HOOK), Rarity.RARE, FeatureType.REWARD_CRATE));
-			}
+		new DelayedTask(() -> {
+			items = FeatureItem.getItems(FeatureType.REWARD_CRATE);
+			items.add(new FeatureItem(getKeyFragmentName(), new ItemStack(Material.TRIPWIRE_HOOK), Rarity.UNCOMMON, FeatureType.REWARD_CRATE));
+			items.add(new FeatureItem(getThreeKeys(), new ItemStack(Material.TRIPWIRE_HOOK), Rarity.RARE, FeatureType.REWARD_CRATE));
 		});
 		EventUtil.register(this);
 	}
@@ -91,20 +87,17 @@ public class Beacon implements Listener {
 	}
 	
 	public static void giveKey(UUID uuid, int toAdd, CrateTypes type) {
-		new AsyncDelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				String [] keys = new String [] { "uuid", "type" };
-				String [] values = new String [] { uuid.toString(), type.getName() };
+		new AsyncDelayedTask(() -> {
+			String [] keys = new String [] { "uuid", "type" };
+			String [] values = new String [] { uuid.toString(), type.getName() };
 
-				if(DB.HUB_CRATE_KEYS.isKeySet(keys, values)) {
-					int amount = DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") + toAdd;
-					DB.HUB_CRATE_KEYS.updateInt("amount", amount, keys, values);
-				} else {
-					DB.HUB_CRATE_KEYS.insert("'" + uuid + "', '" + type.getName() + "', '" + toAdd + "'");
-				}
-				Bukkit.getLogger().info(type.getName() + ": give player key");
+			if(DB.HUB_CRATE_KEYS.isKeySet(keys, values)) {
+				int amount = DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") + toAdd;
+				DB.HUB_CRATE_KEYS.updateInt("amount", amount, keys, values);
+			} else {
+				DB.HUB_CRATE_KEYS.insert("'" + uuid + "', '" + type.getName() + "', '" + toAdd + "'");
 			}
+			Bukkit.getLogger().info(type.getName() + ": give player key");
 		});
 	}
 	
@@ -118,12 +111,7 @@ public class Beacon implements Listener {
 			return;
 		} else {
 			delayed.add(player.getName());
-			new DelayedTask(new Runnable() {
-				@Override
-				public void run() {
-					delayed.remove(player.getName());
-				}
-			}, 20 * delay);
+			new DelayedTask(() -> delayed.remove(player.getName()), 20 * delay);
 		}
 		String [] keys = new String [] { "uuid", "type" };
 		String [] values = new String [] { player.getUniqueId().toString(), type.getName() };
@@ -135,103 +123,81 @@ public class Beacon implements Listener {
 			}
 			return;
 		}
-		if(npc != null) {
-			npc.remove();
-		}
-		npc = new NPCEntity(EntityType.SILVERFISH, null, glass.getLocation().add(1.25, 1.40, 0.5)) {
-			@Override
-			public void onInteract(Player arg0) {
-				
-			}
-		};
-		npc.setSpawnZombie(false);
-		LivingEntity livingEntity = (LivingEntity) npc.getLivingEntity();
-		livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100));
 		running = true;
 		glass.setType(Material.STAINED_GLASS);
-		new DelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				FeatureItem item = null;
-				int chance = random.nextInt(100) + 1;
-				Rarity rarity = type == CrateTypes.PREMIUM ? Rarity.RARE : chance <= 10 ? Rarity.RARE : chance <= 35 ? Rarity.UNCOMMON : Rarity.COMMON;
-				do {
-					item = items.get(random.nextInt(items.size()));
-				} while(item.getRarity() != rarity);
-				setItem(item);
-				setWood();
-				displaying = true;
-				if(player.isOnline()) {
-					item.give(player);
-					String log = item.getName();
-					new AsyncDelayedTask(new Runnable() {
-						@Override
-						public void run() {
-							String uuid = player.getUniqueId().toString();
-							int owned = DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") - 1;
-							if(owned <= 0) {
-								DB.HUB_CRATE_KEYS.delete(keys, values);
-								owned = 0;
-							} else {
-								DB.HUB_CRATE_KEYS.updateInt("amount", owned, keys, values);
-							}
-							Bukkit.getLogger().info(type + ": update key amount");
-							MessageHandler.sendMessage(player, "You now have &e" + owned + " &x" + CrateTypes.VOTING.getDisplay() + " Crate key" + (owned == 1 ? "" : "s") + " left");
-							if(DB.HUB_LIFETIME_CRATES_OPENED.isUUIDSet(player.getUniqueId())) {
-								int amount = DB.HUB_LIFETIME_CRATES_OPENED.getInt(keys, values, "amount") + 1;
-								DB.HUB_LIFETIME_CRATES_OPENED.updateInt("amount", amount, keys, values);
-							} else {
-								DB.HUB_LIFETIME_CRATES_OPENED.insert("'" + player.getUniqueId().toString() + "', '" + type + "', '" + 1 + "'");
-							}
-							Bukkit.getLogger().info(type + ": update lifetime crates used");
-							Calendar calendar = Calendar.getInstance();
-							String month = calendar.get(Calendar.MONTH) + "";
-							String [] keys = new String [] {"uuid", "type", "month"};
-							String [] values = new String [] {uuid, type.getName(), month};
-							if(DB.HUB_MONTHLY_CRATES_OPENED.isKeySet(keys, values)) {
-								int amount = DB.HUB_MONTHLY_CRATES_OPENED.getInt(keys, values, "amount") + 1;
-								DB.HUB_MONTHLY_CRATES_OPENED.updateInt("amount", amount, keys, values);
-							} else {
-								DB.HUB_MONTHLY_CRATES_OPENED.insert("'" + uuid + "', '" + type + "', '1', '" + month + "'");
-							}
-							Bukkit.getLogger().info(type + ": update monthly crates used");
-							String week = calendar.get(Calendar.WEEK_OF_YEAR) + "";
-							keys[2] = "week";
-							values[2] = week;
-							if(DB.HUB_WEEKLY_CRATES_OPENED.isKeySet(keys, values)) {
-								int amount = DB.HUB_WEEKLY_CRATES_OPENED.getInt(keys, values, "amount") + 1;
-								DB.HUB_WEEKLY_CRATES_OPENED.updateInt("amount", amount, keys, values);
-							} else {
-								DB.HUB_WEEKLY_CRATES_OPENED.insert("'" + uuid + "', '" + type + "', '1', '" + week + "'");
-							}
-							Bukkit.getLogger().info(type + ": update weekly crates used");
-							DB.HUB_CRATE_LOGS.insert("'" + player.getUniqueId().toString() + "', '" + type + "', '" + log + "', '" + TimeUtil.getTime() + "'");
-							Bukkit.getLogger().info(type + ": update log");
-						}
-					});
-					String rareString = "&8(" + item.getRarity().getName() + "&8)";
-					MessageHandler.sendMessage(player, "&6You opened &c" + item.getName() + " " + rareString);
-					if(item.getRarity() == Rarity.RARE) {
-						MessageHandler.alert(AccountHandler.getRank(player).getColor() + player.getName() + " &xOpened &c" + item.getName() + " " + rareString);
+		new DelayedTask(() -> {
+			FeatureItem item = null;
+			int chance = random.nextInt(100) + 1;
+			Rarity rarity = type == CrateTypes.PREMIUM ? Rarity.RARE : chance <= 10 ? Rarity.RARE : chance <= 35 ? Rarity.UNCOMMON : Rarity.COMMON;
+			do {
+				item = items.get(random.nextInt(items.size()));
+			} while(item.getRarity() != rarity);
+			setItem(item);
+			setWood();
+			displaying = true;
+			if(player.isOnline()) {
+				item.give(player);
+				String log = item.getName();
+				new AsyncDelayedTask(() -> {
+					String uuid = player.getUniqueId().toString();
+					int owned = DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") - 1;
+					if (owned <= 0) {
+						DB.HUB_CRATE_KEYS.delete(keys, values);
+						owned = 0;
+					} else {
+						DB.HUB_CRATE_KEYS.updateInt("amount", owned, keys, values);
+					}
+					Bukkit.getLogger().info(type + ": update key amount");
+					MessageHandler.sendMessage(player, "You now have &e" + owned + " &x" + CrateTypes.VOTING.getDisplay() + " Crate key" + (owned == 1 ? "" : "s") + " left");
+					if (DB.HUB_LIFETIME_CRATES_OPENED.isUUIDSet(player.getUniqueId())) {
+						int amount = DB.HUB_LIFETIME_CRATES_OPENED.getInt(keys, values, "amount") + 1;
+						DB.HUB_LIFETIME_CRATES_OPENED.updateInt("amount", amount, keys, values);
+					} else {
+						DB.HUB_LIFETIME_CRATES_OPENED.insert("'" + player.getUniqueId().toString() + "', '" + type + "', '" + 1 + "'");
+					}
+					Bukkit.getLogger().info(type + ": update lifetime crates used");
+					Calendar calendar = Calendar.getInstance();
+					String month = calendar.get(Calendar.MONTH) + "";
+					String[] keys1 = new String[]{"uuid", "type", "month"};
+					String[] values1 = new String[]{uuid, type.getName(), month};
+					if (DB.HUB_MONTHLY_CRATES_OPENED.isKeySet(keys1, values1)) {
+						int amount = DB.HUB_MONTHLY_CRATES_OPENED.getInt(keys1, values1, "amount") + 1;
+						DB.HUB_MONTHLY_CRATES_OPENED.updateInt("amount", amount, keys1, values1);
+					} else {
+						DB.HUB_MONTHLY_CRATES_OPENED.insert("'" + uuid + "', '" + type + "', '1', '" + month + "'");
+					}
+					Bukkit.getLogger().info(type + ": update monthly crates used");
+					String week = calendar.get(Calendar.WEEK_OF_YEAR) + "";
+					keys1[2] = "week";
+					values1[2] = week;
+					if (DB.HUB_WEEKLY_CRATES_OPENED.isKeySet(keys1, values1)) {
+						int amount = DB.HUB_WEEKLY_CRATES_OPENED.getInt(keys1, values1, "amount") + 1;
+						DB.HUB_WEEKLY_CRATES_OPENED.updateInt("amount", amount, keys1, values1);
+					} else {
+						DB.HUB_WEEKLY_CRATES_OPENED.insert("'" + uuid + "', '" + type + "', '1', '" + week + "'");
+					}
+					Bukkit.getLogger().info(type + ": update weekly crates used");
+					DB.HUB_CRATE_LOGS.insert("'" + player.getUniqueId().toString() + "', '" + type + "', '" + log + "', '" + TimeUtil.getTime() + "'");
+					Bukkit.getLogger().info(type + ": update log");
+				});
+				String rareString = "&8(" + item.getRarity().getName() + "&8)";
+				MessageHandler.sendMessage(player, "&6You opened &c" + item.getName() + " " + rareString);
+				if(item.getRarity() == Rarity.RARE) {
+					MessageHandler.alert(AccountHandler.getRank(player).getColor() + player.getName() + " &xOpened &c" + item.getName() + " " + rareString);
+				}
+			}
+			new DelayedTask(() -> {
+				counter = 0;
+				if(hologram.getLine(0) != null) {
+					hologram.removeLine(hologram.getLine(0));
+					if(hologram.getLine(0) != null) {
+						hologram.removeLine(hologram.getLine(0));
 					}
 				}
-				new DelayedTask(new Runnable() {
-					@Override
-					public void run() {
-						counter = 0;
-						hologram.setText(getName());
-						if(npc != null) {
-							if(npc.getLivingEntity().getPassenger() != null) {
-								npc.getLivingEntity().getPassenger().remove();
-							}
-							npc.remove();
-							npc = null;
-						}
-						running = false;
-						displaying = false;
-					}
-				}, 20 * 5);
-			}
+				hologram.addLine(new TextLine(hologram, getName()));
+				running = false;
+				displaying = false;
+			}, 20 * 5);
 		}, 20 * 7 + 10);
 	}
 	
@@ -247,26 +213,26 @@ public class Beacon implements Listener {
 	}
 	
 	private void setItem(FeatureItem featureItem) {
-		if(npc.getLivingEntity().getPassenger() == null) {
-			if(featureItem == null) {
+		ItemStack item;
+		ItemLine line = hologram.getLine (1) == null ? null : (ItemLine) hologram.getLine(1);
+
+		if(featureItem == null) {
+			do {
 				featureItem = items.get(random.nextInt(items.size()));
-			}
-			Item item = npc.getLivingEntity().getWorld().dropItemNaturally(npc.getLivingEntity().getLocation(), featureItem.getItemStack());
-			npc.getLivingEntity().setPassenger(item);
+				item = featureItem.getItemStack();
+			} while(line != null && item.equals(line.getItem()));
 		} else {
-			Item item = (Item) npc.getLivingEntity().getPassenger();
-			ItemStack itemStack = null;
-			if(featureItem == null) {
-				do {
-					featureItem = items.get(random.nextInt(items.size()));
-					itemStack = featureItem.getItemStack();
-				} while(itemStack.equals(item.getItemStack()));
-			} else {
-				itemStack = featureItem.getItemStack();
-			}
-			item.setItemStack(itemStack);
+			item = featureItem.getItemStack();
 		}
-		hologram.setText(StringUtil.color("&b" + featureItem.getName()));
+
+		if(hologram.getLine(0) != null) {
+			hologram.removeLine(hologram.getLine(0));
+			if(hologram.getLine(0) != null) {
+				hologram.removeLine(hologram.getLine(0));
+			}
+		}
+		hologram.addLine(new TextLine(hologram, StringUtil.color("&b" + featureItem.getName())));
+		hologram.addLine(new ItemLine(hologram, item));
 	}
 	
 	@EventHandler
@@ -275,7 +241,8 @@ public class Beacon implements Listener {
 		if(ticks == 2) {
 			if(running && !displaying) {
 				if(counter <= 12) {
-					hologram.setText(getName());
+					hologram.removeLine(hologram.getLine(0));
+					hologram.addLine(new TextLine(hologram, getName()));
 					++counter;
 				}
 			}
@@ -285,7 +252,8 @@ public class Beacon implements Listener {
 				EffectUtil.playSound(random.nextBoolean() ? Sound.FIREWORK_BLAST : Sound.FIREWORK_BLAST2, glass.getLocation());
 				ParticleTypes.FIREWORK_SPARK.display(glass.getLocation().add(0, 2, 0));
 				if(counter <= 12) {
-					hologram.setText(getName());
+					hologram.removeLine(hologram.getLine(0));
+					hologram.addLine(new TextLine(hologram, getName()));
 					++counter;
 				}
 				if(counter > 12) {

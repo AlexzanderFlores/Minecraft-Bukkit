@@ -33,7 +33,7 @@ public class Events implements Listener {
 		if(coinsHandler != null) {
 			coinsHandler.getCoins(player);
 			if(coinsHandler.isNewPlayer(player)) {
-				coinsHandler.addCoins(player, 25000, "&7(To help you get started)");
+				coinsHandler.addCoins(player, 100, "&7(To help you get started)");
 			}
 		}
 	}

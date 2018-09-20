@@ -17,7 +17,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 
 import network.customevents.player.InventoryItemClickEvent;
-import network.server.DB;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EffectUtil;
 import network.server.util.EventUtil;
@@ -156,44 +155,41 @@ public class DailyRewards implements Listener {
 					player.openInventory(inventory);
 				}
 			} else if(slot == 14) {
-				final Inventory inventory = Bukkit.createInventory(player, 9 * 4, streakName);
+				Inventory inventory = Bukkit.createInventory(player, 9 * 4, streakName);
 				player.openInventory(inventory);
-				final UUID uuid = player.getUniqueId();
-				final String name = player.getName();
-				new AsyncDelayedTask(new Runnable() {
-					@Override
-					public void run() {
-						int streak = DB.PLAYERS_LIFETIME_VOTES.getInt("uuid", uuid.toString(), "streak");
-						inventory.setItem(10, new ItemCreator(Material.NAME_TAG).setName("&bx1 Multiplier").setLores(new String [] {
-							"",
-							"&eVoting 1 - 10 days in a row",
-							"",
-							"&7All voting perk quantities",
-							"&7are multiplied by 1",
-							""
-						}).setGlow(streak >= 1 && streak <= 10).getItemStack());
+				UUID uuid = player.getUniqueId();
+				String name = player.getName();
+				new AsyncDelayedTask(() -> {
+					int streak = DB.PLAYERS_LIFETIME_VOTES.getInt("uuid", uuid.toString(), "streak");
+					inventory.setItem(10, new ItemCreator(Material.NAME_TAG).setName("&bx1 Multiplier").setLores(new String [] {
+						"",
+						"&eVoting 1 - 10 days in a row",
+						"",
+						"&7All voting perk quantities",
+						"&7are multiplied by 1",
+						""
+					}).setGlow(streak >= 1 && streak <= 10).getItemStack());
 
-						inventory.setItem(12, new ItemCreator(Material.NAME_TAG).setName("&bx2 Multiplier").setAmount(2).setLores(new String [] {
-							"",
-							"&eVoting 11 - 20 days in a row",
-							"",
-							"&7All voting perk quantities",
-							"&7are multiplied by 2",
-							""
-						}).setGlow(streak >= 11 && streak <= 20).getItemStack());
+					inventory.setItem(12, new ItemCreator(Material.NAME_TAG).setName("&bx2 Multiplier").setAmount(2).setLores(new String [] {
+						"",
+						"&eVoting 11 - 20 days in a row",
+						"",
+						"&7All voting perk quantities",
+						"&7are multiplied by 2",
+						""
+					}).setGlow(streak >= 11 && streak <= 20).getItemStack());
 
-						inventory.setItem(14, new ItemCreator(Material.NAME_TAG).setName("&bx3 Multiplier").setAmount(3).setLores(new String [] {
-							"",
-							"&eVoting 21+ days in a row",
-							"",
-							"&7All voting perk quantities",
-							"&7are multiplied by 3",
-							""
-						}).setGlow(streak >= 21).getItemStack());
+					inventory.setItem(14, new ItemCreator(Material.NAME_TAG).setName("&bx3 Multiplier").setAmount(3).setLores(new String [] {
+						"",
+						"&eVoting 21+ days in a row",
+						"",
+						"&7All voting perk quantities",
+						"&7are multiplied by 3",
+						""
+					}).setGlow(streak >= 21).getItemStack());
 
-						inventory.setItem(16, new ItemCreator(ItemUtil.getSkull(name)).setName("&bCurrent Streak: &a" + streak).getItemStack());
-						inventory.setItem(inventory.getSize() - 5, new ItemCreator(Material.WOOD_DOOR).setName("&bBack").getItemStack());
-					}
+					inventory.setItem(16, new ItemCreator(ItemUtil.getSkull(name)).setName("&bCurrent Streak: &a" + streak).getItemStack());
+					inventory.setItem(inventory.getSize() - 5, new ItemCreator(Material.WOOD_DOOR).setName("&bBack").getItemStack());
 				});
 			}
 			event.setCancelled(true);

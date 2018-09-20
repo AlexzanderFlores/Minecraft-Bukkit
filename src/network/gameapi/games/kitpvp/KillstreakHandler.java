@@ -1,5 +1,8 @@
 package network.gameapi.games.kitpvp;
 
+import com.sainttx.holograms.api.Hologram;
+import com.sainttx.holograms.api.line.ItemLine;
+import com.sainttx.holograms.api.line.TextLine;
 import network.customevents.TimeEvent;
 import network.customevents.game.GameDeathEvent;
 import network.customevents.player.NewPlayerJoinEvent;
@@ -12,6 +15,7 @@ import network.player.account.AccountHandler;
 import network.server.DB;
 import network.server.util.EffectUtil;
 import network.server.util.EventUtil;
+import network.server.util.StringUtil;
 import npc.NPCEntity;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
@@ -22,6 +26,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -33,8 +38,8 @@ public class KillstreakHandler implements Listener {
 	private int requiredLevels = 5;
 	private double counter = 0;
 	private double maxTime = 7.5;
+	private Hologram hologram = null;
 	private Player player = null;
-	private NPCEntity npc = null;
 	private List<String> usedKillStreak = null;
 	private List<String> usedKillStreakEver = null;
 	private static List<String> newPlayers = null;
@@ -44,10 +49,14 @@ public class KillstreakHandler implements Listener {
 		World world = Bukkit.getWorlds().get(0);
 		location = new Location(world, x, y, z);
 		location.getBlock().setType(Material.ENCHANTMENT_TABLE);
-		usedKillStreak = new ArrayList<String>();
-		usedKillStreakEver = new ArrayList<String>();
-		newPlayers = new ArrayList<String>();
-		timesUsed = new HashMap<String, Integer>();
+		usedKillStreak = new ArrayList<>();
+		usedKillStreakEver = new ArrayList<>();
+		newPlayers = new ArrayList<>();
+		timesUsed = new HashMap<>();
+
+		hologram = new Hologram("killstreak_selector", location.clone().add(0.5, 2, 0.5));
+		hologram.addLine(new TextLine(hologram, StringUtil.color("&aKillstreak Selector &7(Click)")));
+
 		new PoisonBow();
 		new ExtraHealth();
 		new Strength();
@@ -74,33 +83,36 @@ public class KillstreakHandler implements Listener {
 	}
 	
 	private void selectKillstreak() {
-		if(player.isOnline() && npc != null && npc.getLivingEntity().getPassenger() != null) {
+		if(player.isOnline()) {
 			Killstreak selected = null;
 			for(Killstreak killstreak : Killstreak.getKillstreaks()) {
-				Item item = (Item) npc.getLivingEntity().getPassenger();
-				if(killstreak.getItemStack().equals(item.getItemStack())) {
-					selected = killstreak;
-					break;
+				ItemLine itemLine = (ItemLine) hologram.getLine(1);
+				if(itemLine != null) {
+					if(killstreak.getItemStack().equals(itemLine.getItem())) {
+						selected = killstreak;
+						break;
+					}
 				}
 			}
-			selected.execute(player);
-			Bukkit.getPluginManager().callEvent(new KillstreakEvent(player, selected));
-			if(!usedKillStreakEver.contains(player.getName())) {
-				usedKillStreakEver.add(player.getName());
+
+			if(selected != null) {
+				selected.execute(player);
+				Bukkit.getPluginManager().callEvent(new KillstreakEvent(player, selected));
+				if(!usedKillStreakEver.contains(player.getName())) {
+					usedKillStreakEver.add(player.getName());
+				}
+			}
+
+			if(hologram.getLine(1) != null) {
+				hologram.removeLine(hologram.getLine(1));
 			}
 		}
+
 		//ParticleTypes.FLAME.displaySpiral(npc.getLivingEntity().getLocation());
 		EffectUtil.playSound(player, Sound.ENDERDRAGON_WINGS);
 		player = null;
 		beingUsed = false;
 		counter = 0;
-		if(npc != null) {
-			if(npc.getLivingEntity().getPassenger() != null) {
-				npc.getLivingEntity().getPassenger().remove();
-			}
-			npc.remove();
-			npc = null;
-		}
 	}
 	
 	@EventHandler
@@ -110,36 +122,22 @@ public class KillstreakHandler implements Listener {
 				Player player = event.getPlayer();
 				if(SpectatorHandler.contains(player)) {
 					MessageHandler.sendMessage(player, "&cYou cannot be a spectator when using this");
-				} else {
-					if(player.getLevel() >= requiredLevels) {
-						if(beingUsed) {
-							MessageHandler.sendMessage(player, "&cKillstreak selector is already in use");
-						} else {
-							if(usedKillStreak.contains(player.getName()) && !AccountHandler.Ranks.OWNER.hasRank(player)) {
-								MessageHandler.sendMessage(player, "&cYou can only use this once per life");
-							} else {
-								newPlayers.remove(player.getName());
-								usedKillStreak.add(player.getName());
-								beingUsed = true;
-								player.setLevel(player.getLevel() - requiredLevels);
-								this.player = player;
-								if(npc != null) {
-									npc.remove();
-								}
-								npc = new NPCEntity(EntityType.SILVERFISH, null, location.clone().add(0.5, 1, 0.5)) {
-									@Override
-									public void onInteract(Player player) {
-										
-									}
-								};
-								npc.setSpawnZombie(false);
-								LivingEntity livingEntity = (LivingEntity) npc.getLivingEntity();
-								livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100));
-							}
-						}
+				} else if(player.getLevel() >= requiredLevels) {
+					if(beingUsed) {
+						MessageHandler.sendMessage(player, "&cKillstreak selector is already in use");
 					} else {
-						MessageHandler.sendMessage(player, "&cYou need &e" + requiredLevels + " &clevels to use the killstreak selector");
+						if(usedKillStreak.contains(player.getName()) && !AccountHandler.Ranks.OWNER.hasRank(player)) {
+							MessageHandler.sendMessage(player, "&cYou can only use this once per life");
+						} else {
+							newPlayers.remove(player.getName());
+							usedKillStreak.add(player.getName());
+							beingUsed = true;
+							player.setLevel(player.getLevel() - requiredLevels);
+							this.player = player;
+						}
 					}
+				} else {
+					MessageHandler.sendMessage(player, "&cYou need &e" + requiredLevels + " &clevels to use the killstreak selector");
 				}
 				event.setCancelled(true);
 			}
@@ -149,17 +147,13 @@ public class KillstreakHandler implements Listener {
 	@EventHandler
 	public void onTime(TimeEvent event) {
 		long ticks = event.getTicks();
-		if(ticks == 5) {
-			if(npc != null && counter <= maxTime) {
-				LivingEntity livingEntity = (LivingEntity) npc.getLivingEntity();
+		if(ticks == 5 && player != null) {
+			if(counter <= maxTime) {
 				Killstreak killstreak = Killstreak.getKillstreaks().get(new Random().nextInt(Killstreak.getKillstreaks().size()));
-				if(livingEntity.getPassenger() == null) {
-					Item item = livingEntity.getWorld().dropItem(livingEntity.getLocation(), killstreak.getItemStack());
-					livingEntity.setPassenger(item);
-				} else {
-					Item current = (Item) livingEntity.getPassenger();
-					current.setItemStack(killstreak.getItemStack());
+				if(hologram.getLine(1) != null) {
+					hologram.removeLine(hologram.getLine(1));
 				}
+				hologram.addLine(new ItemLine(hologram, killstreak.getItemStack()));
 				counter += .25;
 			} else if(counter > maxTime) {
 				selectKillstreak();

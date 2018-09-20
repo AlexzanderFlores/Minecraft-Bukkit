@@ -47,6 +47,8 @@ public class HubBase extends ProPlugin {
 		LevelHandler.enable();
 		World world = Bukkit.getWorlds().get(0);
 
+		new DelayedTask(() -> setup = true, 20 * 5);
+
 		CrateTypes.VOTING.setBeacon(world.getBlockAt(1651, 6, -1278), new Vector(0.85, 2.5, 0.5));
 		CrateTypes.PREMIUM.setBeacon(world.getBlockAt(1651, 6, -1284), new Vector(0.85, 2.5, 0.5));
 
@@ -63,13 +65,6 @@ public class HubBase extends ProPlugin {
 		new EndlessParkour();
 		new Flag();
 		new WhitelistHandler();
-
-		new DelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				setup = true;
-			}
-		}, 20 * 5);
 
 		if(hubNumber == 1) {
 			new CommandBase("purchase", 2, false) {

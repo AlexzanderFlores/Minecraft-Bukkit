@@ -1,6 +1,7 @@
 package network.gameapi.shops;
 
-import de.inventivegames.hologram.Hologram;
+import com.sainttx.holograms.api.Hologram;
+import com.sainttx.holograms.api.line.TextLine;
 import network.Network;
 import network.Network.Plugins;
 import network.customevents.TimeEvent;
@@ -83,7 +84,7 @@ public abstract class ShopBase implements Listener {
 		itemStack = new ItemCreator(Material.CHEST).setName("&aShop").setGlow(true).getItemStack();
 		slots = new int [] {3, 5};
 		if(Network.getMiniGame() != null) {
-			holograms = new ArrayList<Hologram>();
+			holograms = new ArrayList<>();
 			colors = new String [] {
 				ChatColor.YELLOW + "",
 				ChatColor.RED + "",
@@ -206,7 +207,7 @@ public abstract class ShopBase implements Listener {
 			if(holograms != null) {
 				String topText = "Kits / Shop";
 				for(Hologram hologram : holograms) {
-					hologram.setText(colors[counter] + "" + topText);
+					hologram.addLine(new TextLine(hologram, colors[counter] + "" + topText));
 				}
 				if(++counter >= colors.length) {
 					counter = 0;
