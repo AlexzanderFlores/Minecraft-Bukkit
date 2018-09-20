@@ -19,7 +19,6 @@ import network.server.servers.slave.Slave;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.CommandRepeater;
 import network.server.util.ConfigurationUtil;
-import network.server.util.FileHandler;
 import network.server.util.Glow;
 import network.staff.Punishment;
 import org.bukkit.Bukkit;
@@ -156,7 +155,6 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 		for(DB.Databases database : DB.Databases.values()) {
 			database.disconnect();
 		}
-		FileHandler.checkForUpdates();
 	}
 	
 	public static Network getInstance() {

@@ -1,13 +1,15 @@
 package network.anticheat;
 
-import network.anticheat.detections.*;
-import network.anticheat.detections.combat.*;
-import network.anticheat.detections.combat.killaura.InventoryKillAuraDetection;
-import network.anticheat.detections.combat.killaura.KillAuraSpectatorCheck;
-import network.anticheat.detections.movement.*;
+import network.anticheat.detections.SpamBotFix;
+import network.anticheat.detections.InventoryKillAuraDetection;
+import network.anticheat.detections.KillAuraSpectatorCheck;
+import network.anticheat.events.PlayerBanEvent;
 import network.customevents.player.PlayerLeaveEvent;
+import network.server.DB;
 import network.server.PerformanceHandler;
+import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EventUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +17,7 @@ import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class AntiCheatBase implements Listener {
     private static boolean enabled = true;
@@ -23,26 +26,9 @@ public class AntiCheatBase implements Listener {
     private int maxPing = 135;
 
     public AntiCheatBase() {
-        new BlocksPerSecondLogger();
-        new InvisibleFireGlitchFix();
-        new FastBowFix();
-        new AutoCritFix();
-        new AttackDistanceLogger();
-        new SpeedFix();
-        new FlyFix();
         new InventoryKillAuraDetection();
         new KillAuraSpectatorCheck();
         new SpamBotFix();
-        new WaterWalkDetection();
-        new AutoClicker();
-        new ClickPatternDetector();
-        new AutoArmorFix();
-        new AutoEatFix();
-        //new AutoSprintFix(); // TODO: Fix
-        new AutoStealFix();
-        new FastEatFix();
-        new ConstantMovement();
-        new AutoRegenFix();
         EventUtil.register(this);
     }
 
@@ -75,26 +61,27 @@ public class AntiCheatBase implements Listener {
         if(notIgnored(player) && !banned.contains(player.getName())) {
             banned.add(player.getName());
             if(queue) {
-//                UUID uuid = player.getUniqueId();
-//                new AsyncDelayedTask(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        DB.NETWORK_ANTI_CHEAT_BAN_QUEUE.insert("'" + uuid.toString() + ", '" + name + "''");
-//                    }
-//                });
+                UUID uuid = player.getUniqueId();
+                new AsyncDelayedTask(new Runnable() {
+                    @Override
+                    public void run() {
+                        DB.NETWORK_ANTI_CHEAT_BAN_QUEUE.insert("'" + uuid.toString() + ", '" + name + "''");
+                    }
+                });
             } else {
-//                Bukkit.getPluginManager().callEvent(new PlayerBanEvent(player.getUniqueId(), player.getDisplay(), name, queue));
-//                new AsyncDelayedTask(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        if(DB.NETWORK_ANTI_CHEAT_DATA.isKeySet("cheat", name)) {
-//                            int amount = DB.NETWORK_ANTI_CHEAT_DATA.getInt("cheat", name, "bans") + 1;
-//                            DB.NETWORK_ANTI_CHEAT_DATA.updateInt("bans", amount, "cheat", name);
-//                        } else {
-//                            DB.NETWORK_ANTI_CHEAT_DATA.insert("'" + name + "', '1'");
-//                        }
-//                    }
-//                });
+                Bukkit.getPluginManager().callEvent(new PlayerBanEvent(player.getUniqueId(), player.getName(), name, false));
+
+                new AsyncDelayedTask(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(DB.NETWORK_ANTI_CHEAT_DATA.isKeySet("cheat", name)) {
+                            int amount = DB.NETWORK_ANTI_CHEAT_DATA.getInt("cheat", name, "bans") + 1;
+                            DB.NETWORK_ANTI_CHEAT_DATA.updateInt("bans", amount, "cheat", name);
+                        } else {
+                            DB.NETWORK_ANTI_CHEAT_DATA.insert("'" + name + "', '1'");
+                        }
+                    }
+                });
             }
         }
     }

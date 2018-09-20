@@ -1,4 +1,4 @@
-package network.anticheat.detections.combat.killaura;
+package network.anticheat.detections;
 
 import network.anticheat.AntiCheatBase;
 import network.customevents.TimeEvent;

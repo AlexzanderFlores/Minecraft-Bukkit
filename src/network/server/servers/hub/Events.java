@@ -99,7 +99,7 @@ public class Events implements Listener {
 			sidebars.remove(name);
 		}
 	}
-
+	
 	private void updateSkins() {
 		List<String> recentCustomer = DB.PLAYERS_CUSTOMERS.getOrdered("id", "uuid", 1, true);
 		List<String> recentVoter = DB.PLAYERS_RECENT_VOTER.getOrdered("id", "uuid", 1, true);

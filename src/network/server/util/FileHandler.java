@@ -10,27 +10,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class FileHandler {
-    public static void checkForUpdates() {
-        String path = "/root/resources/";
-        for(String plugin : new String [] {
-        	"Core.jar",
-        	"NPC.jar",
-        	"EffectLib.jar",
-        	"HologramAPI.jar",
-        	"twitter4j-core-4.0.4.jar",
-			"twitter4j-async-4.0.4.jar",
-			"twitter4j-media-support-4.0.4.jar",
-			"twitter4j-stream-4.0.4.jar"
-        }) {
-            File file = new File(path, plugin);
-            Bukkit.getLogger().info(file.getAbsolutePath());
-            if(file.exists()) {
-                File update = new File("/root/" + Network.getServerName().toLowerCase() + "/plugins/" + plugin);
-                copyFile(file, update);
-            }
-        }
-    }
-
     public static boolean isImage(String url) {
         try {
             return ImageIO.read(new URL(url)) != null;
