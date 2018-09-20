@@ -19,16 +19,12 @@ import network.server.util.EventUtil;
 import npc.NPCEntity;
 
 public class CPSDetector implements Listener {
-	private Map<String, Integer> clicks = null;
-	private List<String> delayed = null;
-	
-	public CPSDetector(Location location) {
-		this(location, location.getWorld().getSpawnLocation());
-	}
-	
+	private Map<String, Integer> clicks;
+	private List<String> delayed;
+
 	public CPSDetector(Location location, Location target) {
-		clicks = new HashMap<String, Integer>();
-		delayed = new ArrayList<String>();
+		clicks = new HashMap<>();
+		delayed = new ArrayList<>();
 		new NPCEntity(EntityType.SKELETON, "&eCPS Detector", location, target) {
 			@Override
 			public void onInteract(Player player) {
@@ -46,18 +42,13 @@ public class CPSDetector implements Listener {
 	public void onTime(TimeEvent event) {
 		long ticks = event.getTicks();
 		if(ticks == 20) {
-			for(final String name : clicks.keySet()) {
+			for(String name : clicks.keySet()) {
 				Player player = ProPlugin.getPlayer(name);
 				if(player != null) {
 					MessageHandler.sendMessage(player, "&aCPS registered: &c" + clicks.get(name));
 					if(!delayed.contains(name)) {
 						delayed.add(name);
-						new DelayedTask(new Runnable() {
-							@Override
-							public void run() {
-								delayed.remove(name);
-							}
-						}, 20 * 10);
+						new DelayedTask(() -> delayed.remove(name), 20 * 10);
 						MessageHandler.sendMessage(player, "&aNote: &eThis is what the server registers. It may not be your true CPS");
 					}
 				}

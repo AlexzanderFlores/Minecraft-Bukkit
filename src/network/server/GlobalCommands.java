@@ -74,11 +74,12 @@ public class GlobalCommands {
 				if(player == null) {
 					MessageHandler.sendMessage(sender, "&c" + name + " is not online");
 				} else {
-					String command = "";
+					StringBuilder string = new StringBuilder();
 					for(int a = 1; a < arguments.length; ++a) {
-						command += arguments[a] + " ";
+						string.append(arguments[a]);
+						string.append(" ");
 					}
-					player.performCommand(command);
+					player.performCommand(string.toString());
 				}
 				return true;
 			}
@@ -87,20 +88,17 @@ public class GlobalCommands {
 		new CommandBase("uhc", 0, 1, true) {
 			@Override
 			public boolean execute(final CommandSender sender, final String [] arguments) {
-				new AsyncDelayedTask(new Runnable() {
-					@Override
-					public void run() {
-						Player player = (Player) sender;
-						if(arguments.length == 1) {
-							MessageHandler.sendMessage(player, arguments[0]);
-						} else {
-							int counter = 0;
-//							for(String url : DB.NETWORK_UHC_URL.getAllStrings("url")) {
-//								ChatClickHandler.sendMessageToRunCommand(player, "&bClick here", "Click to view URL", "/uhc " + url, "&aUHC &eGame #" + ++counter + ": ");
-//							}
-							if(counter == 0) {
-								MessageHandler.sendMessage(player, "&cThere are no UHC games at this time.");
-							}
+				new AsyncDelayedTask(() -> {
+					Player player = (Player) sender;
+					if(arguments.length == 1) {
+						MessageHandler.sendMessage(player, arguments[0]);
+					} else {
+						int counter = 0;
+						for(String url : DB.NETWORK_UHC_URL.getAllStrings("url")) {
+							ChatClickHandler.sendMessageToRunCommand(player, "&bClick here", "Click to view URL", "/uhc " + url, "&aUHC &eGame #" + ++counter + ": ");
+						}
+						if(counter == 0) {
+							MessageHandler.sendMessage(player, "&cThere are no UHC games at this time.");
 						}
 					}
 				});
@@ -247,25 +245,36 @@ public class GlobalCommands {
 				if(Bukkit.getOnlinePlayers().isEmpty()) {
 					MessageHandler.sendMessage(sender, "&cThere are no players online");
 				} else {
-					String players = "";
 					int online = 0;
+					StringBuilder string = new StringBuilder();
+
 					for(Player player : ProPlugin.getPlayers()) {
 						if(!StaffMode.getInstance().contains(player)) {
-							players += AccountHandler.getRank(player).getColor() + player.getName() + ", ";
+							string.append(AccountHandler.getRank(player).getColor());
+							string.append(player.getName());
+							string.append(", ");
 							++online;
 						}
 					}
-					MessageHandler.sendMessage(sender, online + " Players: " + players.substring(0, players.length() - 2));
+
+					string.setLength(string.length() - 2);
+					MessageHandler.sendMessage(sender, online + " Players: " + string.toString());
+
 					if(Network.getMiniGame() != null && SpectatorHandler.isEnabled() && SpectatorHandler.getNumberOf() > 0) {
-						String spectators = "";
 						online = 0;
+						StringBuilder spectators = new StringBuilder();
+
 						for(Player player : SpectatorHandler.getPlayers()) {
 							if(!Ranks.isStaff(player)) {
-								spectators += AccountHandler.getRank(player).getColor() + player.getName() + ", ";
+								spectators.append(AccountHandler.getRank(player).getColor());
+								spectators.append(player.getName());
+								spectators.append(", ");
 								++online;
 							}
 						}
-						MessageHandler.sendMessage(sender, online + " Spectators: " + spectators.substring(0, spectators.length() - 2));
+
+						spectators.setLength(spectators.length() - 2);
+						MessageHandler.sendMessage(sender, online + " Spectators: " + spectators);
 					}
 				}
 				return true;
@@ -275,11 +284,15 @@ public class GlobalCommands {
 		new CommandBase("say", -1, false) {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
-				String message = "";
+				StringBuilder string = new StringBuilder();
+
 				for(String argument : arguments) {
-					message += argument + " ";
+					string.append(argument);
+					string.append(" ");
 				}
-				message = ChatColor.GREEN + StringUtil.color(message.substring(0, message.length() - 1));
+				string.setLength(string.length() - 1);
+				String message = ChatColor.GREEN + StringUtil.color(string.toString());
+
 				Bukkit.getLogger().info(message);
 				for(Player player : Bukkit.getOnlinePlayers()) {
 					player.sendMessage(message);

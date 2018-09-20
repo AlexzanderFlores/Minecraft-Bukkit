@@ -86,7 +86,7 @@ public class PrivateBattleHandler implements Listener {
                     }
 
                     QueueHandler.remove(playerOne);
-                    LobbyHandler.openKitSelection(playerOne);
+                    LobbyHandler.openKitSelection(playerOne, false);
                     sendingTo.put(playerOne.getName(), playerTwo.getName());
                 }
 

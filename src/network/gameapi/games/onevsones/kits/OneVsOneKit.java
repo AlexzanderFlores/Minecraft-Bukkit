@@ -38,7 +38,8 @@ public class OneVsOneKit implements Listener {
     private String name = null;
     private ItemStack icon = null;
     private Map<Integer, ItemStack> items = null;
-    private Map<Integer, List<String>> queue = null; // <team size> <list of player names>
+    private Map<Integer, List<String>> rankedQueue = null; // <team size> <list of player names>
+    private Map<Integer, List<String>> unrankedQueue = null; // <team size> <list of player names>
 
     public OneVsOneKit(String name, Material icon) {
         this(name, new ItemStack(icon));
@@ -55,9 +56,14 @@ public class OneVsOneKit implements Listener {
 
         items = new HashMap<Integer, ItemStack>();
 
-        queue = new HashMap<Integer, List<String>>();
+        rankedQueue = new HashMap<Integer, List<String>>();
         for(int teamSize : OnevsOnes.getTeamSizes()) {
-            queue.put(teamSize, new ArrayList<String>());
+            rankedQueue.put(teamSize, new ArrayList<String>());
+        }
+
+        unrankedQueue = new HashMap<Integer, List<String>>();
+        for(int teamSize : OnevsOnes.getTeamSizes()) {
+            unrankedQueue.put(teamSize, new ArrayList<String>());
         }
 
         if(kits == null) {
@@ -258,17 +264,22 @@ public class OneVsOneKit implements Listener {
         }
     }
 
-    public List<String> getQueue(int teamSize) {
-        return this.queue.get(teamSize);
+    public List<String> getQueue(int teamSize, boolean ranked) {
+        return ranked ? this.rankedQueue.get(teamSize) : this.unrankedQueue.get(teamSize);
     }
 
-    public void addToQueue(Player player, int teamSize) {
-        queue.get(teamSize).add(player.getName());
+    public void addToQueue(Player player, int teamSize, boolean ranked) {
+        if(ranked) {
+            rankedQueue.get(teamSize).add(player.getName());
+        } else {
+            unrankedQueue.get(teamSize).add(player.getName());
+        }
     }
 
     public void removeFromQueue(String name) {
         for(int teamSize : OnevsOnes.getTeamSizes()) {
-            this.queue.get(teamSize).remove(name);
+            this.rankedQueue.get(teamSize).remove(name);
+            this.unrankedQueue.get(teamSize).remove(name);
         }
 
         removePlayerKit(name);
@@ -282,25 +293,25 @@ public class OneVsOneKit implements Listener {
         String name = player.getName();
 
         if(action == QueueEvent.QueueAction.REMOVE) {
-            // If they are being removed from the queue
+            // If they are being removed from the rankedQueue
             removeFromQueue(name);
         } else if(event.getKit().getName().equalsIgnoreCase(getName()) && action == QueueEvent.QueueAction.ADD) {
-            // If they are being added to the queue for this kit
+            // If they are being added to the rankedQueue for this kit
 
             // Give them the kit items
             give(player);
 
             if(AccountHandler.Ranks.PRO.hasRank(player)) {
-                // Add them to the queue instantly if they're a ranked player
-                addToQueue(player, teamSize);
+                // Add them to the rankedQueue instantly if they're a ranked player
+                addToQueue(player, teamSize, event.isRanked());
             } else {
-                // Wait 5 seconds to add them to the queue if they're a default player
+                // Wait 5 seconds to add them to the rankedQueue if they're a default player
                 MessageHandler.sendMessage(player, "&a[TIP] " + AccountHandler.Ranks.PRO.getPrefix() + "&cPerk: &e5x faster queuing time &b/buy");
                 new DelayedTask(new Runnable() {
                     @Override
                     public void run() {
                         if(player.isOnline()) {
-                            addToQueue(player, teamSize);
+                            addToQueue(player, teamSize, event.isRanked());
                         }
                     }
                 }, 20 * 5);

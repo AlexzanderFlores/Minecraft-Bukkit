@@ -2,6 +2,7 @@ package network.server;
 
 import network.Network;
 import network.ProPlugin;
+import network.customevents.AutoRestartEvent;
 import network.customevents.ServerRestartAlertEvent;
 import network.customevents.TimeEvent;
 import network.player.MessageHandler;
@@ -20,7 +21,7 @@ public class RestarterHandler extends CountDownUtil implements Listener {
 	public RestarterHandler() {
 		new CommandBase("restartServer", 1, 2) {
 			@Override
-			public boolean execute(final CommandSender sender, final String [] arguments) {
+			public boolean execute(CommandSender sender, String [] arguments) {
 				try {
 					setCounter(Integer.valueOf(arguments[0]) * 60);
 					if(Bukkit.getOnlinePlayers().isEmpty()) {
@@ -43,6 +44,7 @@ public class RestarterHandler extends CountDownUtil implements Listener {
 				return true;
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		new CommandBase("restartIfEmpty", 0, 1) {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
@@ -51,9 +53,7 @@ public class RestarterHandler extends CountDownUtil implements Listener {
 						ProPlugin.restartServer();
 					} else {
 						MessageHandler.sendMessage(sender, "&cIgnoring restart: Players online");
-						if(sender instanceof Player) {
-							return false;
-						}
+						return !(sender instanceof Player);
 					}
 				} else if(arguments.length == 1 && arguments[0].equalsIgnoreCase("dispatch")) {
 					CommandDispatcher.sendToAll("restartIfEmpty");
@@ -61,30 +61,24 @@ public class RestarterHandler extends CountDownUtil implements Listener {
 				return true;
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		new CommandBase("globalHubUpdate", 0, 1) {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
 				if(arguments.length == 0) {
 					for(int a = 1; a <= ProPlugin.getNumberOfHubs(); ++a) {
-						//ProPlugin.dispatchCommandToServer("hub" + a, "restartServer " + a);
 						CommandDispatcher.sendToServer("hub" + a, "restartServer " + a);
 					}
 					return true;
 				} else if(arguments.length == 1 && arguments[0].equalsIgnoreCase("stop")) {
-					for(int a = 1; a <= ProPlugin.getNumberOfHubs(); ++a) {
-						//ProPlugin.dispatchCommandToServer("hub" + a, "restartServer stop");
-						CommandDispatcher.sendToServer("hub" + a, "restartServer stop");
-					}
+					CommandDispatcher.sendToGame("hub", "restartServer stop");
 					return true;
 				}
 				return false;
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		EventUtil.register(this);
-	}
-	
-	public void toggleRunning() {
-		running = !running;
 	}
 	
 	@EventHandler
@@ -102,7 +96,7 @@ public class RestarterHandler extends CountDownUtil implements Listener {
 					decrementCounter();
 				}
 			}
-		}/* else if(ticks == 20 * 5) {
+		} else if(ticks == 20 * 5) {
 			if(PerformanceHandler.getMemory() >= 70 && !running) {
 				AutoRestartEvent autoRestartEvent = new AutoRestartEvent();
 				Bukkit.getPluginManager().callEvent(autoRestartEvent);
@@ -111,6 +105,6 @@ public class RestarterHandler extends CountDownUtil implements Listener {
 					running = true;
 				}
 			}
-		}*/
+		}
 	}
 }

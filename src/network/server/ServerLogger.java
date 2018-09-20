@@ -33,7 +33,7 @@ public class ServerLogger implements Listener {
 		return false;
 	}
 	
-	public static void updateStatus(boolean delete) {
+	private static void updateStatus(boolean delete) {
 		String game = Network.getPlugin().toString();
 		String number = Network.getServerName().replaceAll("[^\\d.]", "");
 		String [] keys = {"game_name", "server_number"};

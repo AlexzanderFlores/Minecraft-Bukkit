@@ -23,7 +23,6 @@ public class PerformanceHandler implements Listener {
 	private int counter = 0;
 	private static double ticksPerSecond = 0;
 	private static double memory = 0;
-	private long seconds = 0;
 	private long currentSecond = 0;
 	private int tickCounter = 0;
 	private static int uptimeCounter = 0;
@@ -44,6 +43,7 @@ public class PerformanceHandler implements Listener {
 				} else {
 					Bukkit.dispatchCommand(sender, "tps");
 				}
+
 				int averagePing = 0;
 				if(Bukkit.getOnlinePlayers().size() > 0) {
 					for(Player player : Bukkit.getOnlinePlayers()) {
@@ -51,7 +51,7 @@ public class PerformanceHandler implements Listener {
 					}
 					averagePing /= Bukkit.getOnlinePlayers().size();
 				}
-				//MessageHandler.sendMessage(sender, "&bTicks per second: &c" + ticksPerSecond);
+
 				MessageHandler.sendMessage(sender, "&bAverage ping: &c" + averagePing);
 				MessageHandler.sendMessage(sender, "&bConnected clients: &c" + Bukkit.getOnlinePlayers().size());
 				MessageHandler.sendMessage(sender, "&bUsed memory: &c" + getMemory() + "%");
@@ -83,7 +83,7 @@ public class PerformanceHandler implements Listener {
 			}
 		};
 
-		List<Integer> counters = new ArrayList<Integer>();
+		List<Integer> counters = new ArrayList<>();
 		for(int a = 1; a <= 20; ++a) {
 			counters.add(a);
 		}
@@ -95,14 +95,11 @@ public class PerformanceHandler implements Listener {
 		counters.add(20 * 60 * 5);
 		counters.add(20 * 60 * 10);
 
-		Bukkit.getScheduler().runTaskTimer(Network.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				++counter;
-				for(int a : counters) {
-					if(counter % a == 0) {
-						Bukkit.getPluginManager().callEvent(new TimeEvent(a));
-					}
+		Bukkit.getScheduler().runTaskTimer(Network.getInstance(), () -> {
+			++counter;
+			for(int a : counters) {
+				if(counter % a == 0) {
+					Bukkit.getPluginManager().callEvent(new TimeEvent(a));
 				}
 			}
 		}, 1, 1);
@@ -124,7 +121,8 @@ public class PerformanceHandler implements Listener {
 	}
 	
 	public static String getUptimeString() {
-		String uptime = null;
+		String uptime;
+
 		if(uptimeCounter < 60) {
 			uptime = uptimeCounter + " second(s)";
 		} else if(uptimeCounter < (60 * 60)) {
@@ -137,6 +135,7 @@ public class PerformanceHandler implements Listener {
 			int seconds = getAbsoluteValue((uptimeCounter % 60));
 			uptime = hours + "h " + minutes + "m " + seconds + "s";
 		}
+
 		return uptime;
 	}
 	
@@ -155,7 +154,7 @@ public class PerformanceHandler implements Listener {
 	public void onTime(TimeEvent event) {
 		long ticks = event.getTicks();
 		if(ticks == 1) {
-			seconds = (System.currentTimeMillis() / 1000);
+			long seconds = (System.currentTimeMillis() / 1000);
 			if(currentSecond == seconds) {
 				++tickCounter;
 			} else {
@@ -175,8 +174,8 @@ public class PerformanceHandler implements Listener {
 		} else if(ticks == 20 * 5) {
 			Runtime r = Runtime.getRuntime();
 
-			double max = r.maxMemory() / (1024 * 1024);
-			double free = max - r.freeMemory() / (1024 * 1024);
+			double max = r.maxMemory() / (1024.0f * 1024.0f);
+			double free = max - r.freeMemory() / (1024.0f * 1024.0f);
 
 			memory = (int) (free * 100.0d / max + 0.5);
 		}

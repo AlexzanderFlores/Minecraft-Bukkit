@@ -18,11 +18,12 @@ public class QueueEvent extends Event {
     private int teamSize;
     private boolean ranked;
 
-    public QueueEvent(Player player, OneVsOneKit kit, QueueAction queueAction, int teamSize) {
+    public QueueEvent(Player player, OneVsOneKit kit, QueueAction queueAction, int teamSize, boolean ranked) {
         this.player = player;
         this.kit = kit;
         this.queueAction = queueAction;
         this.teamSize = teamSize;
+        this.ranked = ranked;
     }
 
     public Player getPlayer() {
@@ -39,10 +40,6 @@ public class QueueEvent extends Event {
 
     public int getTeamSize() {
         return this.teamSize;
-    }
-
-    public void setRanked(boolean ranked) {
-        this.ranked = ranked;
     }
 
     public boolean isRanked() {

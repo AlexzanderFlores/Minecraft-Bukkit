@@ -35,32 +35,24 @@ import network.server.util.StringUtil;
 import network.server.util.UnicodeUtil;
 
 public class GeneralEvents implements Listener {
-	private List<String> blockedCommands = null;
-	private List<String> delayed = null;
-	private int delay = 3;
+	private List<String> blockedCommands;
+	private List<String> delayed;
 	
 	public GeneralEvents() {
-		blockedCommands = new ArrayList<String>();
+		blockedCommands = new ArrayList<>();
 		blockedCommands.add("/me");
 		blockedCommands.add("/tell");
 		blockedCommands.add("/w");
 		blockedCommands.add("/kill");
 		blockedCommands.add("/suicide");
 		blockedCommands.add("/afk");
-		delayed = new ArrayList<String>();
+		delayed = new ArrayList<>();
 		EventUtil.register(this);
 	}
 	
 	public static void colorPlayerTab(Player player) {
 		String name = AccountHandler.getRank(player).getColor() + player.getName();
-//		if(name.length() > 16) {
-//			name = name.substring(0, 16);
-//		}
-		try {
-			player.setPlayerListName(name);
-		} catch(IllegalArgumentException e) {
-			
-		}
+		player.setPlayerListName(name);
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)
@@ -87,12 +79,9 @@ public class GeneralEvents implements Listener {
 	
 	@EventHandler
 	public void onGameStarting(GameStartingEvent event) {
-		new DelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				for(Player player : ProPlugin.getPlayers()) {
-					update(player);
-				}
+		new DelayedTask(() -> {
+			for(Player player : ProPlugin.getPlayers()) {
+				update(player);
 			}
 		}, 20 * 2);
 	}
@@ -134,6 +123,7 @@ public class GeneralEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
+		int delay = 3;
 		
 		// Chat delay for non premium players
 		if(delayed.contains(player.getName())) {
@@ -143,12 +133,7 @@ public class GeneralEvents implements Listener {
 		} else if(AccountHandler.getRank(player) == Ranks.PLAYER) {
 			final String name = player.getName();
 			delayed.add(name);
-			new DelayedTask(new Runnable() {
-				@Override
-				public void run() {
-					delayed.remove(name);
-				}
-			}, 20 * delay);
+			new DelayedTask(() -> delayed.remove(name), 20 * delay);
 		}
 		
 		// Color codes for premium and above

@@ -43,17 +43,21 @@ import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class LobbyHandler implements Listener {
-	private static ItemStack rankedQueue = null;
+    private static String rankedQueueName = null;
+    private static String unrankedQueueName = null;
+    private static ItemStack rankedQueue = null;
+    private static ItemStack unrankedQueue = null;
     private static List<String> disabledRequests = null;
     private static List<String> watching = null;
-    private static String kitSelectionname = null;
     private static int maxCoords = 100;
 
     public LobbyHandler() {
-    	rankedQueue = new ItemCreator(Material.ARROW).setName("&aKit Selector").getItemStack();
-        disabledRequests = new ArrayList<String>();
-        watching = new ArrayList<String>();
-        kitSelectionname = "Kit Selection";
+        rankedQueueName = "Ranked Queue";
+        unrankedQueueName = "Unranked Queue";
+        rankedQueue = new ItemCreator(Material.DIAMOND_SWORD).setName("&a" + rankedQueueName).getItemStack();
+        unrankedQueue = new ItemCreator(Material.IRON_SWORD).setName("&a" + unrankedQueueName).getItemStack();
+        disabledRequests = new ArrayList<>();
+        watching = new ArrayList<>();
         EventUtil.register(this);
     }
 
@@ -92,7 +96,9 @@ public class LobbyHandler implements Listener {
         player.getInventory().setBoots(new ItemStack(Material.AIR));
         player.getInventory().setHeldItemSlot(0);
         player.getInventory().setItem(0, rankedQueue);
-        player.getInventory().setItem(1, HotBarEditor.getItem());
+        player.getInventory().setItem(1, unrankedQueue);
+        player.getInventory().setItem(7, HotBarEditor.getItem());
+        player.getInventory().setItem(8, SpectatorHandler1v1s.getItem());
         player.updateInventory();
     }
 
@@ -114,8 +120,8 @@ public class LobbyHandler implements Listener {
         return inventory;
     }
 
-    public static void openKitSelection(Player player) {
-        player.openInventory(getKitSelectorInventory(player, kitSelectionname, true));
+    public static void openKitSelection(Player player, boolean ranked) {
+        player.openInventory(getKitSelectorInventory(player, ranked ? rankedQueueName : unrankedQueueName, true));
         watching.add(player.getName());
     }
 
@@ -174,14 +180,15 @@ public class LobbyHandler implements Listener {
     	Player player = event.getPlayer();
 
     	// Selecting a kit
-        if(event.getTitle().equals(kitSelectionname) && !PrivateBattleHandler.choosingMapType(event.getPlayer())) {
+        if((event.getTitle().equals(rankedQueueName) || event.getTitle().equals(unrankedQueueName)) && !PrivateBattleHandler.choosingMapType(event.getPlayer())) {
             event.setCancelled(true);
             player.closeInventory();
             OneVsOneKit kit = OneVsOneKit.getKit(event.getItem());
+
             if(kit == null) {
                 MessageHandler.sendMessage(player, "&cAn error occurred when selecting kit, please try again");
             } else {
-                QueueHandler.add(player, kit, 1);
+                QueueHandler.add(player, kit, 1, event.getTitle().equalsIgnoreCase(rankedQueueName));
                 EffectUtil.playSound(player, Sound.NOTE_PLING);
             }
         }
@@ -189,13 +196,10 @@ public class LobbyHandler implements Listener {
         // Requesting to battle another player
         else if(event.getTitle().equals("Request a Battle")) {
             String name = event.getItem().getItemMeta().getDisplayName();
-            new DelayedTask(new Runnable() {
-                @Override
-                public void run() {
-                    Player player = ProPlugin.getPlayer(name);
-                    if(player != null) {
-                        player.chat("/battle " + name);
-                    }
+            new DelayedTask(() -> {
+                Player player1 = ProPlugin.getPlayer(name);
+                if(player1 != null) {
+                    player1.chat("/battle " + name);
                 }
             });
             player.closeInventory();
@@ -203,13 +207,13 @@ public class LobbyHandler implements Listener {
         }
 
         // Previewing a kit
-        else if(event.getTitle().startsWith("Preview of")) {
-        	Material type = event.getItem().getType();
-        	if(type == Material.WOOD_DOOR) {
-        		openKitSelection(player);
-        	}
-        	event.setCancelled(true);
-        }
+//        else if(event.getTitle().startsWith("Preview of")) {
+//        	Material type = event.getItem().getType();
+//        	if(type == Material.WOOD_DOOR) {
+//        		openKitSelection(player);
+//        	}
+//        	event.setCancelled(true);
+//        }
         // Don't allow players to move armor in their inventory while they're in the lobby
         else if(event.getTitle().equalsIgnoreCase("container.crafting") && isArmor(event.getItem()) && isInLobby(player)) {
             event.setCancelled(true);
@@ -243,14 +247,8 @@ public class LobbyHandler implements Listener {
         Player player = event.getPlayer();
         if(isInLobby(player)) {
             ItemStack item = player.getItemInHand();
-            if(item.equals(rankedQueue)) {
-            	if(RankedHandler.getMatches(player) > 0 || Ranks.PRO.hasRank(player)) {
-            		openKitSelection(player);
-            	} else {
-            		MessageHandler.sendMessage(player, "&cYou are out of ranked matches!");
-            		MessageHandler.sendMessage(player, "&cGet more by voting: &b/vote");
-            		MessageHandler.sendMessage(player, "&cGet unlimited ranked matches with " + Ranks.PRO.getPrefix() + "&b/buy");
-            	}
+            if(item.equals(rankedQueue) || item.equals(unrankedQueue)) {
+                openKitSelection(player, item.equals(rankedQueue));
             }
         }
     }
@@ -276,12 +274,7 @@ public class LobbyHandler implements Listener {
     public void onPlayerSpectator(PlayerSpectatorEvent event) {
     	if(event.getState() == SpectatorState.END) {
     		Player player = event.getPlayer();
-            new DelayedTask(new Runnable() {
-                @Override
-                public void run() {
-                    spawn(player);
-                }
-            });
+            new DelayedTask(() -> spawn(player));
     	}
     }
 

@@ -1,17 +1,42 @@
 package network.gameapi.games.onevsones;
 
+import network.customevents.player.MouseClickEvent;
 import network.gameapi.SpectatorHandler;
 import network.gameapi.games.onevsones.events.BattleRequestEvent;
 import network.player.MessageHandler;
+import network.server.util.ItemCreator;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.inventory.ItemStack;
 
 public class SpectatorHandler1v1s extends SpectatorHandler {
-    public SpectatorHandler1v1s(World world, Location target) {
+    private static ItemStack item = null;
+
+    public SpectatorHandler1v1s() {
         super();
-        createNPC(new Location(world, 8.5, 13, -43.5), target);
         saveItems = false;
+
+        item = new ItemCreator(Material.WATCH).setName("&aSpectate").getItemStack();
+    }
+
+    public static ItemStack getItem() {
+        return item;
+    }
+
+    @EventHandler
+    public void onMouseClick(MouseClickEvent event) {
+        Player player = event.getPlayer();
+        if(getItem().equals(player.getItemInHand())) {
+            if(contains(player)) {
+                remove(player);
+            } else {
+                add(player);
+            }
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
