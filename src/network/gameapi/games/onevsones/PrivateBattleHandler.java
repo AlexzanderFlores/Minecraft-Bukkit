@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import network.gameapi.games.onevsones.events.BattleRequestEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import network.gameapi.games.onevsones.events.QuitCommandEvent;
+import network.server.util.EffectUtil;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +20,6 @@ import network.ProPlugin;
 import network.customevents.player.InventoryItemClickEvent;
 import network.customevents.player.MouseClickEvent;
 import network.customevents.player.PlayerLeaveEvent;
-import network.gameapi.SpectatorHandler;
 import network.gameapi.games.onevsones.kits.OneVsOneKit;
 import network.player.MessageHandler;
 import network.player.account.AccountHandler;
@@ -29,16 +27,17 @@ import network.server.ChatClickHandler;
 import network.server.CommandBase;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
+import org.bukkit.inventory.Inventory;
 
 public class PrivateBattleHandler implements Listener {
     private static Map<String, List<PrivateBattle>> battleRequests = null;
     private static Map<String, String> sendingTo = null;
-    private static List<String> choosingMatchType = null;
+    private static String name = null;
 
     public PrivateBattleHandler() {
-        battleRequests = new HashMap<String, List<PrivateBattle>>();
-        sendingTo = new HashMap<String, String>();
-        choosingMatchType = new ArrayList<String>();
+        battleRequests = new HashMap<>();
+        sendingTo = new HashMap<>();
+        name = "Kit Selector";
 
         new CommandBase("battle", 1, true) {
             @Override
@@ -64,6 +63,9 @@ public class PrivateBattleHandler implements Listener {
                             MessageHandler.sendMessage(playerOne, "&aYou have accepted " + AccountHandler.getPrefix(playerTwo) + "&6's battle request");
 
                             OneVsOneKit kit = OneVsOneKit.getPlayersKit(playerOne);
+                            if(kit == null) {
+                                kit = OneVsOneKit.getPlayersKit(playerTwo);
+                            }
                             Team teamOne = new Team(DyeColor.RED, kit, playerOne);
                             Team teamTwo = new Team(DyeColor.BLUE, kit, playerTwo);
 
@@ -86,7 +88,8 @@ public class PrivateBattleHandler implements Listener {
                     }
 
                     QueueHandler.remove(playerOne);
-                    LobbyHandler.openKitSelection(playerOne, false);
+                    Inventory inventory = LobbyHandler.getKitSelectorInventory(playerOne, name, false);
+                    playerOne.openInventory(inventory);
                     sendingTo.put(playerOne.getName(), playerTwo.getName());
                 }
 
@@ -172,7 +175,7 @@ public class PrivateBattleHandler implements Listener {
     }
 
     public static void removeAllInvitesFromPlayer(Player toRemove) {
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         for(Player player : Bukkit.getOnlinePlayers()) {
             if(battleRequests.containsKey(player.getName())) {
                 for(PrivateBattle request : battleRequests.get(player.getName())) {
@@ -188,17 +191,12 @@ public class PrivateBattleHandler implements Listener {
         }
     }
 
-    public static boolean choosingMapType(Player player) {
-        return choosingMatchType != null && choosingMatchType.contains(player.getName());
-    }
-
     @EventHandler
     public void onMouseClick(MouseClickEvent event) {
         Player player = event.getPlayer();
         if(LobbyHandler.isInLobby(player) && player.getItemInHand().getType() == Material.SLIME_BALL) {
             battleRequests.remove(event.getPlayer().getName());
             sendingTo.remove(event.getPlayer().getName());
-            choosingMatchType.remove(event.getPlayer().getName());
             removeAllInvitesFromPlayer(event.getPlayer());
         }
     }
@@ -221,9 +219,8 @@ public class PrivateBattleHandler implements Listener {
         if(event.getPlayer() instanceof Player) {
             Player player = (Player) event.getPlayer();
             String name = player.getName();
-            if(event.getInventory().getTitle().equals("Kit Selection") && choosingMatchType.contains(name)) {
+            if(event.getInventory().getTitle().equals(name)) {
                 sendingTo.remove(name);
-                choosingMatchType.remove(name);
             }
         }
     }
@@ -231,18 +228,21 @@ public class PrivateBattleHandler implements Listener {
     @EventHandler
     public void onInventoryItemClick(InventoryItemClickEvent event) {
         Player challenger = event.getPlayer();
-        if(event.getTitle().equals("Kit Selection") && choosingMatchType.contains(challenger.getName())) {
+        if(event.getTitle().equals(name)) {
             Player challenged = ProPlugin.getPlayer(sendingTo.get(challenger.getName()));
             if(!hasChallengedPlayer(challenged, challenger)) {
                 if(!battleRequests.containsKey(challenged.getName())) {
-                    battleRequests.put(challenged.getName(), new ArrayList<PrivateBattle>());
+                    battleRequests.put(challenged.getName(), new ArrayList<>());
                 }
                 String name = ChatColor.stripColor(event.getItem().getItemMeta().getDisplayName());
                 PrivateBattle battle = new PrivateBattle(challenger, challenged, OneVsOneKit.getKit(name));
                 if(battle == null || battle.getKit() == null || battle.getKit().getName() == null) {
                     MessageHandler.sendMessage(challenger, "&cAn error occured when sending request, please try again");
                 } else {
+                    OneVsOneKit kit = OneVsOneKit.getKit(event.getItem());
+                    kit.give(challenger);
                     battleRequests.get(challenged.getName()).add(battle);
+
                     MessageHandler.sendMessage(challenger, "Request to " + AccountHandler.getPrefix(challenged) + " &asent");
                     MessageHandler.sendLine(challenged, "&b");
                     MessageHandler.sendMessage(challenged, "Battle request from " + AccountHandler.getPrefix(challenger));
@@ -260,11 +260,19 @@ public class PrivateBattleHandler implements Listener {
     }
 
     @EventHandler
+    public void onQuit(QuitCommandEvent event) {
+        remove(event.getPlayer());
+    }
+
+    @EventHandler
     public void onPlayerLeave(PlayerLeaveEvent event) {
-        String name = event.getPlayer().getName();
+        remove(event.getPlayer());
+    }
+
+    private void remove(Player player) {
+        String name = player.getName();
         battleRequests.remove(name);
         sendingTo.remove(name);
-        choosingMatchType.remove(name);
-        removeAllInvitesFromPlayer(event.getPlayer());
+        removeAllInvitesFromPlayer(player);
     }
 }

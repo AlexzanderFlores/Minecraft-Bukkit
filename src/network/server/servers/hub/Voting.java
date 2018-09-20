@@ -2,9 +2,7 @@ package network.server.servers.hub;
 
 import com.vexsoftware.votifier.model.VotifierEvent;
 import network.Network;
-import network.ProPlugin;
 import network.player.CoinsHandler;
-import network.player.MessageHandler;
 import network.player.account.AccountHandler;
 import network.server.CommandBase;
 import network.server.CommandDispatcher;
@@ -13,9 +11,7 @@ import network.server.servers.hub.crate.Beacon;
 import network.server.servers.hub.crate.CrateTypes;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EventUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -31,12 +27,7 @@ public class Voting implements Listener {
         new CommandBase("testVote", 1) {
             @Override
             public boolean execute(CommandSender sender, String [] arguments) {
-                Player player = ProPlugin.getPlayer(arguments[0]);
-                if(player == null) {
-                    MessageHandler.sendMessage(sender, "&c" + arguments[0] + " is not online");
-                } else {
-                    Voting.execute(player.getName());
-                }
+                Voting.execute(arguments[0]);
                 return true;
             }
         }.setRequiredRank(AccountHandler.Ranks.OWNER);
@@ -58,6 +49,9 @@ public class Voting implements Listener {
                 UUID playerUUID = AccountHandler.getUUID(name);
                 if(playerUUID != null) {
                     String uuid = playerUUID.toString();
+                    int day = Calendar.DAY_OF_WEEK;
+
+                    DB.PLAYERS_RECENT_VOTER.insert("'" + uuid + "', '" + day + "'");
 
                     int multiplier = increaseStreak(playerUUID, uuid);
                     increaseVotes(uuid);

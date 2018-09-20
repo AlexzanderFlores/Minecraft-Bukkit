@@ -210,7 +210,7 @@ public class Events implements Listener {
 					sidebars.get(player.getName()).update(player);
 				}
 			}
-		} else if(ticks == 20 * 10) {
+		} else if(ticks == 20 * 60) {
 			updateSkins();
 			setAds();
 		}

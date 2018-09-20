@@ -190,8 +190,9 @@ public class StatsHandler implements Listener {
 	}
 	
 	public StatsHandler(DB lifetime, DB monthly, DB weekly) {
-		ignoreWinsLosses = new ArrayList<Network.Plugins>();
+		ignoreWinsLosses = new ArrayList<>();
 		ignoreWinsLosses.add(Network.Plugins.KITPVP);
+		ignoreWinsLosses.add(Network.Plugins.ONEVSONE);
 		StatTimes.LIFETIME.setDB(lifetime);
 		StatTimes.MONTHLY.setDB(monthly);
 		StatTimes.WEEKLY.setDB(weekly);
@@ -205,7 +206,7 @@ public class StatsHandler implements Listener {
 			};
 		} else {
 			enabled = true;
-			queue = new ArrayList<UUID>();
+			queue = new ArrayList<>();
 			wins = "Wins";
 			losses = "Losses";
 			kills = "Kills";
@@ -223,10 +224,11 @@ public class StatsHandler implements Listener {
 					}
 				}
 			}, 20, 20);
+
 			new CommandBase("stats", 0, 1) {
 				@Override
 				public boolean execute(CommandSender sender, String[] arguments) {
-					String name = "";
+					String name;
 					if(arguments.length == 0) {
 						if(sender instanceof Player) {
 							Player player = (Player) sender;
@@ -247,7 +249,7 @@ public class StatsHandler implements Listener {
 					} else {
 						loadStats(player);
 						MessageHandler.sendMessage(sender, AccountHandler.getPrefix(player, false) + "'s Statistics:");
-						MessageHandler.sendMessage(sender, "Key: &cLifetime Stats &7/ &bMonthly Stats &7/ &bWeekly Stats");
+						MessageHandler.sendMessage(sender, "Key: &cLifetime Stats &7/ &bMonthly Stats &7/ &aWeekly Stats");
 						if(!gameStats.containsKey(player.getName())) {
 							loadStats(player);
 						}
@@ -271,7 +273,8 @@ public class StatsHandler implements Listener {
 					}
 					return true;
 				}
-			}.setRequiredRank(Ranks.PRO);
+			};
+
 			new StatRanking();
 			EventUtil.register(this);
 		}

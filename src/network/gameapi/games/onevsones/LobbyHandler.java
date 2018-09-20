@@ -180,7 +180,7 @@ public class LobbyHandler implements Listener {
     	Player player = event.getPlayer();
 
     	// Selecting a kit
-        if((event.getTitle().equals(rankedQueueName) || event.getTitle().equals(unrankedQueueName)) && !PrivateBattleHandler.choosingMapType(event.getPlayer())) {
+        if(event.getTitle().equals(rankedQueueName) || event.getTitle().equals(unrankedQueueName)) {
             event.setCancelled(true);
             player.closeInventory();
             OneVsOneKit kit = OneVsOneKit.getKit(event.getItem());
