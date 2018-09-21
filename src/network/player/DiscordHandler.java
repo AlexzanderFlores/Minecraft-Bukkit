@@ -6,7 +6,7 @@ import network.Network;
 import network.customevents.player.PlayerRankChangeEvent;
 import network.server.CommandBase;
 import network.server.DB;
-import network.server.servers.hub.Server;
+import network.server.Server;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;

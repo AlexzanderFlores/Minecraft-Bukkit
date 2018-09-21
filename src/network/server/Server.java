@@ -1,26 +1,24 @@
-package network.server.servers.hub;
+package network.server;
 
 import com.sun.net.httpserver.HttpServer;
 import network.player.DiscordHandler;
+import network.server.servers.hub.WhitelistHandler;
 import network.server.tasks.AsyncDelayedTask;
 
 import java.io.*;
 import java.net.*;
 
 public class Server {
-	Server() {
-		new AsyncDelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
-					server.createContext("/link-discord", DiscordHandler.getInstance());
-					server.createContext("/whitelist", WhitelistHandler.getInstance());
-					server.setExecutor(null);
-					server.start();
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
+	public Server() {
+		new AsyncDelayedTask(() -> {
+			try {
+				HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+				server.createContext("/link-discord", DiscordHandler.getInstance());
+				server.createContext("/whitelist", WhitelistHandler.getInstance());
+				server.setExecutor(null);
+				server.start();
+			} catch(IOException e) {
+				e.printStackTrace();
 			}
 		});
     }

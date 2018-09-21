@@ -4,7 +4,6 @@ import network.customevents.player.AsyncPlayerJoinEvent;
 import network.customevents.player.PlayerItemFrameInteractEvent;
 import network.customevents.player.PlayerLeaveEvent;
 import network.server.tasks.AsyncDelayedTask;
-import network.server.tasks.DelayedTask;
 import network.server.util.EventUtil;
 import network.server.util.ImageMap;
 import org.bukkit.Bukkit;
@@ -16,7 +15,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 import org.inventivetalent.animatedframes.AnimatedFrame;
 import org.inventivetalent.animatedframes.AnimatedFramesPlugin;
-import org.inventivetalent.animatedframes.Callback;
 import org.inventivetalent.mapmanager.event.MapInteractEvent;
 
 import java.util.HashMap;
@@ -31,7 +29,8 @@ public class DisplayImage implements Listener {
         ENDLESS_PARKOUR(new Vector(1616, 5, -1256), new Vector(1612, 8, -1256)),
         RECENT_CUSTOMER(new Vector(1689, 5, -1260), new Vector(1687, 8, -1260)),
         RECENT_VOTER(new Vector(1685, 5, -1260), new Vector(1683, 8, -1260)),
-        RECENT_DISCORD(new Vector(1681, 5, -1260), new Vector(1679, 8, -1260));
+        RECENT_DISCORD(new Vector(1681, 5, -1260), new Vector(1679, 8, -1260)),
+        ONEVSONE_ELO(new Vector(-23, 13, -36), new Vector(-23, 15, -40));
 
         private Location bottomLeft;
         private Location topRight;
@@ -70,7 +69,7 @@ public class DisplayImage implements Listener {
         EventUtil.register(this);
 
         if(images == null) {
-            images = new HashMap<ImageID, DisplayImage>();
+            images = new HashMap<>();
         }
 
         if(images.containsKey(id)) {
@@ -94,52 +93,39 @@ public class DisplayImage implements Listener {
     }
 
     public void display() {
-        new AsyncDelayedTask(new Runnable() {
-            @Override
-            public void run() {
-                removeFrame();
+        new AsyncDelayedTask(() -> {
+            removeFrame();
 
-                new AsyncDelayedTask(new Runnable() {
-                    @Override
-                    public void run() {
-                        ItemFrame firstFrame = ImageMap.getItemFrame(bottomLeft);
-                        ItemFrame secondFrame = ImageMap.getItemFrame(topRight);
+            new AsyncDelayedTask(() -> {
+                ItemFrame firstFrame = ImageMap.getItemFrame(bottomLeft);
+                ItemFrame secondFrame = ImageMap.getItemFrame(topRight);
 
-                        if(firstFrame == null || secondFrame == null) {
-                            return;
-                        }
+                if(firstFrame == null || secondFrame == null) {
+                    return;
+                }
 
-                        frame = null;
-                        do {
-                            try {
-                                frame = plugin.frameManager.createFrame(id.toString(), url, firstFrame, secondFrame);
-                            } catch(Exception e) {}
-                        } while(frame == null);
-
-                        plugin.frameManager.writeToFile(frame);
-                        plugin.frameManager.writeIndexToFile();
-
-                        frame.refresh();
-                        plugin.frameManager.startFrame(frame);
-
-                        frame.startCallback = new Callback<Void>() {
-                            @Override
-                            public void call(Void aVoid) {
-                                new AsyncDelayedTask(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        for(Player player : bottomLeft.getWorld().getPlayers()) {
-                                            frame.addViewer(player);
-                                        }
-                                    }
-                                });
-                            }
-                        };
-
-                        frame.setPlaying(true);
+                frame = null;
+                do {
+                    try {
+                        frame = plugin.frameManager.createFrame(id.toString(), url, firstFrame, secondFrame);
+                    } catch(Exception e) {
                     }
-                }, 20);
-            }
+                } while (frame == null);
+
+                plugin.frameManager.writeToFile(frame);
+                plugin.frameManager.writeIndexToFile();
+
+                frame.refresh();
+                plugin.frameManager.startFrame(frame);
+
+                frame.startCallback = aVoid -> new AsyncDelayedTask(() -> {
+                    for(Player player : bottomLeft.getWorld().getPlayers()) {
+                        frame.addViewer(player);
+                    }
+                });
+
+                frame.setPlaying(true);
+            }, 20);
         }, 20);
     }
 

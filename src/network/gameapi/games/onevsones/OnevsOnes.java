@@ -13,6 +13,7 @@ import network.player.account.AccountHandler.Ranks;
 import network.player.scoreboard.BelowNameHealthScoreboardUtil;
 import network.player.scoreboard.SidebarScoreboardUtil;
 import network.server.*;
+import network.server.effects.images.DisplayImage;
 import network.server.tasks.DelayedTask;
 import network.server.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -24,6 +25,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class OnevsOnes extends ProPlugin {
 	private static String oldPlayerCount = null;
@@ -125,6 +127,10 @@ public class OnevsOnes extends ProPlugin {
         new NoDebuff();
         new Skywars();
         new SpeedUHC();
+
+		new DisplayImage(
+				DisplayImage.ImageID.ONEVSONE_ELO,
+				"elo").display();
 	}
 
 	public static List<Integer> getTeamSizes() {
