@@ -41,7 +41,7 @@ public class Events implements Listener {
 	public Events() {
 		random = new Random();
 		Bukkit.getWorlds().get(0).setSpawnLocation(1684, 6, -1280);
-		sidebars = new HashMap<String, SidebarScoreboardUtil>();
+		sidebars = new HashMap<>();
 		updateSkins();
 		setAds();
 		EventUtil.register(this);
@@ -58,7 +58,7 @@ public class Events implements Listener {
 	}
 	
 	public static void giveSidebar(Player player) {
-		SidebarScoreboardUtil sidebar = new SidebarScoreboardUtil(" &6IP TBA ") {
+		SidebarScoreboardUtil sidebar = new SidebarScoreboardUtil(" &6mc.OpalGaming.com ") {
 			@Override
 			public void update(Player player) {
 				if(oldPlayers != players) {
@@ -165,7 +165,7 @@ public class Events implements Listener {
 			} else if(event.getId() == DisplayImage.ImageID.RECENT_VOTER) {
 				player.chat("/vote");
 			} else if(event.getName().equals("goat")) {
-				MessageHandler.sendMessage(player, "&cComing Soon");
+				MessageHandler.sendMessage(player, "View gaming gear, configs, and setups from your favorite pro-players and streamers! https://goatsettings.com/");
 			}
 
 			event.setSent();
@@ -194,17 +194,15 @@ public class Events implements Listener {
 	public void onTime(TimeEvent event) {
 		long ticks = event.getTicks();
 		if(ticks == 20 * 5) {
-			new AsyncDelayedTask(new Runnable() {
-				@Override
-				public void run() {
-					int players = 0;
-					for(String server : DB.NETWORK_POPULATIONS.getAllStrings("server")) {
-						players += DB.NETWORK_POPULATIONS.getInt("server", server, "population");
-					}
-					oldPlayers = Events.players;
-					Events.players = players;
+			new AsyncDelayedTask(() -> {
+				int players = 0;
+				for(String server : DB.NETWORK_POPULATIONS.getAllStrings("server")) {
+					players += DB.NETWORK_POPULATIONS.getInt("server", server, "population");
 				}
+				oldPlayers = Events.players;
+				Events.players = players;
 			});
+
 			for(Player player : Bukkit.getOnlinePlayers()) {
 				if(sidebars.containsKey(player.getName())) {
 					sidebars.get(player.getName()).update(player);
@@ -218,18 +216,15 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onPlayerRankChange(final PlayerRankChangeEvent event) {
-		new DelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				Player player = event.getPlayer();
-				if(sidebars.containsKey(player.getName())) {
-					sidebars.get(player.getName()).update(player);
-					if(event.getRank() == Ranks.PLAYER && player.getAllowFlight()) {
-						player.setFlying(false);
-						player.setAllowFlight(false);
-					} else if(event.getRank() != Ranks.PLAYER && !player.getAllowFlight()) {
-						player.setAllowFlight(true);
-					}
+		new DelayedTask(() -> {
+			Player player = event.getPlayer();
+			if(sidebars.containsKey(player.getName())) {
+				sidebars.get(player.getName()).update(player);
+				if(event.getRank() == Ranks.PLAYER && player.getAllowFlight()) {
+					player.setFlying(false);
+					player.setAllowFlight(false);
+				} else if(event.getRank() != Ranks.PLAYER && !player.getAllowFlight()) {
+					player.setAllowFlight(true);
 				}
 			}
 		});

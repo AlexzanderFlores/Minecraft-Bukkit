@@ -188,7 +188,9 @@ public class GlobalCommands {
 		new CommandBase("buy") {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
-				MessageHandler.sendMessage(sender, "&cStore coming soon.");
+				MessageHandler.sendLine(sender);
+				MessageHandler.sendMessage(sender, "&bhttps://store.OpalGaming.com/");
+				MessageHandler.sendLine(sender);
 				return true;
 			}
 		};

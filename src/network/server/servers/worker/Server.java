@@ -1,8 +1,7 @@
-package network.server;
+package network.server.servers.worker;
 
 import com.sun.net.httpserver.HttpServer;
 import network.player.DiscordHandler;
-import network.server.servers.hub.WhitelistHandler;
 import network.server.tasks.AsyncDelayedTask;
 
 import java.io.*;
@@ -14,7 +13,6 @@ public class Server {
 			try {
 				HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 				server.createContext("/link-discord", DiscordHandler.getInstance());
-				server.createContext("/whitelist", WhitelistHandler.getInstance());
 				server.setExecutor(null);
 				server.start();
 			} catch(IOException e) {

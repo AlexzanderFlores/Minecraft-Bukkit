@@ -1,5 +1,8 @@
 package network.player.account;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -7,7 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import network.player.MessageHandler;
+import network.server.ChatClickHandler;
+import network.server.CommandBase;
+import network.server.util.EffectUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,6 +35,8 @@ import network.customevents.player.timed.PlayerHourOfPlaytimeEvent;
 import network.server.DB;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EventUtil;
+
+import static network.server.DB.close;
 
 public class PlaytimeTracker implements Listener {
 	public static class Playtime {
@@ -154,13 +165,18 @@ public class PlaytimeTracker implements Listener {
 			return getDays(type) + "d " + getHours(type) + "h " + getMinutes(type) + "m";
 		}
 		
-		public void addSecond(Player player) {
+		void addSecond(Player player) {
 			if(++seconds >= 60) {
 				seconds = 0;
 				++minutes;
 				if(minutes == 30 && hours == 0 && days == 0) {
 					Bukkit.getPluginManager().callEvent(new PlayerFirstThirtyMinutesOfPlaytimeEvent(player));
 				}
+
+				if(minutes % 30 == 0) {
+					Bukkit.getPluginManager().callEvent(new PlayerHourOfPlaytimeEvent(player));
+				}
+
 				if(minutes >= 60) {
 					minutes = 0;
 					Bukkit.getPluginManager().callEvent(new PlayerHourOfPlaytimeEvent(player));
@@ -172,6 +188,7 @@ public class PlaytimeTracker implements Listener {
 					}
 				}
 			}
+
 			if(++monthlySeconds >= 60) {
 				monthlySeconds = 0;
 				if(++monthlyMinutes >= 60) {
@@ -182,6 +199,7 @@ public class PlaytimeTracker implements Listener {
 					}
 				}
 			}
+
 			if(++weeklySeconds >= 60) {
 				weeklySeconds = 0;
 				if(++weeklyMinutes >= 60) {
@@ -201,26 +219,33 @@ public class PlaytimeTracker implements Listener {
 	public enum TimeType {LIFETIME, MONTHLY, WEEKLY}
 	
 	public PlaytimeTracker() {
-		playtime = new HashMap<String, Playtime>();
-		queue = new ArrayList<String>();
+		playtime = new HashMap<>();
+		queue = new ArrayList<>();
 		EventUtil.register(this);
+
+		new CommandBase("test", true) {
+			@Override
+			public boolean execute(CommandSender sender, String [] arguments) {
+				Player player = (Player) sender;
+				test(player);
+				return true;
+			}
+		}.setRequiredRank(AccountHandler.Ranks.STAFF);
 	}
 	
 	public static Playtime getPlayTime(Player player) {
 		return getPlayTime(player.getName());
 	}
 	
-	public static Playtime getPlayTime(final String name) {
+	public static Playtime getPlayTime(String name) {
 		if(!playtime.containsKey(name)) {
-			new AsyncDelayedTask(new Runnable() {
-				@Override
-				public void run() {
-					Player player = ProPlugin.getPlayer(name);
-					if(player != null) {
-						playtime.put(player.getName(), new Playtime(player.getUniqueId()));
-					}
+			new AsyncDelayedTask(() -> {
+				Player player = ProPlugin.getPlayer(name);
+				if(player != null) {
+					playtime.put(player.getName(), new Playtime(player.getUniqueId()));
 				}
 			});
+
 			return null;
 		}
 		return playtime.get(name);
@@ -228,9 +253,10 @@ public class PlaytimeTracker implements Listener {
 	
 	public static List<String> getTop5(TimeType timeType) {
 		DB db = timeType == TimeType.LIFETIME ? DB.PLAYERS_LIFETIME_PLAYTIME : timeType == TimeType.MONTHLY ? DB.PLAYERS_MONTHLY_PLAYTIME : DB.PLAYERS_WEEKLY_PLAYTIME;
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		String key = null;
 		int value = 0;
+
 		if(timeType == TimeType.MONTHLY) {
 			key = "month";
 			value = Calendar.getInstance().get(Calendar.MONTH);
@@ -238,16 +264,19 @@ public class PlaytimeTracker implements Listener {
 			key = "week";
 			value = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
 		}
-		List<String> allUUIDs = new ArrayList<String>();
+
+		List<String> allUUIDs;
 		if(key == null) {
 			allUUIDs = db.getOrdered("days DESC,hours DESC,minutes DESC,seconds", "uuid", 5, true);
 		} else {
 			allUUIDs = db.getOrdered("days DESC,hours DESC,minutes DESC,seconds", "uuid", key, String.valueOf(value), 5, true);
 		}
+
 		for(String uuidString : allUUIDs) {
 			UUID uuid = UUID.fromString(uuidString);
 			names.add(AccountHandler.getName(uuid));
 		}
+
 		Bukkit.getLogger().info("playtime: get top 5 " + timeType.toString());
 		return names;
 	}
@@ -260,6 +289,7 @@ public class PlaytimeTracker implements Listener {
 				if((afk != null && afk.contains(player.getName())) || player.getVehicle() != null || player.getTicksLived() <= 40) {
 					continue;
 				}
+
 				if(playtime.containsKey(player.getName())) {
 					Playtime playtime = getPlayTime(player);
 					if(playtime != null) {
@@ -269,6 +299,7 @@ public class PlaytimeTracker implements Listener {
 					queue.add(player.getName());
 				}
 			}
+
 			if(!queue.isEmpty()) {
 				String name = queue.get(0);
 				Player player = ProPlugin.getPlayer(name);
@@ -284,7 +315,7 @@ public class PlaytimeTracker implements Listener {
 	public void onPlayerAFKEvent(PlayerAFKEvent event) {
 		if(event.getAFK()) {
 			if(afk == null) {
-				afk = new ArrayList<String>();
+				afk = new ArrayList<>();
 			}
 			if(!afk.contains(event.getPlayer().getName())) {
 				afk.add(event.getPlayer().getName());
@@ -298,6 +329,7 @@ public class PlaytimeTracker implements Listener {
 	public void onAsyncPlayerLeave(AsyncPlayerLeaveEvent event) {
 		UUID uuid = event.getUUID();
 		String name = event.getName();
+
 		if(playtime.containsKey(name)) {
 			Playtime time = playtime.get(name);
 			int days = time.getDays(TimeType.LIFETIME);
@@ -312,6 +344,7 @@ public class PlaytimeTracker implements Listener {
 			} else {
 				DB.PLAYERS_LIFETIME_PLAYTIME.insert("'" + uuid.toString() + "', '" + days + "', '" + hours + "', '" + minutes + "', '" + seconds + "'");
 			}
+
 			days = time.getDays(TimeType.MONTHLY);
 			hours = time.getHours(TimeType.MONTHLY);
 			minutes = time.getMinutes(TimeType.MONTHLY);
@@ -327,6 +360,7 @@ public class PlaytimeTracker implements Listener {
 			} else {
 				DB.PLAYERS_MONTHLY_PLAYTIME.insert("'" + uuid.toString() + "', '" + days + "', '" + hours + "', '" + minutes + "', '" + seconds + "', '" + month + "'");
 			}
+
 			days = time.getDays(TimeType.WEEKLY);
 			hours = time.getHours(TimeType.WEEKLY);
 			minutes = time.getMinutes(TimeType.WEEKLY);
@@ -344,9 +378,57 @@ public class PlaytimeTracker implements Listener {
 			}
 			playtime.remove(name);
 		}
+
 		if(afk != null && afk.contains(name)) {
 			afk.remove(name);
 		}
+
 		queue.remove(name);
+	}
+
+	@EventHandler
+	public void onPlayerHourOfPlaytime(PlayerHourOfPlaytimeEvent event) {
+		test(event.getPlayer());
+	}
+
+	public static void test(Player player) {
+		if(AccountHandler.Ranks.STAFF.hasRank(player) && DB.Databases.PLAYERS.isEnabled()) {
+			new AsyncDelayedTask(() -> {
+				UUID uuid = player.getUniqueId();
+
+				boolean remind = false;
+
+				if(DB.PLAYERS_RECENT_VOTER.isUUIDSet(uuid)) {
+					PreparedStatement statement = null;
+					ResultSet resultSet = null;
+					try {
+						String query = "SELECT COUNT(id) FROM " + DB.PLAYERS_RECENT_VOTER.getName() + " WHERE uuid = '" + uuid + "' AND date < NOW() - INTERVAL 1 DAY LIMIT 1;";
+						statement = DB.Databases.PLAYERS.getConnection().prepareStatement(query);
+						resultSet = statement.executeQuery();
+						if(resultSet.next()) {
+							remind = resultSet.getInt("COUNT(id)") == 0;
+						}
+					} catch(SQLException e) {
+						e.printStackTrace();
+					} finally {
+						close(statement, resultSet);
+					}
+				} else {
+					remind = true;
+				}
+
+				if(remind) {
+					MessageHandler.sendLine(player);
+					MessageHandler.sendMessage(player, "Hey " + player.getName() + "!");
+					MessageHandler.sendMessage(player, "");
+					MessageHandler.sendMessage(player, "You haven't &bvoted&x in the last 24 hours");
+					MessageHandler.sendMessage(player, "Voting gives &bin game advantages&x & only takes a few seconds");
+					MessageHandler.sendMessage(player, "");
+					ChatClickHandler.sendMessageToRunCommand(player, " &c[CLICK HERE]", "Click", "/vote", "&eRun &b/vote&e or");
+					MessageHandler.sendLine(player);
+					EffectUtil.playSound(player, Sound.LEVEL_UP);
+				}
+			});
+		}
 	}
 }

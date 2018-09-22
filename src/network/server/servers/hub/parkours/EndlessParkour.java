@@ -51,7 +51,7 @@ public class EndlessParkour implements Listener {
 	private int counter = 0;
 	private Random random = null;
 	private String topPlayer = null;
-	private String url = null;
+//	private String url = null;
 	private int topScore = 0;
 	
 	public EndlessParkour() {
@@ -63,61 +63,61 @@ public class EndlessParkour implements Listener {
 		storedScores = new HashMap<String, Integer>();
 		random = new Random();
 		loadTopData();
-		url = "1v1s.org/EPK";
+//		url = "1v1s.org/EPK";
 		World world = Bukkit.getWorlds().get(0);
 		Hologram hologram = new Hologram("endless_parkour", new Location(world, 1592.5, 6.5, -1262.5));
 		hologram.addLine(new TextLine(hologram, StringUtil.color("&eWalk Forward")));
 		EventUtil.register(this);
-		//TODO: Add 1 respawn into the database when this command is dispatched on the slave server
-		new CommandBase("endlessParkourRespawn", 0, 1) {
-			@Override
-			public boolean execute(CommandSender sender, String [] arguments) {
-				if(arguments.length == 0) {
-					if(sender instanceof Player) {
-						Player player = (Player) sender;
-						String name = player.getName();
-						if(scores.containsKey(name)) {
-							MessageHandler.sendMessage(player, "&cYou cannot run this command while playing");
-							return true;
-						}
-						if(!storedScores.containsKey(name)) {
-							MessageHandler.sendMessage(player, "&cNot scores saved. Scores only save for &e2:30");
-							return true;
-						}
-						new AsyncDelayedTask(new Runnable() {
-							@Override
-							public void run() {
-								UUID uuid = player.getUniqueId();
-								int amount = DB.HUB_PARKOUR_ENDLESS_RESPAWNS.getInt("uuid", uuid.toString(), "amount");
-								if(amount > 0) {
-									MessageHandler.sendMessage(player, "You now have &e" + (--amount) + " &xrespawn" + (amount == 1 ? "" : "s"));
-									DB.HUB_PARKOUR_ENDLESS_RESPAWNS.updateInt("amount", amount, "uuid", uuid.toString());
-									scores.put(name, storedScores.get(name));
-									storedScores.remove(name);
-								} else {
-									MessageHandler.sendMessage(player, "&cYou do not have any Endless Parkour respawns, get some here: &e" + url);
-								}
-							}
-						});
-					} else {
-						return false;
-					}
-				} else if(arguments.length == 1) {
-					if(Ranks.OWNER.hasRank(sender)) {
-						Player player = ProPlugin.getPlayer(arguments[0]);
-						if(player == null) {
-							MessageHandler.sendMessage(sender, "&c" + arguments[0] + " is not online");
-						} else {
-							cancelRemove(player.getName());
-							MessageHandler.sendMessage(player, "Your Endless Parkour respawn has been loaded. To activate it run &e/endlessParkourRespawn &xand you will be teleported into the game. Be ready!");
-						}
-					} else {
-						MessageHandler.sendMessage(sender, Ranks.OWNER.getNoPermission());
-					}
-				}
-				return true;
-			}
-		}.enableDelay(2);
+		//TODO: Add 1 respawn into the database when this command is dispatched on the worker server
+//		new CommandBase("endlessParkourRespawn", 0, 1) {
+//			@Override
+//			public boolean execute(CommandSender sender, String [] arguments) {
+//				if(arguments.length == 0) {
+//					if(sender instanceof Player) {
+//						Player player = (Player) sender;
+//						String name = player.getName();
+//						if(scores.containsKey(name)) {
+//							MessageHandler.sendMessage(player, "&cYou cannot run this command while playing");
+//							return true;
+//						}
+//						if(!storedScores.containsKey(name)) {
+//							MessageHandler.sendMessage(player, "&cNot scores saved. Scores only save for &e2:30");
+//							return true;
+//						}
+//						new AsyncDelayedTask(new Runnable() {
+//							@Override
+//							public void run() {
+//								UUID uuid = player.getUniqueId();
+//								int amount = DB.HUB_PARKOUR_ENDLESS_RESPAWNS.getInt("uuid", uuid.toString(), "amount");
+//								if(amount > 0) {
+//									MessageHandler.sendMessage(player, "You now have &e" + (--amount) + " &xrespawn" + (amount == 1 ? "" : "s"));
+//									DB.HUB_PARKOUR_ENDLESS_RESPAWNS.updateInt("amount", amount, "uuid", uuid.toString());
+//									scores.put(name, storedScores.get(name));
+//									storedScores.remove(name);
+//								} else {
+//									MessageHandler.sendMessage(player, "&cYou do not have any Endless Parkour respawns, get some here: &e" + url);
+//								}
+//							}
+//						});
+//					} else {
+//						return false;
+//					}
+//				} else if(arguments.length == 1) {
+//					if(Ranks.OWNER.hasRank(sender)) {
+//						Player player = ProPlugin.getPlayer(arguments[0]);
+//						if(player == null) {
+//							MessageHandler.sendMessage(sender, "&c" + arguments[0] + " is not online");
+//						} else {
+//							cancelRemove(player.getName());
+//							MessageHandler.sendMessage(player, "Your Endless Parkour respawn has been loaded. To activate it run &e/endlessParkourRespawn &xand you will be teleported into the game. Be ready!");
+//						}
+//					} else {
+//						MessageHandler.sendMessage(sender, Ranks.OWNER.getNoPermission());
+//					}
+//				}
+//				return true;
+//			}
+//		}.enableDelay(2);
 	}
 	
 	public void cancelRemove(String name) {
@@ -203,34 +203,26 @@ public class EndlessParkour implements Listener {
 			near.setData((byte) random.nextInt(15));
 		}
 		blocks.put(name, newBlock);
-		new DelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				for(int a = 0; a < 2; ++a) {
-					oldBlock.setType(Material.AIR);
-					oldBlock.setData((byte) 0);
-					for(Vector offset : new Vector [] {new Vector(1, 0, 0), new Vector(-1, 0, 0), new Vector(0, 0, 1), new Vector(0, 0, -1), new Vector(0, -1, 0)}) {
-						Block near = oldBlock.getRelative(offset.getBlockX(), offset.getBlockY(), offset.getBlockZ());
-						near.setType(Material.AIR);
-						near.setData((byte) 0);
-					}
+		new DelayedTask(() -> {
+			for(int a = 0; a < 2; ++a) {
+				oldBlock.setType(Material.AIR);
+				oldBlock.setData((byte) 0);
+				for(Vector offset : new Vector [] {new Vector(1, 0, 0), new Vector(-1, 0, 0), new Vector(0, 0, 1), new Vector(0, 0, -1), new Vector(0, -1, 0)}) {
+					Block near = oldBlock.getRelative(offset.getBlockX(), offset.getBlockY(), offset.getBlockZ());
+					near.setType(Material.AIR);
+					near.setData((byte) 0);
 				}
 			}
 		}, 20 * 2);
 	}
 	
-	private void remove(final Player player, boolean teleport) {
-		final String name = player.getName();
+	private void remove(Player player, boolean teleport) {
+		String name = player.getName();
 		if(blocks.containsKey(name)) {
 			final Block block = blocks.get(name);
 			blocks.remove(name);
 			remove(block);
-			new DelayedTask(new Runnable() {
-				@Override
-				public void run() {
-					remove(block);
-				}
-			}, 20);
+			new DelayedTask(() -> remove(block), 20);
 			if(Ranks.PRO.hasRank(player)) {
 				player.setAllowFlight(true);
 			}
@@ -240,40 +232,37 @@ public class EndlessParkour implements Listener {
 		}
 		if(scores.containsKey(name)) {
 			final int score = scores.get(name);
-			if(score >= 50) {
-				cancelRemove(name);
-				MessageHandler.sendMessage(player, "Want to return to where you were? &e" + url);
-				MessageHandler.sendMessage(player, "Your score of &e" + score + " &xis saved for only &e2:30 &xso be quick!");
-				taskIds.put(name, new DelayedTask(new Runnable() {
-					@Override
-					public void run() {
-						if(player.isOnline()) {
-							MessageHandler.sendMessage(player, "&cYour previous score of &e" + score + " &cwas removed");
-						}
-						storedScores.remove(name);
+//			if(score >= 50) {
+//				cancelRemove(name);
+//				MessageHandler.sendMessage(player, "Want to return to where you were? &e" + url);
+//				MessageHandler.sendMessage(player, "Your score of &e" + score + " &xis saved for only &e2:30 &xso be quick!");
+//				taskIds.put(name, new DelayedTask(new Runnable() {
+//					@Override
+//					public void run() {
+//						if(player.isOnline()) {
+//							MessageHandler.sendMessage(player, "&cYour previous score of &e" + score + " &cwas removed");
+//						}
+//						storedScores.remove(name);
+//					}
+//				}, 20 * 60 * 2 + 30).getId());
+//				storedScores.put(name, score);
+//			}
+			new AsyncDelayedTask(() -> {
+				UUID uuid = player.getUniqueId();
+				int bestScore = DB.HUB_PARKOUR_ENDLESS_SCORES.getInt("uuid", uuid.toString(), "best_score");
+				if(score > bestScore) {
+					if(DB.HUB_PARKOUR_ENDLESS_SCORES.isUUIDSet(uuid)) {
+						DB.HUB_PARKOUR_ENDLESS_SCORES.updateInt("best_score", score, "uuid", uuid.toString());
+					} else {
+						DB.HUB_PARKOUR_ENDLESS_SCORES.insert("'" + uuid.toString() + "', '" + score + "'");
 					}
-				}, 20 * 60 * 2 + 30).getId());
-				storedScores.put(name, score);
-			}
-			new AsyncDelayedTask(new Runnable() {
-				@Override
-				public void run() {
-					UUID uuid = player.getUniqueId();
-					int bestScore = DB.HUB_PARKOUR_ENDLESS_SCORES.getInt("uuid", uuid.toString(), "best_score");
-					if(score > bestScore) {
-						if(DB.HUB_PARKOUR_ENDLESS_SCORES.isUUIDSet(uuid)) {
-							DB.HUB_PARKOUR_ENDLESS_SCORES.updateInt("best_score", score, "uuid", uuid.toString());
-						} else {
-							DB.HUB_PARKOUR_ENDLESS_SCORES.insert("'" + uuid.toString() + "', '" + score + "'");
-						}
-						MessageHandler.sendMessage(player, "&6New Personal Best: &e" + score);
-						List<String> top = DB.HUB_PARKOUR_ENDLESS_SCORES.getOrdered("best_score", "uuid", 1, true);
-						if(!top.isEmpty() && top.get(0).equals(uuid.toString())) {
-							MessageHandler.sendMessage(player, "&4&k|||&6 New Top Score: &e" + score + " &4&k|||");
-						}
+					MessageHandler.sendMessage(player, "&6New Personal Best: &e" + score);
+					List<String> top = DB.HUB_PARKOUR_ENDLESS_SCORES.getOrdered("best_score", "uuid", 1, true);
+					if(!top.isEmpty() && top.get(0).equals(uuid.toString())) {
+						MessageHandler.sendMessage(player, "&4&k|||&6 New Top Score: &e" + score + " &4&k|||");
 					}
-					scores.remove(name);
 				}
+				scores.remove(name);
 			});
 		}
 		if(scoreboards.containsKey(name)) {
@@ -297,17 +286,14 @@ public class EndlessParkour implements Listener {
 	}
 	
 	private void loadTopData() {
-		new AsyncDelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				List<String> top = DB.HUB_PARKOUR_ENDLESS_SCORES.getOrdered("best_score", "uuid", 1, true);
-				if(top.isEmpty()) {
-					topPlayer = "None";
-				} else {
-					UUID topPlayerUUID = UUID.fromString(top.get(0));
-					topPlayer = AccountHandler.getName(topPlayerUUID);
-					topScore = DB.HUB_PARKOUR_ENDLESS_SCORES.getInt("uuid", topPlayerUUID.toString(), "best_score");
-				}
+		new AsyncDelayedTask(() -> {
+			List<String> top = DB.HUB_PARKOUR_ENDLESS_SCORES.getOrdered("best_score", "uuid", 1, true);
+			if(top.isEmpty()) {
+				topPlayer = "None";
+			} else {
+				UUID topPlayerUUID = UUID.fromString(top.get(0));
+				topPlayer = AccountHandler.getName(topPlayerUUID);
+				topScore = DB.HUB_PARKOUR_ENDLESS_SCORES.getInt("uuid", topPlayerUUID.toString(), "best_score");
 			}
 		});
 	}

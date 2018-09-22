@@ -1,4 +1,4 @@
-package network.server.servers.hub;
+package network.server.servers.worker;
 
 import com.vexsoftware.votifier.model.VotifierEvent;
 import network.Network;
@@ -15,6 +15,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -32,7 +36,7 @@ public class Voting implements Listener {
             }
         }.setRequiredRank(AccountHandler.Ranks.OWNER);
 
-        handlers = new ArrayList<CoinsHandler>();
+        handlers = new ArrayList<>();
         handlers.add(new CoinsHandler(DB.PLAYERS_COINS_KIT_PVP, Network.Plugins.KITPVP.getData()));
         EventUtil.register(this);
     }
@@ -43,29 +47,25 @@ public class Voting implements Listener {
     }
 
     public static void execute(String name) {
-        new AsyncDelayedTask(new Runnable() {
-            @Override
-            public void run() {
-                UUID playerUUID = AccountHandler.getUUID(name);
-                if(playerUUID != null) {
-                    String uuid = playerUUID.toString();
-                    int day = Calendar.DAY_OF_WEEK;
+        new AsyncDelayedTask(() -> {
+            UUID playerUUID = AccountHandler.getUUID(name);
+            if(playerUUID != null) {
+                String uuid = playerUUID.toString();
 
-                    DB.PLAYERS_RECENT_VOTER.insert("'" + uuid + "', '" + day + "'");
+                DB.PLAYERS_RECENT_VOTER.insert("'" + uuid + "', '" + new Timestamp(Calendar.getInstance().getTime().getTime()) + "'");
 
-                    int multiplier = increaseStreak(playerUUID, uuid);
-                    increaseVotes(uuid);
+                int multiplier = increaseStreak(playerUUID, uuid);
+                increaseVotes(uuid);
 
-                    Beacon.giveKey(playerUUID, multiplier, CrateTypes.VOTING);
-                    for(CoinsHandler handler : handlers) {
-                        handler.addCoins(playerUUID, 20 * multiplier);
-                    }
-
-                    giveParkourCheckpoints(playerUUID, uuid, multiplier);
-
-                    CommandDispatcher.sendToGame("ONEVSONE", "addRankedMatches " + name + " 10");
-                    CommandDispatcher.sendToAll("say &e" + name + " has voted for perks & advantages. Run &a/vote");
+                Beacon.giveKey(playerUUID, multiplier, CrateTypes.VOTING);
+                for(CoinsHandler handler : handlers) {
+                    handler.addCoins(playerUUID, 20 * multiplier);
                 }
+
+                giveParkourCheckpoints(playerUUID, uuid, multiplier);
+
+                CommandDispatcher.sendToGame("ONEVSONE", "addRankedMatches " + name + " 10");
+                CommandDispatcher.sendToAll("say &e" + name + " has voted for perks & advantages. Run &a/vote");
             }
         });
     }

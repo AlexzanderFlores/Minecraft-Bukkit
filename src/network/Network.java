@@ -15,7 +15,8 @@ import network.server.*;
 import network.server.servers.building.Building;
 import network.server.servers.hub.items.features.particles.Particles;
 import network.server.servers.hub.main.MainHub;
-import network.server.servers.slave.Slave;
+import network.server.servers.worker.Server;
+import network.server.servers.worker.Worker;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.CommandRepeater;
 import network.server.util.ConfigurationUtil;
@@ -24,6 +25,7 @@ import network.staff.Punishment;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -38,7 +40,7 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 		ONEVSONE("1v1s", "1v1", "1v1s"),
 		UHCSW("UHCSW", "sky_wars", "UHC Sky Wars"),
 		BUILDING("Building", "building"),
-		SLAVE("Slave", "slave");
+		WORKER("Worker", "worker");
 		
 		private String server = null;
 		private String data = null;
@@ -110,13 +112,38 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 			case BUILDING:
 				proPlugin = new Building();
 				break;
-			case SLAVE:
-				proPlugin = new Slave();
+			case WORKER:
+				proPlugin = new Worker();
 				break;
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+
+		if(plugin != Plugins.WORKER) {
+			new CommandBase("purchase", 2, false) {
+				@Override
+				public boolean execute(CommandSender sender, String [] arguments) {
+					String name = arguments[0];
+					String product = arguments[1];
+
+					try {
+						AccountHandler.Ranks rank = AccountHandler.Ranks.valueOf(product.toUpperCase());
+						product = rank.getPrefix();
+
+						Player player = ProPlugin.getPlayer(name);
+						if(player != null) {
+							name = player.getName();
+							AccountHandler.setRank(player, rank, false);
+						}
+					} catch(Exception e) {}
+
+					MessageHandler.alert("&a" + name + "&x has purchased " + product + "&xThank you!");
+					return true;
+				}
+			}.setRequiredRank(AccountHandler.Ranks.OWNER);
+		}
+
 		DB.values(); // Call the enumeration constructors for each item to initialize them
 		maxPlayers = Bukkit.getMaxPlayers();
 		new LevelHandler();

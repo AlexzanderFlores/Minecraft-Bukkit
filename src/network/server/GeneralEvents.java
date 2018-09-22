@@ -3,8 +3,10 @@ package network.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import network.server.util.EffectUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -174,13 +176,12 @@ public class GeneralEvents implements Listener {
 			for(Databases database : Databases.values()) {
 				database.connect();
 			}
-		}/* else if(ticks == 20 * 60 * 10) {
+		} else if(ticks == 20 * 60 * 10) {
         	MessageHandler.alert("");
-        	MessageHandler.alert("&c25% OFF SALE! &bGet unlimited &6Ranked &bmatches:");
-        	MessageHandler.alert("http://store.1v1s.org/category/759467");
+        	MessageHandler.alert("&c25% OFF SALE! &b/buy");
         	MessageHandler.alert("");
         	EffectUtil.playSound(Sound.LEVEL_UP);
-    	}*/
+    	}
 	}
 	
 	@EventHandler

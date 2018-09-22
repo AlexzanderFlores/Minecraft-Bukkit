@@ -155,23 +155,23 @@ public class MuteHandler extends Punishment {
 								// Perform any final execution instructions
 								MessageHandler.alert(message);
 								// Mute other accounts attached to the IP
-								int counter = 0;
-								for(String uuidString : DB.PLAYERS_ACCOUNTS.getAllStrings("uuid", "address", AccountHandler.getAddress(uuid))) {
-									if(!uuidString.equals(uuid.toString())) {
-										Player player = Bukkit.getPlayer(UUID.fromString(uuidString));
-										if(player != null) {
-											player.kickPlayer(ChatColor.RED + "You have been muted due to sharing the IP of " + arguments[0]);
-										}
-										DB.STAFF_MUTES.insert("'" + uuid.toString() + "', '" + uuidString + "', '" + staffUUID + "', 'null', '" + reason.toString() + "', '" + arguments[2] + "', '" + date + "', '" + time + "', 'null', 'null', '" + expires + "', '1'");
-										values = new String [] {uuidString, "1"};
-										id = DB.STAFF_MUTES.getInt(keys, values, "id");
-										DB.STAFF_MUTE_PROOF.insert("'" + id + "', '" + proof + "'");
-										++counter;
-									}
-								}
-								if(counter > 0) {
-									MessageHandler.alert("&cMuted &e" + counter + " &caccount" + (counter == 1 ? "" : "s") + " that shared the same IP as &e" + arguments[0]);
-								}
+//								int counter = 0;
+//								for(String uuidString : DB.PLAYERS_ACCOUNTS.getAllStrings("uuid", "address", AccountHandler.getAddress(uuid))) {
+//									if(!uuidString.equals(uuid.toString())) {
+//										Player player = Bukkit.getPlayer(UUID.fromString(uuidString));
+//										if(player != null) {
+//											player.kickPlayer(ChatColor.RED + "You have been muted due to sharing the IP of " + arguments[0]);
+//										}
+//										DB.STAFF_MUTES.insert("'" + uuid.toString() + "', '" + uuidString + "', '" + staffUUID + "', 'null', '" + reason.toString() + "', '" + arguments[2] + "', '" + date + "', '" + time + "', 'null', 'null', '" + expires + "', '1'");
+//										values = new String [] {uuidString, "1"};
+//										id = DB.STAFF_MUTES.getInt(keys, values, "id");
+//										DB.STAFF_MUTE_PROOF.insert("'" + id + "', '" + proof + "'");
+//										++counter;
+//									}
+//								}
+//								if(counter > 0) {
+//									MessageHandler.alert("&cMuted &e" + counter + " &caccount" + (counter == 1 ? "" : "s") + " that shared the same IP as &e" + arguments[0]);
+//								}
 								// Execute the mute if the player is online
 								Player player = ProPlugin.getPlayer(arguments[0]);
 								if(player != null) {
@@ -193,7 +193,7 @@ public class MuteHandler extends Punishment {
 				});
 				return true;
 			}
-		}.setRequiredRank(Ranks.OWNER);
+		}.setRequiredRank(Ranks.STAFF);
 	}
 	
 	public static boolean checkMute(Player player) {

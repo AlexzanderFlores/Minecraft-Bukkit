@@ -112,7 +112,7 @@ public class OnevsOnes extends ProPlugin {
 					Ranks.PLAYER.getColor() + "Default: &b5s",
 					Ranks.PRO.getColor() + "PRO: &b1s /buy",
 					"     ",
-					"&aIP TBA",
+					"&aOpal Gaming",
 					"      ",
 				});
 				super.update(player);

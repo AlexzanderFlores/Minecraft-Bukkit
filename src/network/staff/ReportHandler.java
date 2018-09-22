@@ -16,7 +16,7 @@ import network.player.account.PlaytimeTracker;
 import network.server.ChatClickHandler;
 import network.server.CommandBase;
 import network.server.DB;
-import network.server.Server;
+import network.server.servers.worker.Server;
 import network.server.tasks.AsyncDelayedTask;
 import network.server.util.EffectUtil;
 import network.server.util.EventUtil;
@@ -40,6 +40,7 @@ public class ReportHandler implements Listener {
     private static Map<String, List<Integer>> reportIDs = null;
     private Map<Integer, String> openReports = null;
     private int counter = 10;
+    private int lastAmount = -1;
     
     public ReportHandler() {
         new CommandBase("report", 1, -1) {
@@ -342,8 +343,13 @@ public class ReportHandler implements Listener {
                 }
             }
 
-            int amount = openReports == null || openReports.isEmpty() ? 0 : openReports.size();
-            Server.post("http://167.114.98.199:8081/reports?a=" + amount);
+            if(Network.getServerName().equalsIgnoreCase("HUB1")) {
+                int amount = openReports == null || openReports.isEmpty() ? 0 : openReports.size();
+                if(amount != lastAmount) {
+                    lastAmount = amount;
+                    Server.post("http://167.114.98.199:8081/reports?a=" + amount);
+                }
+            }
         });
     }
 
