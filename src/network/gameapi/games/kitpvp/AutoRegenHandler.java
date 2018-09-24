@@ -26,56 +26,44 @@ import network.server.util.EventUtil;
 import npc.NPCEntity;
 
 public class AutoRegenHandler implements Listener {
-	private Map<String, Integer> regenPasses = null;
-	private List<String> alertDelayed = null;
-	private List<String> delayed = null;
+	private Map<String, Integer> regenPasses;
+	private List<String> alertDelayed;
+	private List<String> delayed;
 	private int alertDelay = 60;
 	private int delay = 3;
 	
 	public AutoRegenHandler(double x, double y, double z) {
-		regenPasses = new HashMap<String, Integer>();
-		alertDelayed = new ArrayList<String>();
-		delayed = new ArrayList<String>();
+		regenPasses = new HashMap<>();
+		alertDelayed = new ArrayList<>();
+		delayed = new ArrayList<>();
 		World world = Bukkit.getWorlds().get(0);
 		Location location = new Location(world, x, y, z);
-		new NPCEntity(EntityType.ZOMBIE, "&eLoad Auto Regen Passes", location, Material.GOLDEN_APPLE) {
+
+		new NPCEntity(EntityType.ZOMBIE, "&eLoad Auto Regen Passes", location, world.getSpawnLocation(), Material.GOLDEN_APPLE) {
 			@Override
-			public void onInteract(final Player player) {
+			public void onInteract(Player player) {
 				if(delayed.contains(player.getName())) {
 					MessageHandler.sendMessage(player, "&cYou can only click on this every &e" + delay + " &cseconds");
 				} else {
 					delayed.add(player.getName());
-					new DelayedTask(new Runnable() {
-						@Override
-						public void run() {
-							delayed.remove(player.getNoDamageTicks());
-						}
-					}, 20 * delay);
+					new DelayedTask(() -> delayed.remove(player.getNoDamageTicks()), 20 * delay);
 					if(regenPasses.containsKey(player.getName())) {
 						updateAndRemove(player);
 						MessageHandler.sendMessage(player, "Disabled auto regen passes for you");
 					} else {
-						new AsyncDelayedTask(new Runnable() {
-							@Override
-							public void run() {
-								if(DB.PLAYERS_KIT_PVP_AUTO_REGEN.isUUIDSet(player.getUniqueId())) {
-									int amount = DB.PLAYERS_KIT_PVP_AUTO_REGEN.getInt("uuid", player.getUniqueId().toString(), "amount");
-									regenPasses.put(player.getName(), amount);
-									if(alertDelayed.contains(player.getName())) {
-										MessageHandler.sendMessage(player, "&bLoaded regen passes");
-									} else {
-										alertDelayed.add(player.getName());
-										new DelayedTask(new Runnable() {
-											@Override
-											public void run() {
-												alertDelayed.remove(player.getName());
-											}
-										}, 20 * alertDelay);
-										MessageHandler.alert(AccountHandler.getRank(player).getColor() + player.getName() + " &ehas loaded regen passes gotten from &c/vote");
-									}
+						new AsyncDelayedTask(() -> {
+							if(DB.PLAYERS_KIT_PVP_AUTO_REGEN.isUUIDSet(player.getUniqueId())) {
+								int amount = DB.PLAYERS_KIT_PVP_AUTO_REGEN.getInt("uuid", player.getUniqueId().toString(), "amount");
+								regenPasses.put(player.getName(), amount);
+								if(alertDelayed.contains(player.getName())) {
+									MessageHandler.sendMessage(player, "&bLoaded regen passes");
 								} else {
-									MessageHandler.sendMessage(player, "&cYou have no auto regen passes! You can get some with &e/vote &cand &e/vote shop");
+									alertDelayed.add(player.getName());
+									new DelayedTask(() -> alertDelayed.remove(player.getName()), 20 * alertDelay);
+									MessageHandler.alert(AccountHandler.getRank(player).getColor() + player.getName() + " &ehas loaded regen passes gotten from &c/vote");
 								}
+							} else {
+								MessageHandler.sendMessage(player, "&cYou have no auto regen passes! You can get some with &e/vote &cand &e/vote shop");
 							}
 						});
 					}
@@ -90,17 +78,14 @@ public class AutoRegenHandler implements Listener {
 		if(regenPasses.containsKey(name)) {
 			final int amount = regenPasses.get(name);
 			final UUID uuid = player.getUniqueId();
-			new AsyncDelayedTask(new Runnable() {
-				@Override
-				public void run() {
-					boolean isInTable = DB.PLAYERS_KIT_PVP_AUTO_REGEN.isUUIDSet(uuid);
-					if(amount > 0 && isInTable) {
-						DB.PLAYERS_KIT_PVP_AUTO_REGEN.updateInt("amount", amount, "uuid", uuid.toString());
-					} else if(amount <= 0 && isInTable){
-						DB.PLAYERS_KIT_PVP_AUTO_REGEN.deleteUUID(uuid);
-					}
-					regenPasses.remove(name);
+			new AsyncDelayedTask(() -> {
+				boolean isInTable = DB.PLAYERS_KIT_PVP_AUTO_REGEN.isUUIDSet(uuid);
+				if(amount > 0 && isInTable) {
+					DB.PLAYERS_KIT_PVP_AUTO_REGEN.updateInt("amount", amount, "uuid", uuid.toString());
+				} else if(amount <= 0 && isInTable){
+					DB.PLAYERS_KIT_PVP_AUTO_REGEN.deleteUUID(uuid);
 				}
+				regenPasses.remove(name);
 			});
 		}
 	}

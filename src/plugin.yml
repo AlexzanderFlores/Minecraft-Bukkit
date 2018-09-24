@@ -5,6 +5,9 @@ softdepend: [NPC, Votifier, EffectLib, Citizens, Holograms]
 authors: [AlexzanderFlores]
 commands:
 # Global Commands
+  runVote:
+    usage: /runVote <name>
+
   viewQueue:
     usage: /viewQueue
 
@@ -118,12 +121,15 @@ commands:
     usage: /closeReport <id>
 
   vote:
-    usage: /vote
+    usage: /vote [shop]
 
   versions:
     usage: /versions
 
 # Hub Commands
+  checkpointFromVoting:
+    usage: /checkpointFromVoting <name> <amount>
+
   confirmDiscord:
     usage: /confirmDiscord
 

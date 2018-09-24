@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import network.customevents.player.timed.PlayerHalfHourPlaytimeEvent;
 import network.player.MessageHandler;
 import network.server.ChatClickHandler;
 import network.server.CommandBase;
@@ -173,8 +174,8 @@ public class PlaytimeTracker implements Listener {
 					Bukkit.getPluginManager().callEvent(new PlayerFirstThirtyMinutesOfPlaytimeEvent(player));
 				}
 
-				if(minutes % 30 == 0) {
-					Bukkit.getPluginManager().callEvent(new PlayerHourOfPlaytimeEvent(player));
+				if(minutes % 20 == 0) {
+					Bukkit.getPluginManager().callEvent(new PlayerHalfHourPlaytimeEvent(player));
 				}
 
 				if(minutes >= 60) {
@@ -222,15 +223,6 @@ public class PlaytimeTracker implements Listener {
 		playtime = new HashMap<>();
 		queue = new ArrayList<>();
 		EventUtil.register(this);
-
-		new CommandBase("test", true) {
-			@Override
-			public boolean execute(CommandSender sender, String [] arguments) {
-				Player player = (Player) sender;
-				test(player);
-				return true;
-			}
-		}.setRequiredRank(AccountHandler.Ranks.STAFF);
 	}
 	
 	public static Playtime getPlayTime(Player player) {
@@ -384,51 +376,5 @@ public class PlaytimeTracker implements Listener {
 		}
 
 		queue.remove(name);
-	}
-
-	@EventHandler
-	public void onPlayerHourOfPlaytime(PlayerHourOfPlaytimeEvent event) {
-		test(event.getPlayer());
-	}
-
-	public static void test(Player player) {
-		if(AccountHandler.Ranks.STAFF.hasRank(player) && DB.Databases.PLAYERS.isEnabled()) {
-			new AsyncDelayedTask(() -> {
-				UUID uuid = player.getUniqueId();
-
-				boolean remind = false;
-
-				if(DB.PLAYERS_RECENT_VOTER.isUUIDSet(uuid)) {
-					PreparedStatement statement = null;
-					ResultSet resultSet = null;
-					try {
-						String query = "SELECT COUNT(id) FROM " + DB.PLAYERS_RECENT_VOTER.getName() + " WHERE uuid = '" + uuid + "' AND date < NOW() - INTERVAL 1 DAY LIMIT 1;";
-						statement = DB.Databases.PLAYERS.getConnection().prepareStatement(query);
-						resultSet = statement.executeQuery();
-						if(resultSet.next()) {
-							remind = resultSet.getInt("COUNT(id)") == 0;
-						}
-					} catch(SQLException e) {
-						e.printStackTrace();
-					} finally {
-						close(statement, resultSet);
-					}
-				} else {
-					remind = true;
-				}
-
-				if(remind) {
-					MessageHandler.sendLine(player);
-					MessageHandler.sendMessage(player, "Hey " + player.getName() + "!");
-					MessageHandler.sendMessage(player, "");
-					MessageHandler.sendMessage(player, "You haven't &bvoted&x in the last 24 hours");
-					MessageHandler.sendMessage(player, "Voting gives &bin game advantages&x & only takes a few seconds");
-					MessageHandler.sendMessage(player, "");
-					ChatClickHandler.sendMessageToRunCommand(player, " &c[CLICK HERE]", "Click", "/vote", "&eRun &b/vote&e or");
-					MessageHandler.sendLine(player);
-					EffectUtil.playSound(player, Sound.LEVEL_UP);
-				}
-			});
-		}
 	}
 }

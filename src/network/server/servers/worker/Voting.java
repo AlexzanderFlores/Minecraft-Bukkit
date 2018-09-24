@@ -1,8 +1,6 @@
 package network.server.servers.worker;
 
 import com.vexsoftware.votifier.model.VotifierEvent;
-import network.Network;
-import network.player.CoinsHandler;
 import network.player.account.AccountHandler;
 import network.server.CommandBase;
 import network.server.CommandDispatcher;
@@ -16,17 +14,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.UUID;
 
 public class Voting implements Listener {
-    private static List<CoinsHandler> handlers = null;
-
     Voting() {
         new CommandBase("testVote", 1) {
             @Override
@@ -36,8 +27,6 @@ public class Voting implements Listener {
             }
         }.setRequiredRank(AccountHandler.Ranks.OWNER);
 
-        handlers = new ArrayList<>();
-        handlers.add(new CoinsHandler(DB.PLAYERS_COINS_KIT_PVP, Network.Plugins.KITPVP.getData()));
         EventUtil.register(this);
     }
 
@@ -57,14 +46,15 @@ public class Voting implements Listener {
                 int multiplier = increaseStreak(playerUUID, uuid);
                 increaseVotes(uuid);
 
-                Beacon.giveKey(playerUUID, multiplier, CrateTypes.VOTING);
-                for(CoinsHandler handler : handlers) {
-                    handler.addCoins(playerUUID, 20 * multiplier);
-                }
+                int passes = DB.PLAYERS_VOTE_PASSES.getInt("uuid", uuid, "vote_passes") + (5 * multiplier);
+                DB.PLAYERS_VOTE_PASSES.updateInt("vote_passes", passes, "uuid", uuid);
 
-                giveParkourCheckpoints(playerUUID, uuid, multiplier);
+//                Beacon.giveKey(playerUUID, multiplier, CrateTypes.VOTING);
+//                giveParkourCheckpoints(playerUUID, uuid, multiplier);
 
-                CommandDispatcher.sendToGame("ONEVSONE", "addRankedMatches " + name + " 10");
+//                CommandDispatcher.sendToGame("ONEVSONE", "addRankedMatches " + name + " " + (10 * multiplier));
+//                CommandDispatcher.sendToGame("KITPVP", "addCoins " + name + " KITPVP " + (20 * multiplier));
+//                CommandDispatcher.sendToGame("HUB", "checkpointFromVoting " + name + " " + (10 * multiplier));
                 CommandDispatcher.sendToAll("say &e" + name + " has voted for perks & advantages. Run &a/vote");
             }
         });
@@ -90,7 +80,7 @@ public class Voting implements Listener {
                 }
             }
 
-            multiplier = streak <= 5 ? 1 : streak <= 10 ? 2 : streak <= 15 ? 3 : streak <= 20 ? 4 : streak <= 25 ? 5 : 6;
+            multiplier = streak <= 10 ? 1 : streak <= 20 ? 2 : 3;
             DB.PLAYERS_LIFETIME_VOTES.updateInt("amount", amount, "uuid", uuid);
             DB.PLAYERS_LIFETIME_VOTES.updateInt("day", currentDay, "uuid", uuid);
             DB.PLAYERS_LIFETIME_VOTES.updateInt("streak", streak, "uuid", uuid);
@@ -126,14 +116,14 @@ public class Voting implements Listener {
         }
     }
 
-    private static void giveParkourCheckpoints(UUID playerUUID, String uuid, int multiplier) {
-        int toAdd = 10 * multiplier;
-
-        if(DB.HUB_PARKOUR_CHECKPOINTS.isUUIDSet(playerUUID)) {
-            int amount = DB.HUB_PARKOUR_CHECKPOINTS.getInt("uuid", uuid, "amount") + toAdd;
-            DB.HUB_PARKOUR_CHECKPOINTS.updateInt("amount", amount, "uuid", uuid);
-        } else {
-            DB.HUB_PARKOUR_CHECKPOINTS.insert("'" + uuid + "', '" + toAdd + "'");
-        }
-    }
+//    private static void giveParkourCheckpoints(UUID playerUUID, String uuid, int multiplier) {
+//        int toAdd = 10 * multiplier;
+//
+//        if(DB.HUB_PARKOUR_CHECKPOINTS.isUUIDSet(playerUUID)) {
+//            int amount = DB.HUB_PARKOUR_CHECKPOINTS.getInt("uuid", uuid, "amount") + toAdd;
+//            DB.HUB_PARKOUR_CHECKPOINTS.updateInt("amount", amount, "uuid", uuid);
+//        } else {
+//            DB.HUB_PARKOUR_CHECKPOINTS.insert("'" + uuid + "', '" + toAdd + "'");
+//        }
+//    }
 }

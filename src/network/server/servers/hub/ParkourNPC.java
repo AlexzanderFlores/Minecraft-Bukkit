@@ -15,8 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 
-import static network.server.servers.hub.items.GameSelector.displayGameGlass;
-
 public class ParkourNPC implements Listener {
 	private static String name = null;
 	private static Location endlessLocation = null;
@@ -58,7 +56,6 @@ public class ParkourNPC implements Listener {
 		Inventory inventory = Bukkit.createInventory(player, 9 * 3, name);
 		inventory.setItem(12, new ItemCreator(Material.GOLD_BOOTS).setName("&bEndless Parkour").getItemStack());
 		inventory.setItem(14, new ItemCreator(Material.CHAINMAIL_BOOTS).setName("&bParkour Course").getItemStack());
-		displayGameGlass(inventory);
 		player.openInventory(inventory);
 	}
 

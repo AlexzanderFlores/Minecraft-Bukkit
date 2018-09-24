@@ -16,6 +16,7 @@ import network.staff.StaffMode;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 import java.util.UUID;
 
@@ -123,20 +124,6 @@ public class GlobalCommands {
 				return true;
 			}
 		}.setRequiredRank(Ranks.OWNER);
-		
-		new CommandBase("vote") {
-			@Override
-			public boolean execute(CommandSender sender, String [] arguments) {
-				MessageHandler.sendLine(sender, "&6");
-				MessageHandler.sendMessage(sender, "https://minecraftservers.org/server/514731");
-				MessageHandler.sendLine(sender, "&6");
-				if(sender instanceof Player) {
-					Player player = (Player) sender;
-					EffectUtil.playSound(player, Sound.LEVEL_UP);
-				}
-				return true;
-			}
-		};
 		
 		new CommandBase("sysTime") {
 			@Override

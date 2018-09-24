@@ -37,36 +37,14 @@ import java.util.Map;
 public class GameSelector extends HubItemBase {
 	private static Map<String, Plugins> watching = null;
 	private static Map<Plugins, Integer> itemSlots = null;
-	private static List<Integer> slots = null;
 	private static final int rows = 3;
 	private static final int size = 9 * rows;
 	private static final String name = "Game Selector";
 	
 	public GameSelector() {
 		super(new ItemCreator(Material.COMPASS).setName("&e" + name), 0);
-		watching = new HashMap<String, Plugins>();
-		itemSlots = new HashMap<Plugins, Integer>();
-		slots = new ArrayList<Integer>();
-		for(int a = 0; a < 8; ++a) {
-			if(!slots.contains(a)) {
-				slots.add(a);
-			}
-		}
-		for(int a = 8, counter = 0; a <= 8 * rows; a += 8, ++counter) {
-			if(!slots.contains(a + counter)) {
-				slots.add(a + counter);
-			}
-		}
-		for(int a = 9; a < size; a += 9) {
-			if(!slots.contains(a)) {
-				slots.add(a);
-			}
-		}
-		for(int a = 0; a < 9; ++a) {
-			if(!slots.contains(size - 1 - a)) {
-				slots.add(size - 1 - a);
-			}
-		}
+		watching = new HashMap<>();
+		itemSlots = new HashMap<>();
 	}
 
 	@Override
@@ -312,23 +290,9 @@ public class GameSelector extends HubItemBase {
 		}).getItemStack();
 		inventory.setItem(15, item);
 
-		displayGameGlass(inventory);
+		ItemUtil.displayGameGlass(inventory);
 
 		player.openInventory(inventory);
-	}
-
-	public static void displayGameGlass(Inventory inventory) {
-		for(int slot : slots) {
-			try {
-				ItemStack itemStack = inventory.getItem(slot);
-				Material material = itemStack == null ? null : itemStack.getType();
-				if(itemStack == null || material == null || material == Material.AIR) {
-					inventory.setItem(slot, new ItemCreator(Material.STAINED_GLASS_PANE, (byte) 13).setGlow(true).setName(" ").getItemStack());
-				}
-			} catch(IndexOutOfBoundsException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 	
 	private static byte getWoolColor(int priority) {

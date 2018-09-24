@@ -106,13 +106,14 @@ public class Beacon implements Listener {
 		glass.setData((byte) 3);
 	}
 	
-	private void activate(final Player player) {
+	private void activate(Player player) {
 		if(delayed.contains(player.getName())) {
 			return;
 		} else {
 			delayed.add(player.getName());
 			new DelayedTask(() -> delayed.remove(player.getName()), 20 * delay);
 		}
+
 		String [] keys = new String [] { "uuid", "type" };
 		String [] values = new String [] { player.getUniqueId().toString(), type.getName() };
 		if(DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") <= 0) {
@@ -123,8 +124,10 @@ public class Beacon implements Listener {
 			}
 			return;
 		}
+
 		running = true;
 		glass.setType(Material.STAINED_GLASS);
+
 		new DelayedTask(() -> {
 			FeatureItem item = null;
 			int chance = random.nextInt(100) + 1;
@@ -135,9 +138,11 @@ public class Beacon implements Listener {
 			setItem(item);
 			setWood();
 			displaying = true;
+
 			if(player.isOnline()) {
 				item.give(player);
 				String log = item.getName();
+
 				new AsyncDelayedTask(() -> {
 					String uuid = player.getUniqueId().toString();
 					int owned = DB.HUB_CRATE_KEYS.getInt(keys, values, "amount") - 1;
@@ -147,6 +152,7 @@ public class Beacon implements Listener {
 					} else {
 						DB.HUB_CRATE_KEYS.updateInt("amount", owned, keys, values);
 					}
+
 					Bukkit.getLogger().info(type + ": update key amount");
 					MessageHandler.sendMessage(player, "You now have &e" + owned + " &x" + CrateTypes.VOTING.getDisplay() + " Crate key" + (owned == 1 ? "" : "s") + " left");
 					if (DB.HUB_LIFETIME_CRATES_OPENED.isUUIDSet(player.getUniqueId())) {
@@ -155,6 +161,7 @@ public class Beacon implements Listener {
 					} else {
 						DB.HUB_LIFETIME_CRATES_OPENED.insert("'" + player.getUniqueId().toString() + "', '" + type + "', '" + 1 + "'");
 					}
+
 					Bukkit.getLogger().info(type + ": update lifetime crates used");
 					Calendar calendar = Calendar.getInstance();
 					String month = calendar.get(Calendar.MONTH) + "";
@@ -166,6 +173,7 @@ public class Beacon implements Listener {
 					} else {
 						DB.HUB_MONTHLY_CRATES_OPENED.insert("'" + uuid + "', '" + type + "', '1', '" + month + "'");
 					}
+
 					Bukkit.getLogger().info(type + ": update monthly crates used");
 					String week = calendar.get(Calendar.WEEK_OF_YEAR) + "";
 					keys1[2] = "week";
@@ -180,12 +188,14 @@ public class Beacon implements Listener {
 					DB.HUB_CRATE_LOGS.insert("'" + player.getUniqueId().toString() + "', '" + type + "', '" + log + "', '" + TimeUtil.getTime() + "'");
 					Bukkit.getLogger().info(type + ": update log");
 				});
+
 				String rareString = "&8(" + item.getRarity().getName() + "&8)";
 				MessageHandler.sendMessage(player, "&6You opened &c" + item.getName() + " " + rareString);
 				if(item.getRarity() == Rarity.RARE) {
 					MessageHandler.alert(AccountHandler.getRank(player).getColor() + player.getName() + " &xOpened &c" + item.getName() + " " + rareString);
 				}
 			}
+
 			new DelayedTask(() -> {
 				counter = 0;
 				if(hologram.getLine(0) != null) {

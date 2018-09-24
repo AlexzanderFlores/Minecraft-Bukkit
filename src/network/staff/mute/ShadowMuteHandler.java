@@ -22,40 +22,37 @@ import java.util.UUID;
 
 public class ShadowMuteHandler implements Listener {
     private static List<String> shadowMuted = null;
-    private List<String> checkedForShadowMuted = null;
+    private List<String> checkedForShadowMuted;
 
     public ShadowMuteHandler() {
-        checkedForShadowMuted = new ArrayList<String>();
-        shadowMuted = new ArrayList<String>();
+        checkedForShadowMuted = new ArrayList<>();
+        shadowMuted = new ArrayList<>();
         new CommandBase("shadowMute", 1) {
             @Override
-            public boolean execute(final CommandSender sender, final String[] arguments) {
-                new AsyncDelayedTask(new Runnable() {
-                    @Override
-                    public void run() {
-                        Player target = ProPlugin.getPlayer(arguments[0]);
-                        String name = null;
-                        UUID uuid = null;
-                        if(target == null) {
-                            name = arguments[0];
-                            uuid = AccountHandler.getUUID(name);
-                            if(uuid == null) {
-                            	MessageHandler.sendMessage(sender, "&c" + name + " has never logged in before");
-                            	return;
-                            }
-                        } else {
-                            name = target.getName();
-                            uuid = target.getUniqueId();
+            public boolean execute(CommandSender sender, String[] arguments) {
+                new AsyncDelayedTask(() -> {
+                    Player target = ProPlugin.getPlayer(arguments[0]);
+                    String name = null;
+                    UUID uuid = null;
+                    if(target == null) {
+                        name = arguments[0];
+                        uuid = AccountHandler.getUUID(name);
+                        if(uuid == null) {
+                            MessageHandler.sendMessage(sender, "&c" + name + " has never logged in before");
+                            return;
                         }
-                        if(DB.STAFF_SHADOW_MUTES.isUUIDSet(uuid)) {
-                            DB.STAFF_SHADOW_MUTES.deleteUUID(uuid);
-                            shadowMuted.remove(name);
-                            MessageHandler.sendMessage(sender, name + " is no longer shadow muted");
-                        } else {
-                            DB.STAFF_SHADOW_MUTES.insert("'" + uuid.toString() + "'");
-                            shadowMuted.add(name);
-                            MessageHandler.sendMessage(sender, name + " is now shadow muted");
-                        }
+                    } else {
+                        name = target.getName();
+                        uuid = target.getUniqueId();
+                    }
+                    if(DB.STAFF_SHADOW_MUTES.isUUIDSet(uuid)) {
+                        DB.STAFF_SHADOW_MUTES.deleteUUID(uuid);
+                        shadowMuted.remove(name);
+                        MessageHandler.sendMessage(sender, name + " is no longer shadow muted");
+                    } else {
+                        DB.STAFF_SHADOW_MUTES.insert("'" + uuid.toString() + "'");
+                        shadowMuted.add(name);
+                        MessageHandler.sendMessage(sender, name + " is now shadow muted");
                     }
                 });
                 return true;
@@ -67,18 +64,17 @@ public class ShadowMuteHandler implements Listener {
     @EventHandler
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
+
         if(!checkedForShadowMuted.contains(player.getName())) {
             checkedForShadowMuted.add(player.getName());
             if(DB.STAFF_SHADOW_MUTES.isUUIDSet(player.getUniqueId())) {
                 shadowMuted.add(player.getName());
             }
         }
+
         if(shadowMuted.contains(player.getName())) {
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                if(!online.getName().equals(player.getName())) {
-                    event.getRecipients().remove(online);
-                }
-            }
+            event.getRecipients().clear();
+            event.getRecipients().add(player);
         }
     }
 

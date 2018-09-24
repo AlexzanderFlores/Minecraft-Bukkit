@@ -1,5 +1,6 @@
 package network.staff;
 
+import me.konsolas.aac.api.PlayerViolationEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -26,30 +27,39 @@ public class StaffChat implements Listener {
 					staff = player.getName();
 					rank = AccountHandler.getRank(player);
 				}
+
 				String message = "";
 				for(String argument : arguments) {
 					message += argument + " ";
 				}
-				for(Player player : Bukkit.getOnlinePlayers()) {
-					if(Ranks.isStaff(player)) {
-						MessageHandler.sendMessage(player, "&b[Staff] " + rank.getColor() + staff + ": &f" + StringUtil.color(message.substring(0, message.length() - 1)));
-					}
-				}
+
+				send(rank.getColor() + staff + ": &f" + StringUtil.color(message.substring(0, message.length() - 1)));
 				return true;
 			}
 		}.setRequiredRank(Ranks.TRIAL);
+
 		EventUtil.register(this);
+	}
+
+	private void send(String message) {
+		for(Player player : Bukkit.getOnlinePlayers()) {
+			if(Ranks.isStaff(player)) {
+				MessageHandler.sendMessage(player, "&b[Staff] " + message);
+			}
+		}
 	}
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if(Ranks.isStaff(event.getPlayer())) {
-			String name = AccountHandler.getPrefix(event.getPlayer());
-			for(Player player : Bukkit.getOnlinePlayers()) {
-				if(Ranks.isStaff(player)) {
-					MessageHandler.sendMessage(player, "&bStaff: " + name + " has joined this server");
-				}
-			}
+			send(AccountHandler.getPrefix(event.getPlayer()) + " has joined the server");
 		}
 	}
+
+//	@EventHandler
+//	public void onPlayerViolation(PlayerViolationEvent event) {
+//		if(event.getViolations() >= 5) {
+//			send("&6[AAC] &f" + event.getMessage());
+//		}
+//	}
 }

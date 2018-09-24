@@ -4,12 +4,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class PlayerHalfHourOfPlaytimeEvent extends Event {
+public class PlayerHalfHourPlaytimeEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private Player player = null;
     private boolean cancelled = false;
 
-    public PlayerHalfHourOfPlaytimeEvent(Player player) {
+    public PlayerHalfHourPlaytimeEvent(Player player) {
         this.player = player;
     }
 

@@ -78,6 +78,7 @@ public enum DB {
 	PLAYERS_LIFETIME_VOTES("uuid VARCHAR(40), amount INT, day INT, streak INT, highest_streak INT, PRIMARY KEY(uuid)"),
 	PLAYERS_MONTHLY_VOTES("id INT NOT NULL AUTO_INCREMENT, uuid VARCHAR(40), amount INT, month INT, PRIMARY KEY(id)"),
 	PLAYERS_WEEKLY_VOTES("id INT NOT NULL AUTO_INCREMENT, uuid VARCHAR(40), amount INT, week INT, PRIMARY KEY(id)"),
+	PLAYERS_VOTE_PASSES("uuid VARCHAR(40), vote_passes INT, PRIMARY KEY(uuid)"),
 
 	// Coins
 	PLAYERS_COINS_DOMINATION("uuid VARCHAR(40), coins INT, PRIMARY KEY(uuid)"),

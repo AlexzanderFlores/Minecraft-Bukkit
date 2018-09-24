@@ -4,6 +4,7 @@ import network.Network;
 import network.ProPlugin;
 import network.player.LevelHandler;
 import network.player.TeamScoreboardHandler;
+import network.player.account.AccountHandler;
 import network.server.*;
 import network.server.servers.hub.crate.CrateTypes;
 import network.server.servers.hub.crate.KeyFragments;
@@ -12,9 +13,12 @@ import network.server.servers.hub.items.GameSelector;
 import network.server.servers.hub.items.HubSelector;
 import network.server.servers.hub.items.Profile;
 import network.server.servers.hub.parkours.EndlessParkour;
+import network.server.servers.hub.parkours.Parkour;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class HubBase extends ProPlugin {
@@ -41,11 +45,23 @@ public class HubBase extends ProPlugin {
 		new Profile();
 		new HubSelector();
 		new ServerLogger();
-		new DailyRewards(new Location(world, 1658, 5, -1277));
+		new DailyRewards(new Location(world, 1658, 5, -1277), world.getSpawnLocation());
 		new TeamScoreboardHandler();
 		new ParkourNPC();
 		new EndlessParkour();
+		new Parkour();
 		new Flag();
+
+		new CommandBase("runVote", 1) {
+			@Override
+			public boolean execute(CommandSender sender, String [] arguments) {
+				String name = arguments[0];
+				Player player = ProPlugin.getPlayer(name);
+
+
+				return true;
+			}
+		}.setRequiredRank(AccountHandler.Ranks.OWNER);
 	}
 	
 	public static int getHubNumber() {

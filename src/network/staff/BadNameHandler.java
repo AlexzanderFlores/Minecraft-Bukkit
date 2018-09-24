@@ -17,17 +17,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class BadNameHandler implements Listener {
-    private List<String> marked = null;
-    private List<String> checked = null;
+    private List<String> marked;
+    private List<String> checked;
 
     public BadNameHandler() {
-        marked = new ArrayList<String>();
-        checked = new ArrayList<String>();
+        marked = new ArrayList<>();
+        checked = new ArrayList<>();
 
         new CommandBase("badName", 1, true) {
             @Override
@@ -44,27 +42,24 @@ public class BadNameHandler implements Listener {
                 if(uuid == null) {
                     MessageHandler.sendMessage(sender, "&cThat player has not logged in or has already changed their name.");
                 } else {
-                    new AsyncDelayedTask(new Runnable() {
-                        @Override
-                        public void run() {
-                            Player staff = (Player) sender;
+                    new AsyncDelayedTask(() -> {
+                        Player staff = (Player) sender;
 
-                            if(DB.STAFF_BAD_NAMES.isUUIDSet(uuid)) {
-                                DB.STAFF_BAD_NAMES.deleteUUID(uuid);
-                                MessageHandler.sendMessage(staff, name + " has been &cunmarked &xas having a bad name.");
-                                marked.remove(name);
-                                checked.add(name);
-                                if(target != null) {
-                                    GeneralEvents.colorPlayerTab(target);
-                                }
-                            } else {
-                                DB.STAFF_BAD_NAMES.insert("'" + uuid.toString() + "', '" + staff.getUniqueId().toString() + "', '" + name + "'");
-                                MessageHandler.sendMessage(staff, name + " has been &cmarked &xas having a bad name.");
-                                marked.add(name);
-                                checked.add(name);
-                                if(target != null) {
-                                    block(target); // To set tab name
-                                }
+                        if(DB.STAFF_BAD_NAMES.isUUIDSet(uuid)) {
+                            DB.STAFF_BAD_NAMES.deleteUUID(uuid);
+                            MessageHandler.sendMessage(staff, name + " has been &cunmarked &xas having a bad name.");
+                            marked.remove(name);
+                            checked.add(name);
+                            if(target != null) {
+                                GeneralEvents.colorPlayerTab(target);
+                            }
+                        } else {
+                            DB.STAFF_BAD_NAMES.insert("'" + uuid.toString() + "', '" + staff.getUniqueId().toString() + "', '" + name + "'");
+                            MessageHandler.sendMessage(staff, name + " has been &cmarked &xas having a bad name.");
+                            marked.add(name);
+                            checked.add(name);
+                            if(target != null) {
+                                block(target); // To set tab name
                             }
                         }
                     });
@@ -100,6 +95,13 @@ public class BadNameHandler implements Listener {
         if(block(player)) {
             MessageHandler.sendMessage(player, "&cYou cannot send chat messages due to your IGN breaking our rules. After you change your name please contact a staff member.");
             event.setCancelled(true);
+        }
+
+        for(String name : marked) {
+            if(event.getMessage().toLowerCase().contains(name.toLowerCase())) {
+                event.getRecipients().clear();
+                event.getRecipients().add(player);
+            }
         }
     }
 

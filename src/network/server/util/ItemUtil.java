@@ -1,5 +1,6 @@
 package network.server.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -95,6 +96,40 @@ public class ItemUtil {
 		} else {
 			MessageHandler.sendMessage(player, "&cNo one to teleport to");
 			return null;
+		}
+	}
+
+	public static void displayGameGlass(Inventory inventory) {
+		List<Integer> slots = new ArrayList<>();
+
+		for(int a = 0; a < inventory.getSize(); ++a) {
+			double row = Math.floor(a / 9);
+			if(a <= 8 || a % 9 == 0 || a >= inventory.getSize() - 9 || a == (8 * (row + 1) + row)) {
+				slots.add(a);
+			}
+		}
+
+		// 00 01 02 03 04 05 06 07 08
+		// 09 10 11 12 13 14 15 16 17
+		// 18 19 20 21 22 23 24 25 26
+		// 27 28 29 30 31 32 33 34 35
+		// 36 37 38 39 40 41 42 43 44
+		// 45 46 47 48 49 50 51 52 53
+
+		displayGameGlass(inventory, slots);
+	}
+
+	public static void displayGameGlass(Inventory inventory, List<Integer> slots) {
+		for(int slot : slots) {
+			try {
+				ItemStack itemStack = inventory.getItem(slot);
+				Material material = itemStack == null ? null : itemStack.getType();
+				if(itemStack == null || material == null || material == Material.AIR) {
+					inventory.setItem(slot, new ItemCreator(Material.STAINED_GLASS_PANE, (byte) 13).setGlow(true).setName(" ").getItemStack());
+				}
+			} catch(IndexOutOfBoundsException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

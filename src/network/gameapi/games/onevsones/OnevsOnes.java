@@ -68,8 +68,8 @@ public class OnevsOnes extends ProPlugin {
 //        new TeamMatchHandler(new Location(world, 3.5, 13, -44.5));
 //        new OnDemandTournaments(new Location(world, -2.5, 13, -44.5));
 //        new MonthlyTournaments(new Location(world, -7.5, 13, -43.5));
-		new DailyRewards(new Location(world, -7.5, 12, -13.5));
-		new StatsNPC(new Location(world, 8.5, 12, -13.5));
+		new DailyRewards(new Location(world, -7.5, 12, -13.5), new Location(world, 0.5, 12, -30.5));
+		new StatsNPC(new Location(world, 8.5, 12, -13.5), new Location(world, 0.5, 12, -30.5));
 
         new DelayedTask(() -> {
 			List<Location> locations = Arrays.asList(

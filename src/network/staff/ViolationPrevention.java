@@ -39,6 +39,7 @@ public class ViolationPrevention implements Listener {
 		mutes.add("horriblestaff");
 		mutes.add("autistic");
 		mutes.add("autism");
+		mutes.add("autist");
 		mutes.add("cancer");
 		mutes.add("kys");
 		mutes.add("sperm");

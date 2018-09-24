@@ -19,6 +19,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
@@ -26,6 +27,7 @@ import java.util.Random;
 public class SpawnHandler implements Listener {
 	public static int spawnY = 77;
 	private static int radius = 40;
+	private static Location spawn;
 	
 	public SpawnHandler() {
 		EventUtil.register(this);
@@ -34,10 +36,11 @@ public class SpawnHandler implements Listener {
 	public static Location spawn(Player player) {
 		Random random = new Random();
 		int range = 3;
-		Location spawn = player.getWorld().getSpawnLocation();
+		spawn = player.getWorld().getSpawnLocation();
 		spawn.setX(spawn.getBlockX() + (random.nextInt(range) * (random.nextBoolean() ? 1 : -1)));
 		spawn.setY(spawn.getY() + 2.5d);
 		spawn.setZ(spawn.getBlockZ() + (random.nextInt(range) * (random.nextBoolean() ? 1 : -1)));
+		spawn.setYaw(-90.0f);
 		player.teleport(spawn);
 		return spawn;
 	}
@@ -82,6 +85,11 @@ public class SpawnHandler implements Listener {
 		if(event.getState() == SpectatorState.END) {
 			spawn(event.getPlayer());
 		}
+	}
+
+	@EventHandler
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		event.setRespawnLocation(spawn);
 	}
 
 	@EventHandler
