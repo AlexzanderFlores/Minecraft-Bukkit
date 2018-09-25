@@ -3,10 +3,7 @@ package network.player;
 import network.Network;
 import network.customevents.player.InventoryItemClickEvent;
 import network.customevents.player.timed.PlayerHourOfPlaytimeEvent;
-import network.server.ChatClickHandler;
-import network.server.CommandBase;
-import network.server.CommandDispatcher;
-import network.server.DB;
+import network.server.*;
 import network.server.servers.hub.crate.Beacon;
 import network.server.servers.hub.crate.CrateTypes;
 import network.server.tasks.AsyncDelayedTask;
@@ -63,7 +60,7 @@ public class VoteHandler implements Listener {
         ItemCreator itemCreator;
         int cost;
 
-        inventory.setItem(11, new ItemCreator(Material.DIAMOND).setName("&bGet Vote Links").getItemStack());
+        inventory.setItem(12, new ItemCreator(Material.DIAMOND).setGlow(true).setName("&bGet Vote Links").getItemStack());
 
         int passes = getPasses(player);
         itemCreator = new ItemCreator(Material.NAME_TAG).setName("&bVoting Passes");
@@ -75,6 +72,7 @@ public class VoteHandler implements Listener {
         itemCreator.addLore("");
         itemCreator.addLore("&eYou currently have &b" + passes);
         itemCreator.addLore("");
+        itemCreator.setAmount(passes);
         inventory.setItem(13, itemCreator.getItemStack());
 
         int streak = DB.PLAYERS_LIFETIME_VOTES.getInt("uuid", uuid.toString(), "streak");
@@ -88,7 +86,7 @@ public class VoteHandler implements Listener {
         itemCreator.addLore("&aYour streak multiplier applies to");
         itemCreator.addLore("&aVoting Passes only, not shop items.");
         itemCreator.addLore("");
-        inventory.setItem(15, itemCreator.getItemStack());
+        inventory.setItem(14, itemCreator.getItemStack());
 
         itemCreator = new ItemCreator(ItemUtil.getSkull(player.getName())).setName("&bSkin Shown in Hubs");
         itemCreator.addLore("");
@@ -163,6 +161,9 @@ public class VoteHandler implements Listener {
         inventory.setItem(42, itemCreator.getItemStack());
 
         ItemUtil.displayGameGlass(inventory);
+
+//        SocialMediaItems.setDiscord(inventory, 10);
+//        SocialMediaItems.setTwitter(inventory, 16);
 
         player.openInventory(inventory);
     }

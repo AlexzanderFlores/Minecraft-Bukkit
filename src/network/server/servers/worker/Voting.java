@@ -46,8 +46,14 @@ public class Voting implements Listener {
                 int multiplier = increaseStreak(playerUUID, uuid);
                 increaseVotes(uuid);
 
-                int passes = DB.PLAYERS_VOTE_PASSES.getInt("uuid", uuid, "vote_passes") + (5 * multiplier);
-                DB.PLAYERS_VOTE_PASSES.updateInt("vote_passes", passes, "uuid", uuid);
+                int amount = 5 * multiplier;
+
+                if(DB.PLAYERS_VOTE_PASSES.isUUIDSet(playerUUID)) {
+                    int passes = DB.PLAYERS_VOTE_PASSES.getInt("uuid", uuid, "vote_passes");
+                    DB.PLAYERS_VOTE_PASSES.updateInt("vote_passes", passes + amount, "uuid", uuid);
+                } else {
+                    DB.PLAYERS_VOTE_PASSES.insert("'" + uuid + "', '" + amount + "'");
+                }
 
 //                Beacon.giveKey(playerUUID, multiplier, CrateTypes.VOTING);
 //                giveParkourCheckpoints(playerUUID, uuid, multiplier);

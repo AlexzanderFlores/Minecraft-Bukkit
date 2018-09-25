@@ -171,6 +171,7 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 		new CommandRepeater();
 		new DiscordHandler();
 		new VoteHandler();
+		new SocialMediaItems();
 		Glow.register();
 	}
 	
