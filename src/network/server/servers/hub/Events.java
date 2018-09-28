@@ -40,17 +40,16 @@ public class Events implements Listener {
 	
 	public Events() {
 		random = new Random();
-		Bukkit.getWorlds().get(0).setSpawnLocation(1684, 6, -1280);
 		sidebars = new HashMap<>();
-		updateSkins();
-		setAds();
+//		updateSkins();
+//		setAds();
 		EventUtil.register(this);
 	}
 	
 	public static Location getSpawn() {
 		int range = 6;
 		Location location = Bukkit.getWorlds().get(0).getSpawnLocation();
-		location.setYaw(-180.0f);
+		location.setYaw(-90.0f);
 		location.setPitch(0.0f);
 		location.setX(location.getX() + (random.nextBoolean() ? random.nextInt(range) : random.nextInt(range) * -1));
 		location.setZ(location.getZ() + (random.nextBoolean() ? random.nextInt(range) : random.nextInt(range) * -1));
@@ -209,8 +208,8 @@ public class Events implements Listener {
 				}
 			}
 		} else if(ticks == 20 * 60) {
-			updateSkins();
-			setAds();
+//			updateSkins();
+//			setAds();
 		}
 	}
 	

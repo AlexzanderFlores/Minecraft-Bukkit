@@ -79,19 +79,16 @@ public abstract class MiniGame extends ProPlugin {
 		new PostGameStartingEvent(true);
 		new LeaveItem();
 		new MapRating();
-		VotingHandler.loadMaps();
+//		VotingHandler.loadMaps();
 		//new CoinBoosters();
 		new AutoJoinHandler();
 		new TimeOfDay();
 		new KillLogger();
 		teamHandler = new TeamHandler();
-		new DelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				new ServerLogger();
-			}
-		});
+
+		new DelayedTask(() -> new ServerLogger());
 		setGameState(GameStates.WAITING);
+
 		new CommandBase("startGame", 0, 1) {
 			@Override
 			public boolean execute(CommandSender sender, String[] arguments) {
@@ -107,6 +104,7 @@ public abstract class MiniGame extends ProPlugin {
 				return true;
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		new CommandBase("setTimer", 1) {
 			@Override
 			public boolean execute(CommandSender sender, String[] arguments) {
@@ -118,6 +116,7 @@ public abstract class MiniGame extends ProPlugin {
 				}
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		new CommandBase("win", true) {
 			@Override
 			public boolean execute(CommandSender sender, String [] arguments) {
@@ -128,6 +127,7 @@ public abstract class MiniGame extends ProPlugin {
 				return true;
 			}
 		}.setRequiredRank(Ranks.OWNER);
+
 		setToDefaultSidebar();
 	}
 	

@@ -176,12 +176,7 @@ public class GeneralEvents implements Listener {
 			for(Databases database : Databases.values()) {
 				database.connect();
 			}
-		} else if(ticks == 20 * 60 * 10) {
-        	MessageHandler.alert("");
-        	MessageHandler.alert("&c25% OFF SALE! &b/buy");
-        	MessageHandler.alert("");
-        	EffectUtil.playSound(Sound.LEVEL_UP);
-    	}
+		}
 	}
 	
 	@EventHandler

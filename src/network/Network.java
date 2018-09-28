@@ -4,6 +4,7 @@ import network.customevents.player.*;
 import network.gameapi.MiniGame;
 import network.gameapi.games.kitpvp.KitPVP;
 import network.gameapi.games.onevsones.OnevsOnes;
+import network.gameapi.games.uhc.UHC;
 import network.gameapi.games.uhcskywars.SkyWars;
 import network.player.*;
 import network.player.account.AccountHandler;
@@ -38,6 +39,7 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 		HUB("HUB", "hub", "Hub"),
 		KITPVP("KitPVP", "kit_pvp", "Kit PVP"),
 		ONEVSONE("1v1s", "1v1", "1v1s"),
+		UHC("UHC", "uhc"),
 		UHCSW("UHCSW", "sky_wars", "UHC Sky Wars"),
 		BUILDING("Building", "building"),
 		WORKER("Worker", "worker");
@@ -106,6 +108,9 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 			case ONEVSONE:
 				proPlugin = new OnevsOnes();
 				break;
+			case UHC:
+				proPlugin = new UHC();
+				break;
 			case UHCSW:
 				proPlugin = new SkyWars();
 				break;
@@ -167,7 +172,8 @@ public class Network extends JavaPlugin implements PluginMessageListener {
 		new AutoAlerts();
 		new CommandDispatcher();
 		new DefaultChatColor();
-//		new Alerts();
+		new Alerts();
+		new RankAds();
 		new CommandRepeater();
 		new DiscordHandler();
 		new VoteHandler();

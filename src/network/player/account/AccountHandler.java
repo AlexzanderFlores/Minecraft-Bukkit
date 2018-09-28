@@ -34,12 +34,13 @@ public class AccountHandler implements Listener {
 		TRIAL(ChatColor.DARK_AQUA, "[Trial]"),
 		STAFF(ChatColor.DARK_GREEN, "[Staff]"),
 		SENIOR_STAFF(ChatColor.BLUE, "[Sr. Staff]"),
+		ADMIN(ChatColor.RED, "[Admin]"),
 		OWNER(ChatColor.RED, "[Owner]");
 		
-		private ChatColor color = null;
-		private String prefix = null;
+		private ChatColor color;
+		private String prefix;
 		
-		private Ranks(ChatColor color, String prefix) {
+		Ranks(ChatColor color, String prefix) {
 			this.color = color;
 			this.prefix = color + ChatColor.translateAlternateColorCodes('&', prefix) + (prefix.equals("") ? "" : " " + ChatColor.WHITE);
 		}
@@ -86,36 +87,33 @@ public class AccountHandler implements Listener {
 	private static Map<String, Ranks> ranks = null;
 	
 	public AccountHandler() {
-		ranks = new HashMap<String, Ranks>();
+		ranks = new HashMap<>();
 		new CommandBase("setRank", 2, 3, false) {
 			@Override
 			public boolean execute(final CommandSender sender, final String [] arguments) {
-				new AsyncDelayedTask(new Runnable() {
-					@Override
-					public void run() {
-						UUID uuid = getUUID(arguments[0]);
-						if(uuid == null) {
-							MessageHandler.sendMessage(sender, "&c" + arguments[0] + " has never logged in");
-						} else {
-							try {
-								Ranks rank = Ranks.valueOf(arguments[1].toUpperCase());
-								Player target = ProPlugin.getPlayer(arguments[0]);
-								if(target != null) {
-									if(arguments.length == 3) {
-										if(rank.hasRank(target)) {
-											MessageHandler.sendMessage(sender, "&c" + target.getName() + " already has that rank");
-											return;
-										}
+				new AsyncDelayedTask(() -> {
+					UUID uuid = getUUID(arguments[0]);
+					if(uuid == null) {
+						MessageHandler.sendMessage(sender, "&c" + arguments[0] + " has never logged in");
+					} else {
+						try {
+							Ranks rank = Ranks.valueOf(arguments[1].toUpperCase());
+							Player target = ProPlugin.getPlayer(arguments[0]);
+							if(target != null) {
+								if(arguments.length == 3) {
+									if(rank.hasRank(target)) {
+										MessageHandler.sendMessage(sender, "&c" + target.getName() + " already has that rank");
+										return;
 									}
-									updateRank(target, rank);
 								}
-								setRank(uuid, rank);
-								MessageHandler.sendMessage(sender, arguments[0] + " has been set to " + rank.getPrefix());
-							} catch(IllegalArgumentException e) {
-								MessageHandler.sendMessage(sender, "&cUnknown rank! Please use one of the following:");
-								for(Ranks rank : Ranks.values()) {
-									MessageHandler.sendMessage(sender, rank.toString() + " &a- " + rank.getPrefix());
-								}
+								updateRank(target, rank);
+							}
+							setRank(uuid, rank);
+							MessageHandler.sendMessage(sender, arguments[0] + " has been set to " + rank.getPrefix());
+						} catch(IllegalArgumentException e) {
+							MessageHandler.sendMessage(sender, "&cUnknown rank! Please use one of the following:");
+							for(Ranks rank : Ranks.values()) {
+								MessageHandler.sendMessage(sender, rank.toString() + " &a- " + rank.getPrefix());
 							}
 						}
 					}
@@ -190,13 +188,8 @@ public class AccountHandler implements Listener {
 		}
 	}
 	
-	public static void setRank(final UUID uuid, final Ranks rank) {
-		new AsyncDelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				DB.PLAYERS_ACCOUNTS.updateString("rank", rank.toString(), "uuid", uuid.toString());
-			}
-		});
+	public static void setRank(UUID uuid, Ranks rank) {
+		new AsyncDelayedTask(() -> DB.PLAYERS_ACCOUNTS.updateString("rank", rank.toString(), "uuid", uuid.toString()));
 	}
 	
 	public static Ranks getRank(CommandSender sender) {
@@ -209,7 +202,7 @@ public class AccountHandler implements Listener {
 	
 	public static Ranks getRank(UUID uuid) {
 		try {
-			return Ranks.PLAYER;//Ranks.valueOf(DB.PLAYERS_ACCOUNTS.getString("uuid", uuid.toString(), "rank"));
+			return Ranks.valueOf(DB.PLAYERS_ACCOUNTS.getString("uuid", uuid.toString(), "rank"));
 		} catch(NullPointerException e) {
 			return Ranks.PLAYER;
 		}
@@ -255,31 +248,25 @@ public class AccountHandler implements Listener {
 			Ranks rank = Ranks.valueOf(DB.PLAYERS_ACCOUNTS.getString("uuid", player.getUniqueId().toString(), "rank"));
 			setRank(player, rank);
 			if(Network.getPlugin() == Network.Plugins.HUB) {
-				new AsyncDelayedTask(new Runnable() {
-					@Override
-					public void run() {
-						String uuid = player.getUniqueId().toString();
-						String currentAddress = DB.PLAYERS_ACCOUNTS.getString("uuid", uuid, "address");
-						if(!currentAddress.equals(address) || !DB.PLAYERS_IP_ADDRESSES.isKeySet("uuid", uuid)) {
-							DB.PLAYERS_IP_ADDRESSES.insert("'" + uuid + "', '" + address + "', '" + TimeUtil.getTime() + "'");
-						}
-						DB.PLAYERS_ACCOUNTS.updateString("name", player.getName(), "uuid", uuid);
-						DB.PLAYERS_ACCOUNTS.updateString("address", address, "uuid", uuid);
+				new AsyncDelayedTask(() -> {
+					String uuid = player.getUniqueId().toString();
+					String currentAddress = DB.PLAYERS_ACCOUNTS.getString("uuid", uuid, "address");
+					if(!currentAddress.equals(address) || !DB.PLAYERS_IP_ADDRESSES.isKeySet("uuid", uuid)) {
+						DB.PLAYERS_IP_ADDRESSES.insert("'" + uuid + "', '" + address + "', '" + TimeUtil.getTime() + "'");
 					}
+					DB.PLAYERS_ACCOUNTS.updateString("name", player.getName(), "uuid", uuid);
+					DB.PLAYERS_ACCOUNTS.updateString("address", address, "uuid", uuid);
 				});
 			}
 		} else if(Network.getPlugin() == Network.Plugins.HUB) {
 			Ranks startingRank = Ranks.PLAYER;
 			setRank(player, startingRank);
-			new DelayedTask(new Runnable() {
-				@Override
-				public void run() {
-					String uuid = player.getUniqueId().toString();
-					String name = player.getName();
-					String rank = startingRank.toString();
-					DB.PLAYERS_ACCOUNTS.insert("'" + uuid + "', '" + name + "', '" + address + "', '" + rank + "', '" + TimeUtil.getTime().substring(0, 10) + "'");
-					DB.PLAYERS_IP_ADDRESSES.insert("'" + uuid + "', '" + address + "', '" + TimeUtil.getTime() + "'");
-				}
+			new DelayedTask(() -> {
+				String uuid = player.getUniqueId().toString();
+				String name = player.getName();
+				String rank = startingRank.toString();
+				DB.PLAYERS_ACCOUNTS.insert("'" + uuid + "', '" + name + "', '" + address + "', '" + rank + "', '" + TimeUtil.getTime().substring(0, 10) + "'");
+				DB.PLAYERS_IP_ADDRESSES.insert("'" + uuid + "', '" + address + "', '" + TimeUtil.getTime() + "'");
 			});
 		}
 	}
@@ -294,11 +281,6 @@ public class AccountHandler implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerLeave(PlayerLeaveEvent event) {
 		final String name = event.getPlayer().getName();
-		new DelayedTask(new Runnable() {
-			@Override
-			public void run() {
-				ranks.remove(name);
-			}
-		});
+		new DelayedTask(() -> ranks.remove(name));
 	}
 }
